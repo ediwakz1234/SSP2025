@@ -33,6 +33,16 @@ class Settings(BaseSettings):
     LOCATION_POPULATION: int = 11364
     LOCATION_CENTER_LAT: float = 14.8373
     LOCATION_CENTER_LON: float = 120.9558
+
+
+        # ✅ Add these lines
+    MAIL_USERNAME: str | None = None
+    MAIL_PASSWORD: str | None = None
+    MAIL_FROM: str | None = None
+    MAIL_PORT: int = 587
+    MAIL_SERVER: str = "smtp.gmail.com"
+    MAIL_TLS: bool = True
+    MAIL_SSL: bool = False
     
     class Config:
         env_file = ".env"
