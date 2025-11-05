@@ -86,6 +86,41 @@ export async function register(email: string, password: string, name: string): P
     const tokenData = storeAuth(access_token, user);
 
     return { user, token: { token: access_token, expiresAt: tokenData.expiresAt } };
+
+
+}
+
+export async function registerAndRedirect(
+    formData: {
+        first_name: string;
+        last_name: string;
+        email: string;
+        password: string;
+        contact_number?: string;
+        address?: string;
+        age?: number;
+        gender?: string;
+    }
+) {
+    const response = await fetch(`${API_BASE_URL}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.detail || "Registration failed");
+    }
+
+    const data = await response.json();
+
+    // ✅ Store token and user
+    localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    // ✅ Return message for toast
+    return data.message || "🎉 Registration successful!";
 }
 
 /**
@@ -138,6 +173,7 @@ export const isAuthenticated = async (): Promise<boolean> => {
         localStorage.removeItem("user");
         return false;
     }
+
 };
 
 /**

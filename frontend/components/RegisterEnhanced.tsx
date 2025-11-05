@@ -4,6 +4,14 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { registerAndRedirect } from "../utils/auth";
+
+declare global {
+    interface Window {
+        navigateTo?: (path: string) => void;
+    }
+}
+
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 
@@ -15,6 +23,7 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
         password: "",
         confirmPassword: "",
         contactNumber: "",
+        date_of_birth: "",
         address: "",
         age: "",
         gender: "",
@@ -29,6 +38,8 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
     const handleGenderChange = (value: string) => {
         setFormData({ ...formData, gender: value });
     };
+
+
 
     const validateForm = () => {
         const { firstName, lastName, email, password, confirmPassword, age } = formData;
@@ -68,6 +79,7 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
         setIsLoading(true);
 
         try {
+            // ✅ Perform registration once
             const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -80,6 +92,7 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
                     address: formData.address.trim(),
                     age: parseInt(formData.age),
                     gender: formData.gender,
+
                 }),
             });
 
@@ -94,22 +107,35 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
 
             const data = await response.json();
 
-            // Store token and user info
-            localStorage.setItem("token", data.access_token);
+            // ✅ Store token and user info
+            localStorage.setItem("access_token", data.access_token);
             if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
 
-            toast.success("Account created successfully!");
-            onRegisterSuccess(); // e.g. navigate("/login");
+            // ✅ Toast feedback
+            toast.success("🎉 Account created successfully! Redirecting to Dashboard...");
+
+            // ✅ Redirect after short delay
+            setTimeout(() => {
+                if (window.navigateTo) {
+                    window.navigateTo("/dashboard");
+                } else {
+                    window.location.href = "/dashboard";
+                }
+            }, 1500);
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : "Registration failed";
+            const errorMessage =
+                err instanceof Error ? err.message : "Registration failed";
             toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }
     };
 
+
+
+
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 p-4">
             <Card className="w-full max-w-lg shadow-lg rounded-2xl">
                 <CardHeader>
                     <CardTitle className="text-center text-2xl font-semibold">
@@ -122,6 +148,9 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">
+                                First Name *
+                            </label>
                             <Input
                                 name="firstName"
                                 placeholder="First Name *"
@@ -130,6 +159,9 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
                                 disabled={isLoading}
                                 required
                             />
+                            <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">
+                                Last Name *
+                            </label>
                             <Input
                                 name="lastName"
                                 placeholder="Last Name *"
@@ -139,7 +171,9 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
                                 required
                             />
                         </div>
-
+                        <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">
+                            Email *
+                        </label>
                         <Input
                             name="email"
                             type="email"
@@ -151,6 +185,9 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
                         />
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">
+                                Password *
+                            </label>
                             <Input
                                 name="password"
                                 type="password"
@@ -160,6 +197,11 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
                                 disabled={isLoading}
                                 required
                             />
+
+
+                            <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">
+                                Confirm Password *
+                            </label>
                             <Input
                                 name="confirmPassword"
                                 type="password"
@@ -170,7 +212,9 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
                                 required
                             />
                         </div>
-
+                        <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">
+                            Contact Number*
+                        </label>
                         <Input
                             name="contactNumber"
                             placeholder="Contact Number"
@@ -178,7 +222,9 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
                             onChange={handleChange}
                             disabled={isLoading}
                         />
-
+                        <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">
+                            Address *
+                        </label>
                         <Input
                             name="address"
                             placeholder="Address (Street, Barangay, City, Province)"
@@ -187,6 +233,25 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
                             disabled={isLoading}
                         />
 
+                        <label
+                            htmlFor="date_of_birth"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Date of Birth *
+                        </label>
+                        <Input
+                            name="date_of_birth"
+                            type="date"
+                            placeholder="Date of Birth *"
+                            value={formData.date_of_birth}
+                            onChange={handleChange}
+                            disabled={isLoading}
+                            required
+                        />
+
+                        <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">
+                            Age *
+                        </label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <Input
                                 name="age"
@@ -197,7 +262,9 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
                                 disabled={isLoading}
                                 required
                             />
-
+                            <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">
+                                Gender *
+                            </label>
                             <Select onValueChange={handleGenderChange} disabled={isLoading}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select Gender" />
@@ -218,11 +285,14 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
                             {isLoading ? "Creating Account..." : "Create Account"}
                         </Button>
 
-                        <p className="text-center text-sm text-muted-foreground mt-2">
-                            Already have an account?{" "}
-                            <a href="/login" className="text-primary hover:underline">
-                                Sign in here
-                            </a>
+                        <div className="text-center text-sm text-muted-foreground mt-2">
+                            <p>
+                                Already have an account?{" "}
+                                <a href="/login" className="text-primary hover:underline">
+                                    Sign in here
+                                </a>
+                            </p>
+
                             {/* Security Note */}
                             <div className="mt-4 bg-blue-50 border border-blue-200 text-blue-700 text-sm rounded-md p-3">
                                 <p>
@@ -242,11 +312,8 @@ export default function RegisterEnhanced({ onRegisterSuccess }: { onRegisterSucc
                                     ← Back to Login
                                 </Button>
                             </div>
+                        </div>
 
-
-
-
-                        </p>
                     </form>
                 </CardContent>
             </Card>

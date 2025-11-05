@@ -5,9 +5,11 @@ import axios from "axios";
 import { Button } from "../components/ui/button";
 import { Upload, FileJson, FileSpreadsheet, FileText, X } from "lucide-react";
 import { toast } from "sonner";
+import { Business } from "../data/businesses";
+
 
 interface ImportExportDialogProps {
-    onImportSuccess?: () => void;
+    onImportSuccess?: (data: Business[]) => void;
     onExportSuccess?: () => void;
 }
 
@@ -21,10 +23,15 @@ export default function ImportExportDialog({
     const [uploading, setUploading] = useState(false);
     const [open, setOpen] = useState(false);
 
-    // ✅ Import Handler
     const handleImport = async () => {
         if (!file) {
             toast.error("Please select a file to upload.");
+            return;
+        }
+
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            toast.error("⚠️ No access token found. Please log in first.");
             return;
         }
 
@@ -33,18 +40,24 @@ export default function ImportExportDialog({
         formData.append("file", file);
 
         try {
-            await axios.post("http://127.0.0.1:8000/api/v1/clustering/import", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-                },
-            });
+            const response = await axios.post<Business[]>(
+                "http://127.0.0.1:8000/api/v1/clustering/import",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
             toast.success("✅ File imported successfully!");
-            setFile(null);
-            if (onImportSuccess) onImportSuccess();
+            if (onImportSuccess) onImportSuccess(response.data);
 
-            // ✅ Auto-close dialog after success
+            // Reset file and close dialog
+            const input = document.getElementById("fileUpload") as HTMLInputElement;
+            if (input) input.value = "";
+            setFile(null);
             setOpen(false);
             setActiveTab("export");
         } catch (err) {
@@ -55,18 +68,30 @@ export default function ImportExportDialog({
         }
     };
 
-    // ✅ Export Handler
+
+
     const handleExport = async () => {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            toast.error("⚠️ No access token found. Please log in first.");
+            return;
+        }
+
         try {
             const response = await axios.get(
                 `http://127.0.0.1:8000/api/v1/clustering/export/latest?format=${selectedFormat}`,
                 {
                     responseType: "blob",
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 }
             );
+
+            if (!response.data || response.data.size === 0) {
+                toast.warning("⚠️ No clustering results available to export.");
+                return;
+            }
 
             const extension =
                 selectedFormat === "json"
@@ -84,9 +109,11 @@ export default function ImportExportDialog({
             link.parentNode?.removeChild(link);
 
             toast.success(`📦 Exported successfully as ${extension.toUpperCase()}`);
+
+            // ✅ Notify parent (triggers resetToMock + navigation)
             if (onExportSuccess) onExportSuccess();
 
-            // ✅ Auto-close dialog after export
+            // ✅ Close dialog
             setOpen(false);
             setActiveTab("export");
         } catch (err) {
@@ -94,6 +121,7 @@ export default function ImportExportDialog({
             toast.error("❌ Failed to export data. Please try again.");
         }
     };
+
 
     return (
         <Dialog.Root open={open} onOpenChange={(newOpen) => {
@@ -113,6 +141,9 @@ export default function ImportExportDialog({
                         <Dialog.Title className="text-lg font-semibold">
                             Import & Export Data
                         </Dialog.Title>
+                        <Dialog.Description className="sr-only">
+                            Upload or export clustering data
+                        </Dialog.Description>
                         <Dialog.Close>
                             <X className="w-5 h-5 text-gray-500 hover:text-black cursor-pointer" />
                         </Dialog.Close>

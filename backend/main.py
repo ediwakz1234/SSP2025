@@ -4,6 +4,7 @@ from app.core.config import settings
 from app.core.database import engine, Base
 from app.api.v1 import auth, users, businesses, clustering, analytics
 
+
 # Create database tables
 Base.metadata.create_all(bind=engine)
 

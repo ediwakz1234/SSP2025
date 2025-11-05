@@ -1,11 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Store, Users, MapPin, TrendingUp, Building2, Briefcase } from "lucide-react";
-import { businesses, getUniqueCategories, LOCATION_INFO } from "../data/businesses";
+import { LOCATION_INFO } from "../data/businesses";
+import { useBusinessStore } from "../store/useBusinessStore";
+import { Loader2 } from "lucide-react";
+
+
 
 export function DashboardPage() {
-    const categories = getUniqueCategories();
+
+    const { businesses, mode } = useBusinessStore();       // ← dynamic data
+    const categories = [...new Set(businesses.map(b => b.category))];
     const commercialZones = businesses.filter(b => b.zone_type === "Commercial").length;
     const residentialZones = businesses.filter(b => b.zone_type === "Residential").length;
+    const totalBusinesses = businesses.length;
+
+
 
     const stats = [
         {
@@ -58,8 +67,20 @@ export function DashboardPage() {
         count: businesses.filter(b => b.category === cat).length
     })).sort((a, b) => b.count - a.count);
 
+
+    if (businesses.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[60vh] text-muted-foreground">
+                <Loader2 className="w-6 h-6 mb-2 animate-spin" />
+                Loading business data...
+            </div>
+        );
+    }
     return (
         <div className="space-y-6">
+            <p className="text-sm text-muted-foreground">
+                Mode: {mode === "mock" ? "Demo (Mock)" : "Session (Imported)"}
+            </p>
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {stats.map((stat, index) => {
@@ -81,6 +102,8 @@ export function DashboardPage() {
                     );
                 })}
             </div>
+
+
 
             {/* Location Info */}
             <Card>
@@ -112,6 +135,7 @@ export function DashboardPage() {
                     </div>
                 </CardContent>
             </Card>
+
 
             {/* Top Categories */}
             <Card>

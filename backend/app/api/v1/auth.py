@@ -30,14 +30,16 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
     hashed_password = get_password_hash(user.password)
     new_user = User(
+        username=f"{user.first_name.lower()}{user.last_name.lower()}",
         email=user.email,
         hashed_password=hashed_password,
         first_name=user.first_name,
         last_name=user.last_name,
-        contact_number=user.contact_number,
+       phone_number=user.phone_number,
         address=user.address,
         age=user.age,
         gender=user.gender,
+        date_of_birth=user.date_of_birth,
     )
 
     db.add(new_user)
@@ -46,7 +48,9 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
     access_token = create_access_token(data={"sub": new_user.email})
 
+    # ✅ Add a clear message field for frontend toast
     return {
+        "message": "🎉 Registration successful! Welcome aboard.",
         "access_token": access_token,
         "token_type": "bearer",
         "user": {
@@ -57,15 +61,6 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         },
     }
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
-from app.core.database import get_db
-from app.core.security import verify_password, create_access_token
-from app.models.user import User
-from app.schemas.token import Token  # ensure your Token schema has access_token, token_type, and user
-
-router = APIRouter()
 
 @router.post("/login", response_model=Token)
 async def login(
@@ -101,10 +96,11 @@ async def login(
             "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
-            "contact_number": user.contact_number,
+            "phone_number": user.phone_number, 
             "address": user.address,
             "age": user.age,
             "gender": user.gender,
+            
         },
     }
 
@@ -149,11 +145,7 @@ async def reset_password(token: str, new_password: str, db: Session = Depends(ge
 
     user.hashed_password = get_password_hash(new_password)
     db.commit()
-
-    return {"message": "Password reset successful!"}    
-    
-
-    
+   
     
     # Create access token
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -170,7 +162,9 @@ async def reset_password(token: str, new_password: str, db: Session = Depends(ge
             "name": user.name,
             "is_active": user.is_active,
             "created_at": user.created_at.isoformat()
+            
         }
+        
     }
 
 @router.post("/request-password-reset")

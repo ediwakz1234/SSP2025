@@ -10,6 +10,9 @@ import { MapPage } from "./components/MapPage";
 import { OpportunitiesPage } from "./components/OpportunitiesPage";
 import { Toaster } from "./components/ui/sonner";
 import { isAuthenticated, logout } from "./utils/auth";
+import { Profile } from './components/Profile';
+import type { User } from "./utils";
+
 
 type AuthView = "login" | "register" | "forgot-password";
 
@@ -17,6 +20,8 @@ export default function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [authView, setAuthView] = useState<AuthView>("login");
     const [currentPage, setCurrentPage] = useState("dashboard");
+    const currentUser: User | null = JSON.parse(localStorage.getItem("user") || "null");
+
 
     // Check authentication on mount
     useEffect(() => {
@@ -70,6 +75,9 @@ export default function App() {
                 return <MapPage />;
             case "opportunities":
                 return <OpportunitiesPage />;
+            case "profile":
+                return currentUser ? <Profile user={currentUser} /> : <DashboardPage />;
+
             default:
                 return <DashboardPage />;
         }

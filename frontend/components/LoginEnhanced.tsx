@@ -69,11 +69,21 @@ export default function LoginEnhanced({
             }
 
             const data = await response.json();
-            localStorage.setItem("token", data.access_token);
-            if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
+
+            // ✅ Use the same key name used in your other components
+            localStorage.setItem("access_token", data.access_token);
+
+            // ✅ Save user info safely
+            if (data.user) {
+                localStorage.setItem("user", JSON.stringify(data.user));
+            }
+
+            // ✅ Optional: force the app to refresh so `App.tsx` picks up the new user
+            window.location.reload();
 
             toast.success("Login successful!");
             onLogin(); // Navigate to dashboard or next page
+
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Login failed";
             toast.error(errorMessage);
@@ -95,7 +105,7 @@ export default function LoginEnhanced({
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 p-4">
             <Card className="w-full max-w-md shadow-lg rounded-2xl">
                 <CardHeader className="space-y-1 text-center">
                     <div className="flex justify-center mb-4">

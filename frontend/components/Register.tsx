@@ -23,6 +23,7 @@ export function Register({ onRegisterSuccess, onBackToLogin }: RegisterProps) {
         address: "",
         age: "",
         gender: "",
+        date_of_birth: "",
     });
 
     const [isLoading, setIsLoading] = useState(false);
@@ -79,6 +80,7 @@ export function Register({ onRegisterSuccess, onBackToLogin }: RegisterProps) {
                     address: formData.address.trim(),
                     age: parseInt(formData.age),
                     gender: formData.gender,
+                    date_of_birth: formData.date_of_birth,
                 }),
             });
 
@@ -106,48 +108,70 @@ export function Register({ onRegisterSuccess, onBackToLogin }: RegisterProps) {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 p-4">
             <Card className="w-full max-w-lg shadow-lg rounded-2xl">
                 <CardHeader>
                     <CardTitle className="text-center text-2xl font-semibold">
                         Create Account
                     </CardTitle>
                     <p className="text-center text-sm text-muted-foreground">
-                        Register to access the Store Placement System
+                        Join the Store Placement Analysis System
                     </p>
                 </CardHeader>
+
                 <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        {/* First and Last Name */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                                    First Name *
+                                </label>
+                                <Input
+                                    name="firstName"
+                                    placeholder="First Name *"
+                                    value={formData.firstName}
+                                    onChange={handleChange}
+                                    disabled={isLoading}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                                    Last Name *
+                                </label>
+                                <Input
+                                    name="lastName"
+                                    placeholder="Last Name *"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
+                                    disabled={isLoading}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        {/* Email */}
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                                Email *
+                            </label>
                             <Input
-                                name="firstName"
-                                placeholder="First Name *"
-                                value={formData.firstName}
-                                onChange={handleChange}
-                                disabled={isLoading}
-                                required
-                            />
-                            <Input
-                                name="lastName"
-                                placeholder="Last Name *"
-                                value={formData.lastName}
+                                name="email"
+                                type="email"
+                                placeholder="Email Address *"
+                                value={formData.email}
                                 onChange={handleChange}
                                 disabled={isLoading}
                                 required
                             />
                         </div>
 
-                        <Input
-                            name="email"
-                            type="email"
-                            placeholder="Email Address *"
-                            value={formData.email}
-                            onChange={handleChange}
-                            disabled={isLoading}
-                            required
-                        />
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {/* Passwords */}
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                                Password *
+                            </label>
                             <Input
                                 name="password"
                                 type="password"
@@ -157,6 +181,12 @@ export function Register({ onRegisterSuccess, onBackToLogin }: RegisterProps) {
                                 disabled={isLoading}
                                 required
                             />
+                        </div>
+
+                        <div>
+                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                                Confirm Password *
+                            </label>
                             <Input
                                 name="confirmPassword"
                                 type="password"
@@ -168,64 +198,107 @@ export function Register({ onRegisterSuccess, onBackToLogin }: RegisterProps) {
                             />
                         </div>
 
-                        <Input
-                            name="contactNumber"
-                            placeholder="Contact Number"
-                            value={formData.contactNumber}
-                            onChange={handleChange}
-                            disabled={isLoading}
-                        />
-
-                        <Input
-                            name="address"
-                            placeholder="Address (Street, Barangay, City, Province)"
-                            value={formData.address}
-                            onChange={handleChange}
-                            disabled={isLoading}
-                        />
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {/* Contact Number */}
+                        <div>
+                            <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                                Contact Number *
+                            </label>
                             <Input
-                                name="age"
-                                type="number"
-                                placeholder="Age *"
-                                value={formData.age}
+                                name="contactNumber"
+                                placeholder="Contact Number"
+                                value={formData.contactNumber}
+                                onChange={handleChange}
+                                disabled={isLoading}
+                            />
+                        </div>
+
+                        {/* Address */}
+                        <div>
+                            <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                                Address *
+                            </label>
+                            <Input
+                                name="address"
+                                placeholder="Address (Street, Barangay, City, Province)"
+                                value={formData.address}
+                                onChange={handleChange}
+                                disabled={isLoading}
+                            />
+                        </div>
+
+                        {/* Date of Birth */}
+                        <div>
+                            <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">
+                                Date of Birth *
+                            </label>
+                            <Input
+                                name="date_of_birth"
+                                type="date"
+                                placeholder="mm/dd/yyyy"
+                                value={formData.date_of_birth}
                                 onChange={handleChange}
                                 disabled={isLoading}
                                 required
                             />
-
-                            <Select onValueChange={handleGenderChange} disabled={isLoading}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Gender" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Male">Male</SelectItem>
-                                    <SelectItem value="Female">Female</SelectItem>
-                                    <SelectItem value="Other">Other</SelectItem>
-                                </SelectContent>
-                            </Select>
                         </div>
 
-                        <Button type="submit" className="w-full mt-4" disabled={isLoading}>
+                        {/* Age and Gender */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-1">
+                                    Age *
+                                </label>
+                                <Input
+                                    name="age"
+                                    type="number"
+                                    placeholder="Age *"
+                                    value={formData.age}
+                                    onChange={handleChange}
+                                    disabled={isLoading}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+                                    Gender *
+                                </label>
+                                <Select onValueChange={handleGenderChange} disabled={isLoading}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select Gender" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Male">Male</SelectItem>
+                                        <SelectItem value="Female">Female</SelectItem>
+                                        <SelectItem value="Other">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        {/* Submit Button */}
+                        <Button
+                            type="submit"
+                            className="w-full mt-2"
+                            disabled={isLoading}
+                        >
                             {isLoading ? "Creating Account..." : "Create Account"}
                         </Button>
 
-                        <p className="text-center text-sm text-muted-foreground mt-2">
-                            Already have an account?{" "}
+                        {/* Footer */}
+                        <div className="text-center text-sm text-muted-foreground mt-3">
+                            <p>
+                                Already have an account?{" "}
+                                <a href="/login" className="text-primary hover:underline">
+                                    Sign in here
+                                </a>
+                            </p>
 
-                            <a href="/login" className="text-primary hover:underline">
-                                Sign in here
-                            </a>
-
-                            {/* Security Note */}
                             <div className="mt-4 bg-blue-50 border border-blue-200 text-blue-700 text-sm rounded-md p-3">
                                 <p>
                                     <strong>Note:</strong> Your information is encrypted and used only to register your account in the Store Placement System.
                                 </p>
                             </div>
 
-                            {/* Back Button */}
                             <div className="mt-4 flex justify-center">
                                 <Button
                                     type="button"
@@ -237,12 +310,11 @@ export function Register({ onRegisterSuccess, onBackToLogin }: RegisterProps) {
                                     ← Back to Login
                                 </Button>
                             </div>
-
-
-                        </p>
+                        </div>
                     </form>
                 </CardContent>
             </Card>
         </div>
     );
+
 }

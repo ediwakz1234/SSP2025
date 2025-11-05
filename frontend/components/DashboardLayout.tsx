@@ -10,6 +10,8 @@ import {
     X
 } from "lucide-react";
 import { Button } from "./ui/button";
+import { User } from "lucide-react";
+
 
 interface DashboardLayoutProps {
     children: ReactNode;
@@ -27,6 +29,8 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout }:
         { id: "analytics", label: "Analytics", icon: BarChart3 },
         { id: "map", label: "Map View", icon: Map },
         { id: "opportunities", label: "Business Opportunities", icon: TrendingUp },
+        { id: 'profile', label: 'Profile', icon: User },
+
     ];
 
     return (
@@ -70,8 +74,8 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout }:
                                 key={item.id}
                                 onClick={() => onNavigate(item.id)}
                                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive
-                                        ? "bg-primary text-primary-foreground"
-                                        : "hover:bg-accent text-foreground"
+                                    ? "bg-primary text-primary-foreground"
+                                    : "hover:bg-accent text-foreground"
                                     }`}
                             >
                                 <Icon className="w-5 h-5 flex-shrink-0" />
