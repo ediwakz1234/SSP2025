@@ -26,7 +26,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "../ui/dialog";
 import { toast } from "sonner";
 import {
@@ -49,10 +48,6 @@ import {
   deleteSeedBusiness,
   resetSeedData,
 } from "../../lib/api-client";
-
-interface SeedDataManagementProps {
-  accessToken: string;
-}
 
 type Business = {
   id?: number;
@@ -79,14 +74,17 @@ const getDisplayStreet = (b: Business) =>
   b.street || b.address || "No address";
 const getDisplayZone = (b: Business) => b.zone_type || "Unzoned";
 
-export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
+export function SeedDataManagement() {
+  // ⬅️ token is now read internally instead of passed as prop
+  const accessToken = localStorage.getItem("access_token") || "";
+
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [zoneFilter, setZoneFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(
-    null,
+    null
   );
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [form, setForm] = useState({
@@ -99,6 +97,12 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
   });
 
   const fetchData = async () => {
+    if (!accessToken) {
+      toast.error("Missing access token. Please log in again.");
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const res = await getSeedData(accessToken);
@@ -117,26 +121,27 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
 
   useEffect(() => {
     fetchData();
-  }, [accessToken]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const categories = useMemo(
     () =>
       Array.from(
         new Set(
-          businesses.map((b) => getDisplayCategory(b)).filter(Boolean),
-        ),
+          businesses.map((b) => getDisplayCategory(b)).filter(Boolean)
+        )
       ).sort(),
-    [businesses],
+    [businesses]
   );
 
   const zones = useMemo(
     () =>
       Array.from(
         new Set(
-          businesses.map((b) => getDisplayZone(b)).filter(Boolean),
-        ),
+          businesses.map((b) => getDisplayZone(b)).filter(Boolean)
+        )
       ).sort(),
-    [businesses],
+    [businesses]
   );
 
   const filteredBusinesses = useMemo(() => {
@@ -144,7 +149,7 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
 
     if (categoryFilter !== "all") {
       result = result.filter(
-        (b) => getDisplayCategory(b) === categoryFilter,
+        (b) => getDisplayCategory(b) === categoryFilter
       );
     }
     if (zoneFilter !== "all") {
@@ -186,6 +191,11 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
   };
 
   const handleSave = async () => {
+    if (!accessToken) {
+      toast.error("Missing access token. Please log in again.");
+      return;
+    }
+
     try {
       const payload = {
         business_name: form.name.trim(),
@@ -206,7 +216,7 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
         result = await updateSeedBusiness(
           selectedBusiness.id ?? selectedBusiness.business_id!,
           payload,
-          accessToken,
+          accessToken
         );
       } else {
         result = await createSeedBusiness(payload, accessToken);
@@ -226,7 +236,13 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
   };
 
   const handleDelete = async (business: Business) => {
+    if (!accessToken) {
+      toast.error("Missing access token. Please log in again.");
+      return;
+    }
+
     if (!confirm("Delete this business from seed data?")) return;
+
     try {
       const id = business.id ?? business.business_id;
       if (!id) {
@@ -247,12 +263,18 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
   };
 
   const handleResetData = async () => {
+    if (!accessToken) {
+      toast.error("Missing access token. Please log in again.");
+      return;
+    }
+
     if (
       !confirm(
-        "Reset seed data to default? This will clear your custom changes.",
+        "Reset seed data to default? This will clear your custom changes."
       )
     )
       return;
+
     try {
       const result = await resetSeedData(accessToken);
       if (result?.success) {
@@ -330,6 +352,7 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
             </div>
           </CardContent>
         </Card>
+
         <Card className="border-purple-100">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm">
@@ -344,6 +367,7 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
             </div>
           </CardContent>
         </Card>
+
         <Card className="border-purple-100">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm">
@@ -365,8 +389,7 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
             <div>
               <CardTitle className="text-sm">Seed businesses</CardTitle>
               <CardDescription>
-                Filter, edit, and manage seed businesses similar to your UI
-                mockup.
+                Filter, edit, and manage seed businesses similar to your UI mockup.
               </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -410,6 +433,7 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
             </div>
           </div>
         </CardHeader>
+
         <CardContent>
           <ScrollArea className="h-[420px] pr-3">
             <div className="space-y-2">
@@ -498,6 +522,7 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
               Update the business details used for clustering.
             </DialogDescription>
           </DialogHeader>
+
           <div className="space-y-4 py-2">
             <div className="grid gap-3">
               <div className="space-y-1">
@@ -563,6 +588,7 @@ export function SeedDataManagement({ accessToken }: SeedDataManagementProps) {
               </div>
             </div>
           </div>
+
           <DialogFooter className="flex gap-2">
             <Button
               variant="outline"

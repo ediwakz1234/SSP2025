@@ -1,56 +1,66 @@
-import { NavLink, Outlet } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Users,
-  BarChart3,
-  ListChecks,
-  Database,
-} from "lucide-react";
+import { Outlet, useNavigate } from "react-router-dom";
+import { supabase } from "../../lib/supabase"; // 
+import { Button } from "../ui/button";
 
+export function AdminLayout() {
+  const navigate = useNavigate();
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
+  };
 
-const menu = [
-  { name: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/admin" },
-  { name: "Users", icon: <Users size={18} />, path: "/admin/users" },
-  { name: "Analytics", icon: <BarChart3 size={18} />, path: "/admin/analytics" },
-  { name: "Activity Logs", icon: <ListChecks size={18} />, path: "/admin/logs" },
-  { name: "Seed Data", icon: <Database size={18} />, path: "/admin/seed" },
-];
-
-export default function AdminLayout() {
   return (
-    <div className="flex bg-gray-50 min-h-screen">
-      
-      {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r flex flex-col fixed h-screen">
-        <div className="h-20 flex items-center px-6 border-b">
-          <p className="text-xl font-bold tracking-tight">Admin Portal</p>
-        </div>
+    <div className="min-h-screen flex bg-gray-50">
 
-        <nav className="flex-1 px-4 py-6 space-y-2">
-          {menu.map((m) => (
-            <NavLink
-              key={m.name}
-              to={m.path}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium
-                transition-colors 
-                ${
-                  isActive
-                    ? "bg-purple-100 text-purple-700"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`
-              }
-            >
-              {m.icon}
-              {m.name}
-            </NavLink>
-          ))}
+      {/* Sidebar */}
+      <aside className="w-64 bg-white border-r shadow-sm p-6">
+        <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
+
+        <nav className="space-y-3">
+          <p
+            onClick={() => navigate("/admin")}
+            className="cursor-pointer text-sm hover:text-primary"
+          >
+            Dashboard
+          </p>
+
+          <p
+            onClick={() => navigate("/admin/users")}
+            className="cursor-pointer text-sm hover:text-primary"
+          >
+            User Management
+          </p>
+
+          <p
+            onClick={() => navigate("/admin/activity-logs")}
+            className="cursor-pointer text-sm hover:text-primary"
+          >
+            Activity Logs
+          </p>
+
+          <p
+            onClick={() => navigate("/admin/seed-data")}
+            className="cursor-pointer text-sm hover:text-primary"
+          >
+            Seed Data Management
+          </p>
+
+          <p
+            onClick={() => navigate("/admin/analytics")}
+            className="cursor-pointer text-sm hover:text-primary"
+          >
+            Analytics
+          </p>
         </nav>
+
+        <Button className="mt-10 w-full" onClick={handleLogout}>
+          Logout
+        </Button>
       </aside>
 
-      {/* MAIN CONTENT */}
-      <main className="ml-64 flex-1 p-8">
+      {/* Page Content */}
+      <main className="flex-1 p-8">
         <Outlet />
       </main>
     </div>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+
 import {
   Card,
   CardContent,
@@ -10,6 +11,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
 import { ScrollArea } from "../ui/scroll-area";
+
 import {
   Select,
   SelectContent,
@@ -17,8 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { toast } from "sonner";
+
 import {
   Users,
   Search,
@@ -28,11 +32,8 @@ import {
   Calendar,
   Activity,
 } from "lucide-react";
-import { getAllUsers } from "../../lib/api-client";
 
-interface UserManagementProps {
-  accessToken: string;
-}
+import { getAllUsers } from "../../lib/api-client";
 
 interface SspUser {
   id: number;
@@ -45,25 +46,33 @@ interface SspUser {
   gender?: string;
 }
 
-export function UserManagement({ accessToken }: UserManagementProps) {
+export function UserManagement() {
+  // ⬅️ NEW: self-managed authentication
+  const accessToken = localStorage.getItem("access_token") || "";
+
   const [users, setUsers] = useState<SspUser[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">(
-    "all",
-  );
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Fetch Users
   const fetchUsers = async () => {
+    if (!accessToken) {
+      toast.error("Access token missing. Please log in again.");
+      return;
+    }
+
     try {
       setLoading(true);
       const res = await getAllUsers(accessToken);
+
       if (res?.success) {
         setUsers(res.users || []);
       } else {
         toast.error(res?.error || "Failed to fetch users");
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       toast.error("Failed to fetch users");
     } finally {
       setLoading(false);
@@ -72,8 +81,9 @@ export function UserManagement({ accessToken }: UserManagementProps) {
 
   useEffect(() => {
     fetchUsers();
-  }, [accessToken]);
+  }, []);
 
+  // Apply Filters
   const filteredUsers = useMemo(() => {
     return users
       .filter((user) => {
@@ -83,10 +93,12 @@ export function UserManagement({ accessToken }: UserManagementProps) {
       })
       .filter((user) => {
         if (!searchQuery) return true;
+
         const q = searchQuery.toLowerCase();
-        const name = `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim();
+        const fullName = `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim();
+
         return (
-          name.toLowerCase().includes(q) ||
+          fullName.toLowerCase().includes(q) ||
           (user.email ?? "").toLowerCase().includes(q) ||
           (user.username ?? "").toLowerCase().includes(q)
         );
@@ -108,11 +120,13 @@ export function UserManagement({ accessToken }: UserManagementProps) {
             View and filter registered SSP users.
           </p>
         </div>
+
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Activity className="h-3 w-3 text-purple-600" />
             <span>{users.length} total users</span>
           </div>
+
           <Button
             size="sm"
             variant="outline"
@@ -126,7 +140,7 @@ export function UserManagement({ accessToken }: UserManagementProps) {
         </div>
       </div>
 
-      {/* Small stats row */}
+      {/* Stats Row */}
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="border-purple-100 bg-purple-50/70">
           <CardHeader className="pb-2">
@@ -140,6 +154,7 @@ export function UserManagement({ accessToken }: UserManagementProps) {
             <div className="text-2xl font-semibold">{totalActive}</div>
           </CardContent>
         </Card>
+
         <Card className="border-purple-100">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm">
@@ -154,6 +169,7 @@ export function UserManagement({ accessToken }: UserManagementProps) {
             </div>
           </CardContent>
         </Card>
+
         <Card className="border-purple-100">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm">
@@ -165,16 +181,14 @@ export function UserManagement({ accessToken }: UserManagementProps) {
           <CardContent className="pb-3">
             <div className="text-sm">
               {users.length
-                ? new Date(
-                    users[users.length - 1].created_at ?? "",
-                  ).toLocaleDateString()
+                ? new Date(users[users.length - 1].created_at ?? "").toLocaleDateString()
                 : "—"}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters + table/list */}
+      {/* Filters + List */}
       <Card className="border-purple-100">
         <CardHeader className="pb-3">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -184,7 +198,9 @@ export function UserManagement({ accessToken }: UserManagementProps) {
                 Search and filter users similar to your UI screenshot.
               </CardDescription>
             </div>
+
             <div className="flex flex-wrap items-center gap-2">
+              {/* Search */}
               <div className="relative w-full min-w-[220px] md:w-64">
                 <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -194,15 +210,16 @@ export function UserManagement({ accessToken }: UserManagementProps) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
+
+              {/* Filter */}
               <Select
                 value={statusFilter}
-                onValueChange={(v: "all" | "active" | "inactive") =>
-                  setStatusFilter(v)
-                }
+                onValueChange={(v: "all" | "active" | "inactive") => setStatusFilter(v)}
               >
                 <SelectTrigger className="w-[130px] text-sm">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
+
                 <SelectContent>
                   <SelectItem value="all">All users</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
@@ -212,6 +229,7 @@ export function UserManagement({ accessToken }: UserManagementProps) {
             </div>
           </div>
         </CardHeader>
+
         <CardContent>
           <ScrollArea className="h-[420px] pr-3">
             <div className="space-y-2">
@@ -219,7 +237,8 @@ export function UserManagement({ accessToken }: UserManagementProps) {
                 const initials =
                   (user.first_name?.[0] || user.username?.[0] || "U").toUpperCase() +
                   (user.last_name?.[0] || "").toUpperCase();
-                const name =
+
+                const fullName =
                   user.first_name || user.last_name
                     ? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim()
                     : user.username || "Unnamed user";
@@ -229,15 +248,18 @@ export function UserManagement({ accessToken }: UserManagementProps) {
                     key={user.id}
                     className="flex items-center justify-between rounded-lg border border-purple-50 bg-white px-3 py-2 text-sm shadow-[0_1px_0_0_rgba(15,23,42,0.03)]"
                   >
+                    {/* Left Section */}
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8 border border-purple-100">
                         <AvatarFallback className="bg-purple-50 text-xs font-medium text-purple-700">
                           {initials}
                         </AvatarFallback>
                       </Avatar>
+
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">{name}</span>
+                          <span className="font-medium">{fullName}</span>
+
                           {user.gender && (
                             <Badge
                               variant="outline"
@@ -247,11 +269,12 @@ export function UserManagement({ accessToken }: UserManagementProps) {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          {user.email}
-                        </p>
+
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
                       </div>
                     </div>
+
+                    {/* Right Section */}
                     <div className="flex flex-col items-end gap-1">
                       <Badge
                         variant="outline"
@@ -263,12 +286,11 @@ export function UserManagement({ accessToken }: UserManagementProps) {
                       >
                         {user.is_active ? "Active" : "Inactive"}
                       </Badge>
+
                       <span className="text-[10px] text-muted-foreground">
                         Joined{" "}
                         {user.created_at
-                          ? new Date(
-                              user.created_at,
-                            ).toLocaleDateString()
+                          ? new Date(user.created_at).toLocaleDateString()
                           : "—"}
                       </span>
                     </div>
@@ -284,7 +306,7 @@ export function UserManagement({ accessToken }: UserManagementProps) {
 
               {loading && (
                 <p className="py-6 text-center text-sm text-muted-foreground">
-                  Loading users...
+                  Loading users…
                 </p>
               )}
             </div>

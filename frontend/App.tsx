@@ -1,125 +1,102 @@
-import { useState, useEffect } from "react";
-import { Login } from "./components/Login";
+import { Routes, Route, Navigate } from "react-router-dom";
+
+// AUTH SYSTEM
+import { AuthProvider } from "./components/auth/AuthContext";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { RoleProtectedRoute } from "./components/auth/RoleProtectedRoute";
+
+// PUBLIC PAGES
+import { LandingPage } from "./components/landing/LandingPage";
+import { UserLogin } from "./components/auth/UserLogin";
+import { AdminLoginPage } from "./components/auth/AdminLoginPage";
 import { Register } from "./components/auth/Register";
-import { ForgotPassword } from "./components/ForgotPassword";
-import { DashboardLayout } from "./components/DashboardLayout";
-import { DashboardPage } from "./components/users/DashboardPage";
-import { ClusteringPage } from "./components/ClusteringPage";
-import { AnalyticsPage } from "./components/users/AnalyticsPage";
-import { MapPage } from "./components/MapPage";
+import { ForgotPasswordPage } from "./components/auth/ForgotPasswordPage";
+
+// NEW OTP RESET COMPONENTS
+import { EnterCodePage } from "./components/auth/EnterCodePage";
+import { ResetPasswordPage } from "./components/auth/ResetPasswordPage";
+import { ResetPasswordSuccessPage } from "./components/auth/ResetPasswordSuccessPage";
+
+// USER PAGES
+import { DashboardLayout as UserDashboardLayout } from "./components/auth/DashboardLayout";
+import { DashboardPage as UserDashboardPage } from "./components/users/DashboardPage";
+import { UserAnalyticsPage as UserAnalyticsPage } from "./components/users/UserAnalyticsPage";
+import { ClusteringPage } from "./components/users/ClusteringPage";
+import { MapPage } from "./components/users/MapPage";
 import { OpportunitiesPage } from "./components/users/OpportunitiesPage";
+import { Profile } from "./components/users/Profile";
+
+// ADMIN PAGES
+import { AdminLayout } from "./components/admin/AdminLayout";
+import { AdminPortal } from "./components/admin/AdminPortal";
+import { ActivityLogsPage } from "./components/admin/ActivityLogsPage";
+import { UserManagement } from "./components/admin/UserManagement";
+import { SeedDataManagement } from "./components/admin/SeedDataManagement";
+import { AdminAnalyticsPage } from "./components/admin/AdminAnalyticsPage";
+
+// UI
 import { Toaster } from "./components/ui/sonner";
-import { isAuthenticated, logout } from "./utils/auth";
-import { Profile } from './components/users/Profile';
-import type { User } from "./utils";
 
+export function App() {
+  return (
+    <AuthProvider>
+      <Toaster position="top-right" />
 
-type AuthView = "login" | "register" | "forgot-password";
+      <Routes>
 
-export default function App() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [authView, setAuthView] = useState<AuthView>("login");
-    const [currentPage, setCurrentPage] = useState("dashboard");
-    const currentUser: User | null = JSON.parse(localStorage.getItem("user") || "null");
+        {/* PUBLIC ROUTES */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/user/login" element={<UserLogin />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
+        {/* 🔵 ENTER OTP CODE */}
+        <Route path="/enter-code" element={<EnterCodePage />} />
 
-    // Check authentication on mount
-    useEffect(() => {
-        const checkAuth = async () => {
-            const auth = await isAuthenticated();
-            if (auth) {
-                setIsLoggedIn(true);
-            }
-        };
-        checkAuth();
-    }, []);
+        {/* 🟩 FINAL PASSWORD RESET PAGE */}
+        <Route path="/reset-password-final" element={<ResetPasswordPage />} />
 
-    // Expose navigate function globally for Quick Actions
-    useEffect(() => {
-        (window as any).navigateTo = handleNavigate;
-        return () => {
-            delete (window as any).navigateTo;
-        };
-    }, []);
+        {/* 🟧 SUCCESS PAGE */}
+        <Route path="/reset-password-success" element={<ResetPasswordSuccessPage />} />
 
-    const handleLogin = () => {
-        setIsLoggedIn(true);
-        setAuthView("login");
-    };
+        {/* USER PROTECTED ROUTES */}
+        <Route
+          path="/user"
+          element={
+            <ProtectedRoute>
+              <UserDashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<UserDashboardPage />} />
+          <Route path="analytics" element={<UserAnalyticsPage />} />
+          <Route path="clustering" element={<ClusteringPage />} />
+          <Route path="map" element={<MapPage />} />
+          <Route path="opportunities" element={<OpportunitiesPage />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
 
-    const handleRegisterSuccess = () => {
-        setIsLoggedIn(true);
-        setAuthView("login");
-    };
+        {/* ADMIN PROTECTED ROUTES */}
+        <Route
+          path="/admin"
+          element={
+            <RoleProtectedRoute role="admin">
+              <AdminLayout />
+            </RoleProtectedRoute>
+          }
+        >
+          <Route index element={<AdminPortal />} />
+          <Route path="analytics" element={<AdminAnalyticsPage />} />
+          <Route path="activity-logs" element={<ActivityLogsPage />} />
+          <Route path="user-management" element={<UserManagement />} />
+          <Route path="seed-data" element={<SeedDataManagement />} />
+        </Route>
 
-    const handleLogout = () => {
-        logout();
-        setIsLoggedIn(false);
-        setCurrentPage("dashboard");
-        setAuthView("login");
-    };
+        {/* FALLBACK */}
+        <Route path="*" element={<Navigate to="/" />} />
 
-    const handleNavigate = (page: string) => {
-        setCurrentPage(page);
-    };
-
-    const renderPage = () => {
-        switch (currentPage) {
-            case "dashboard":
-                return <DashboardPage />;
-            case "clustering":
-                return <ClusteringPage />;
-            case "analytics":
-                return <AnalyticsPage />;
-            case "map":
-                return <MapPage />;
-            case "opportunities":
-                return <OpportunitiesPage />;
-            case "profile":
-                return currentUser ? <Profile user={currentUser} /> : <DashboardPage />;
-
-            default:
-                return <DashboardPage />;
-        }
-    };
-
-    if (!isLoggedIn) {
-        if (authView === "register") {
-            return (
-                <Register
-                    onRegisterSuccess={handleRegisterSuccess}
-                    onBackToLogin={() => setAuthView("login")}
-                />
-            );
-        }
-
-        if (authView === "forgot-password") {
-            return (
-                <ForgotPassword
-                    onBackToLogin={() => setAuthView("login")}
-                />
-            );
-        }
-
-        return (
-            <Login
-                onLogin={handleLogin}
-                onShowRegister={() => setAuthView("register")}
-                onShowForgotPassword={() => setAuthView("forgot-password")}
-            />
-        );
-    }
-
-    return (
-        <>
-            <DashboardLayout
-                currentPage={currentPage}
-                onNavigate={handleNavigate}
-                onLogout={handleLogout}
-            >
-                {renderPage()}
-            </DashboardLayout>
-            <Toaster />
-        </>
-    );
+      </Routes>
+    </AuthProvider>
+  );
 }

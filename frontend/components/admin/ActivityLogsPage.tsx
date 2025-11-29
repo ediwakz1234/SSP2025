@@ -27,11 +27,10 @@ import {
   RefreshCw,
   Search,
 } from "lucide-react";
-import { getActivityLogs } from "../../lib/api-client";
 
-interface ActivityLogsPageProps {
-  accessToken: string;
-}
+import { supabase } from "../../lib/supabase"; // ✅ New Supabase client
+
+// ❌ Removed props interface — no props are required anymore
 
 interface ActivityLog {
   id: number;
@@ -43,20 +42,24 @@ interface ActivityLog {
   created_at?: string;
 }
 
-export function ActivityLogsPage({ accessToken }: ActivityLogsPageProps) {
+export function ActivityLogsPage() {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [typeFilter, setTypeFilter] = useState<"all" | "success" | "error" | "info">(
-    "all",
-  );
+  const [typeFilter, setTypeFilter] = useState<"all" | "success" | "error" | "info">("all");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // ✅ NEW: Fetch from Supabase instead of API-client
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      const res = await getActivityLogs(accessToken);
-      if (res?.success) {
-        setLogs(res.logs || []);
+
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (!error) {
+        setLogs(data || []);
       }
     } finally {
       setLoading(false);
@@ -65,14 +68,12 @@ export function ActivityLogsPage({ accessToken }: ActivityLogsPageProps) {
 
   useEffect(() => {
     fetchLogs();
-  }, [accessToken]);
+  }, []); // ❌ Removed accessToken dependency
 
+  // Filters & search logic (UNCHANGED)
   const filteredLogs = useMemo(() => {
     return logs
-      .filter((log) => {
-        if (typeFilter === "all") return true;
-        return log.status === typeFilter;
-      })
+      .filter((log) => (typeFilter === "all" ? true : log.status === typeFilter))
       .filter((log) => {
         if (!searchQuery) return true;
         const q = searchQuery.toLowerCase();
@@ -120,6 +121,7 @@ export function ActivityLogsPage({ accessToken }: ActivityLogsPageProps) {
               <CardTitle className="text-sm">Filters</CardTitle>
               <CardDescription>Filter logs by type and keyword.</CardDescription>
             </div>
+
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative w-full min-w-[220px] md:w-72">
                 <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -130,11 +132,12 @@ export function ActivityLogsPage({ accessToken }: ActivityLogsPageProps) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
+
               <Select
                 value={typeFilter}
-                onValueChange={(
-                  value: "all" | "success" | "error" | "info",
-                ) => setTypeFilter(value)}
+                onValueChange={(value: "all" | "success" | "error" | "info") =>
+                  setTypeFilter(value)
+                }
               >
                 <SelectTrigger className="w-[140px] text-sm">
                   <SelectValue placeholder="Type" />
@@ -149,6 +152,7 @@ export function ActivityLogsPage({ accessToken }: ActivityLogsPageProps) {
             </div>
           </div>
         </CardHeader>
+
         <CardContent className="pb-3">
           <ScrollArea className="h-[420px] pr-3">
             <div className="space-y-2">
@@ -156,6 +160,7 @@ export function ActivityLogsPage({ accessToken }: ActivityLogsPageProps) {
                 let icon = <Activity className="h-3.5 w-3.5 text-slate-500" />;
                 let badgeClass =
                   "border-slate-200 bg-slate-50 text-[10px] text-slate-700";
+
                 if (log.status === "success") {
                   icon = <LogIn className="h-3.5 w-3.5 text-green-600" />;
                   badgeClass =
@@ -186,24 +191,22 @@ export function ActivityLogsPage({ accessToken }: ActivityLogsPageProps) {
                             {log.status ?? "info"}
                           </Badge>
                         </div>
+
                         <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
                           <Clock className="h-3 w-3" />
                           {log.created_at
-                            ? new Date(
-                                log.created_at,
-                              ).toLocaleString()
+                            ? new Date(log.created_at).toLocaleString()
                             : "—"}
                         </span>
                       </div>
+
                       <p className="mt-0.5 text-[11px] text-muted-foreground">
                         {log.details || log.context || "No additional details"}
                       </p>
+
                       {log.user_email && (
                         <p className="mt-0.5 text-[10px] text-slate-500">
-                          User:{" "}
-                          <span className="font-medium">
-                            {log.user_email}
-                          </span>
+                          User: <span className="font-medium">{log.user_email}</span>
                         </p>
                       )}
                     </div>

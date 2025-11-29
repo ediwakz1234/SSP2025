@@ -1,0 +1,101 @@
+business_id,business_name,general_category,latitude,longitude,street,zone_type,status,business_density_50m,competitor_density_50m,business_density_100m,competitor_density_100m,business_density_200m,competitor_density_200m,zone_encoded
+1,SANTA MARIA 888 Hardware & CONSTRUCTION SUPPLIES,Merchandise / Trading,14.83326,120.95468,Gulod St.,Commercial,Active,2,0,5,0,9,0,0
+2,VK Food & Beverages,Food & Beverages,14.83335,120.95478,Gulod St.,Commercial,Active,4,0,5,0,9,0,0
+3,Reymalyn Loading Station,Retail,14.83373,120.95497,Gulod St.,Commercial,Active,4,1,5,1,12,4,0
+4,Nanay Mercy & KMS Carwash,Services,14.8336,120.95501,Gulod St.,Commercial,Active,4,0,5,0,12,1,0
+5,BIGOTE'S MAMIHAN,Restaurant,14.83397,120.95488,Gulod St.,Commercial,Active,2,0,9,1,13,1,0
+6,Pau Motorcycle Shop,Services,14.83471,120.95503,Luwasan St.,Commercial,Active,4,0,8,0,16,3,0
+7,EDANOZO Merchandising / Trading,Merchandising / Trading ,14.83463,120.95514,Luwasan St.,Commercial,Active,3,0,7,0,16,0,0
+8,Dalen's Store,Retail,14.83477,120.95515,Luwasan St.,Commercial,Active,4,0,8,3,16,5,0
+9,Heteroza Pizza Pasta Frappe A.T.B.P,Restaurant,14.83486,120.95501,Luwasan St.,Commercial,Active,4,0,8,1,17,2,0
+10,Mr. BREWSKO,Food & Beverages,14.83515,120.9551,Luwasan St.,Commercial,Active,5,0,8,0,15,0,0
+11,Xyreel's Store,Retail,14.83558,120.95525,Centro St.,Commercial,Active,3,2,9,3,18,6,0
+12,Centro Eatery,Restaurant,14.83574,120.95533,Centro St.,Commercial,Active,2,0,7,0,18,2,0
+13,KAF Services - STA. CRUZ BRANCH,Services,14.83591,120.95561,Centro St.,Commercial,Active,2,1,7,2,20,5,0
+14,HAIRCHITECT BARBERSHOP,Services,14.83619,120.95581,Centro St.,Commercial,Active,2,1,8,3,20,5,0
+15,R.C.S. MINI MART,Retail,14.83656,120.95555,Centro St.,Commercial,Active,1,0,9,2,21,7,0
+16,SnJ Food Hub,Restaurant,14.8374,120.95592,Pag-asa St.,Commercial,Active,4,1,10,1,20,2,0
+17,Casa David Private Entertainment / Leisure,Entertainment / Leisure,14.83736,120.95666,Pag-asa St.,Commercial,Active,0,0,9,1,19,1,0
+18,D.C. Marianos Hardware and Construction Supplies,Merchandise / Trading,14.83752,120.95728,Pag-asa St.,Residential,Active,0,0,4,0,18,1,1
+19,Rjhaynne Beverages Trading,Retail,14.83734,120.95805,Pag-asa St.,Commercial,Active,0,0,3,1,6,2,0
+20,JayJays Peanut butter,Retail,14.83671,120.95762,Pag-asa St.,Residential,Active,0,0,2,1,13,4,1
+21,Idols Sizzlingan Atbp.,Restaurant,14.83763,120.95888,Bukid St.,Commercial,Active,1,0,2,0,8,1,0
+22,MNMs Talipapa & Sari Sari Store,Retail,14.83765,120.95897,Bukid St.,Commercial,Active,1,0,1,0,8,2,0
+23,BigBrew Sta. Cruz - Sta. Maria Bulacan,Food & Beverages,14.83779,120.96005,Bukid St.,Commercial,Active,2,0,3,0,5,0,0
+24,Kambal Inasal,Restaurant,14.83767,120.96001,Bukid St.,Commercial,Active,2,0,3,0,5,1,0
+25,Crystal World,Services,14.83768,120.96035,Bukid St.,Residential,Active,3,1,3,1,5,1,1
+26,Boss kleng vape shop,Retail,14.83448,120.96379,Matahimik St.,Residential,Active,0,0,0,0,1,0,1
+27,Santa Cruz Bully Kennel,Pet Store,14.83491,120.96222,Matahimik St.,Commercial,Active,1,0,3,0,4,0,0
+28,Sta. Cruz 888 Metal Trading and Hardware,Merchandise / Trading,14.83491,120.96183,Matahimik St.,Residential,Active,3,0,3,0,3,0,1
+29,MNM Frozen Meat Trading,Retail,14.83486,120.96158,Maunlad St.,Commercial,Active,2,0,3,0,3,0,0
+30,DM² Food Hub/Double D' Brew,Food & Beverages,14.83478,120.9616,Maunlad St.,Commercial,Active,2,0,3,0,3,0,0
+31,Cornelio LPG Store,Retail,14.83556,120.95947,Maunlad St.,Residential,Active,0,0,0,0,0,0,1
+32,ML Photography Studio,Services,14.83323,120.95969,Maligaya St.,Residential,Active,0,0,2,1,2,1,1
+33,Mg Events Catering Services,Services,14.83347,120.95896,Maligaya St.,Residential,Active,1,0,2,1,2,1,1
+34,LOLET'S ,Restaurant,14.83197,120.96245,Mapayapa St.,Commercial,Active,4,1,5,1,10,1,0
+35,JLM's STORE,Retail,14.83183,120.96242,Mapayapa St.,Residential,Active,4,2,5,3,10,6,1
+36,Nessies Store,Retail,14.83178,120.96252,Mapayapa St.,Residential,Active,4,2,7,5,10,6,1
+37,BlesZas Eatery,Restaurant,14.83185,120.96281,Mapayapa St.,Commercial,Active,5,1,7,1,10,1,0
+38,Sabon Depot Dealer,Retail,14.83106,120.96306,Mapayapa St.,Commercial,Active,0,0,7,4,10,6,0
+39,RAYMOND PHONE REPAIR AND CCTV,Services,14.83713,120.95015,Sonoma Residences,Residential,Active,1,0,3,0,4,1,1
+40,3K Hardware and Constriction Supply,Merchandise / Trading,14.83735,120.9505,Sonoma Residences,Residential,Active,2,0,3,0,4,0,1
+41,MELANIO FARM FRESH EGGS - WHOLESALE and RETAIL,Retail,14.83785,120.95023,Sonoma Residences,Residential,Active,0,0,3,1,4,1,1
+42,Garage Gym,Services,14.83868,120.9508,Sonoma Residences,Residential,Active,0,0,0,0,4,1,1
+43,BNC STORE,Retail,14.8373,120.95092,Sonoma Residences,Residential,Active,1,0,3,1,4,1,1
+44,Vicky's Cakes and Pastries,Retail,14.83802,120.95583,Housing Project,Commercial,Active,3,1,6,1,17,6,0
+45,YANI'S LECHON MANOK,Retail,14.83812,120.95599,Housing Project,Commercial,Active,2,1,4,1,18,6,0
+46,Sandra Store,Retail,14.83918,120.95609,Housing Project,Commercial,Active,1,0,3,1,17,6,0
+47,MONTREAL BATTERY SHOP,Services,14.83933,120.95625,Housing Project,Commercial,Active,2,0,4,0,16,2,0
+48,Lots'A Pizza Fuel Hub,Restaurant,14.83975,120.95638,Housing Project,Commercial,Active,1,0,6,0,15,1,0
+49,SilkshopManila STA.MARIA BULACAN,Retail,14.84021,120.95641,Provincial Road,Commercial,Active,2,0,7,1,14,4,0
+50,DRD Construction Supply,Merchandise / Trading,14.84048,120.95643,Provincial Road,Commercial,Active,4,0,7,0,15,1,0
+51,Jihos Food House,Restaurant,14.84085,120.95633,Provincial Road,Commercial,Active,4,0,6,0,14,1,0
+52,RLW MEAT SHOP,Retail,14.84089,120.95635,Provincial Road,Commercial,Active,3,0,6,1,15,4,0
+53,RDC Auto parts and hydraulic hose repair center,Services,14.84122,120.95639,Provincial Road,Commercial,Active,2,0,5,2,15,4,0
+54,Lilets Creamy Peanut butter,Retail,14.84026,120.95443,Matimyas St.,Commercial,Active,0,0,3,1,3,1,0
+55,Body Transformers Gym,Services,14.84011,120.95516,Matimyas St.,Residential,Active,1,0,3,1,13,5,1
+56,Rehydrate Water Refilling Station,Services,14.84064,120.95496,Matimyas St.,Residential,Active,0,0,3,1,11,4,1
+57,CDK Coco Lumber And Trading,Merchandise / Trading,14.83721,120.95593,Provincial Road,Commercial,Active,4,0,9,0,20,1,0
+58,Villa Anju Private Entertainment / Leisure,Entertainment / Leisure,14.83779,120.9569,Pag asa St.,Commercial,Active,0,0,3,1,19,1,0
+59,3Dr Poultry Supply,Retail,14.84266,120.9566,Provincial Road,Commercial,Active,3,1,4,1,9,2,0
+60,Tacia's Store,Retail,14.84012,120.95516,Provincial Road,Commercial,Active,1,0,3,1,13,4,0
+61,Lucing's Eatery,Restaurant,14.83737,120.96256,Bukid St.,Residential,Active,1,0,2,0,2,0,1
+62,TERRACES PET AND POULTRY SUPPLY,Retail,14.83715,120.96281,Bukid St.,Residential,Active,1,0,2,0,2,0,1
+63,Workout Warehouse by Coach Jow,Services,14.83056,120.96316,Bukid St.,Commercial,Active,1,0,3,0,10,0,0
+64,Likhang Ugat Furnishings,Merchandising / Trading ,14.83042,120.9631,Mapayapa St.,Commercial,Active,1,0,3,0,10,0,0
+65,Rej Meat Shop,Retail,14.83076,120.96368,Mapayapa St.,Residential,Active,0,0,3,1,10,6,1
+66,Jackie's Store,Retail,14.83167,120.96337,Mapayapa St.,Residential,Active,1,1,5,4,10,6,1
+67,Nessie�s Store,Retail,14.83175,120.96257,Mapayapa St.,Residential,Active,4,2,7,5,10,6,1
+68,Nene's Sari Sari Store,Retail,14.83351,120.95901,Maligaya St.,Residential,Active,1,0,2,0,2,0,1
+69,Gil's chicharon,Retail,14.83337,120.95481,Provincial Road,Commercial,Active,4,1,5,1,9,2,0
+70,Three Grace's Store,Retail,14.83523,120.9553,Provincial Road,Commercial,Active,3,2,9,3,16,6,0
+71,Jumpin Beans Caf�,Food & Beverages,14.4027,120.95633,Provincial Road,Commercial,Active,0,0,0,0,0,0,0
+72,GC Rattan Outdoor Merchandising / Trading Bulacan,Merchandising / Trading,14.84005,120.95715,Provincial Road,Commercial,Active,0,0,4,0,10,0,0
+73,Sautter's Food & Beverages,Food & Beverages,14.8409,120.9513,Sonoma Residences,Residential,Active,0,0,0,0,2,0,1
+74,Magnus 1 Pet Supplies,Retail,14.84064,120.94993,Sonoma Residences,Residential,Active,1,0,2,0,3,0,1
+75,Coffee Break - Sonoma,Food & Beverages,14.84311,120.95093,Sonoma Residences,Residential,Active,0,0,1,0,1,0,1
+76,RV Sari-sari Store,Retail,14.84365,120.95053,Sonoma Residences,Residential,Active,0,0,1,0,1,0,1
+77,One Stop Barber Salon & Spa,Services,14.84029,120.9497,Sonoma Residences,Residential,Active,1,0,2,0,3,0,1
+78,Ka Jenny Sari Sari Store,Retail,14.83874,120.95673,Provincial Road,Residential,Active,0,0,3,1,17,4,1
+79,Brew & Buff,Food & Beverages,14.8382,120.95609,Provincial Road,Commercial,Active,2,0,6,0,17,0,0
+80,AutoFix Garage,Services,14.84164,120.95592,Provincial Road,Residential,Active,0,0,3,1,14,5,1
+81,NorthCo Petroleum,Services,14.83637,120.95636,Provincial Road,Commercial,Active,1,0,6,3,21,4,0
+82,LMS Hardware - AAL hardware,Merchandise / Trading,14.84186,120.95731,Provincial Road,Commercial,Active,0,0,0,0,12,3,0
+83,Oiland Sta Cruz Sta Maria,Services,14.84042,120.95642,Provincial Road,Commercial,Active,3,0,7,1,15,5,0
+84,AM'S FOOD CORNER,Restaurant,14.84279,120.9567,Provincial Road,Residential,Active,3,0,5,0,8,0,1
+85,JDS BUILDERS SUPPLY,Merchandise / Trading,14.84327,120.95683,Provincial Road,Commercial,Active,2,1,5,1,6,2,0
+86,3TEN FCLS Variety Store,Retail,14.84277,120.9568,Provincial Road,Commercial,Active,3,1,5,1,8,1,0
+87,Jetti - Sta.Cruz,Services,14.84302,120.95673,Provincial Road,Commercial,Active,4,0,5,0,7,1,0
+88,Raquels Salon,Services,14.83797,120.96051,Bukid St.,Residential,Active,1,1,3,1,5,1,1
+89,Jeshtine Printing,Services,14.83797,120.96263,Bukid St.,Residential,Active,0,0,2,0,3,0,1
+90,EVELYN EATERY,Retail,14.83671,120.95621,Provincial Road,Residential,Active,2,0,9,2,21,8,1
+91,Ell's Printing Shop & Arcade Games,Services,14.83695,120.9559,Provincial Road,Residential,Active,4,1,10,3,19,4,1
+92,Mang Ambo�s Lechon Manok,Retail,14.83704,120.95586,Provincial Road,Residential,Active,4,0,10,2,19,6,1
+93,JMDR Services Branch 3,Services,14.8372,120.95591,Provincial Road,Commercial,Active,4,1,9,1,20,4,0
+94,Ellan Boy Eatery,Restaurant,14.83767,120.95583,Provincial Road,Commercial,Active,2,1,9,1,19,1,0
+95,J&D Bigasan,Retail,14.83522,120.95531,Provincial Road,Commercial,Active,3,2,9,3,16,6,0
+96,Tako Alley,Restaurant,14.84097,120.94924,Sonoma Residences,Residential,Active,0,0,2,0,2,0,1
+97,Jar and Faith Water Refilling Station,Services,14.8001,120.95109,Sonoma Residences,Residential,Active,0,0,0,0,0,0,1
+98,St. Lorenz General Merchandize,Merchandise / Trading,14.84332,120.95729,Provincial Road,Residential,Active,1,1,4,1,6,2,1
+99,R,Retail,14.83919,120.96282,Bukid St.,Residential,Active,0,0,0,0,1,0,1
+100,tiptop foods opc,Retail,14.832,120.96322,Bukid St.,Residential,Active,2,1,6,4,10,6,1
