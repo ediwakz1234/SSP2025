@@ -60,12 +60,11 @@ type ActivityLog = {
   id: number;
   action: string;
   created_at?: string;
-  metadata?: Record<string, unknown> | null;
-};
-
-type ActivityMetadata = {
-  page?: string;
-  timeSpentSeconds?: number;
+  metadata?: {
+    page?: string;
+    timeSpentSeconds?: number;
+    [key: string]: unknown;
+  } | null;
 };
 
 type PageType = "clustering" | "analytics" | "map" | "opportunities";
@@ -112,13 +111,6 @@ function getActionIcon(action: string) {
   if (a.includes("login")) return LogIn;
 
   return ActivityIcon;
-}
-
-function parseMetadata(meta?: Record<string, unknown> | null): ActivityMetadata {
-  if (meta && typeof meta === "object") {
-    return meta as ActivityMetadata;
-  }
-  return {};
 }
 
 
@@ -547,14 +539,10 @@ export function DashboardPage() {
 
                 if (searchQuery.trim() !== "") {
                   const q = searchQuery.toLowerCase();
-                  logs = logs.filter((log) => {
-                    const meta = parseMetadata(log.metadata);
-                    const pageValue = meta.page ? meta.page.toLowerCase() : "";
-                    return (
-                      log.action.toLowerCase().includes(q) ||
-                      pageValue.includes(q)
-                    );
-                  });
+                  logs = logs.filter((log) =>
+                    log.action.toLowerCase().includes(q) ||
+                    (log.metadata?.page || "").toLowerCase().includes(q)
+                  );
                 }
 
                 if (logs.length === 0)
@@ -569,7 +557,6 @@ export function DashboardPage() {
 
                 return logs.map((log) => {
   const Icon = getActionIcon(log.action);
-  const meta = parseMetadata(log.metadata);
 
   return (
     <div
@@ -584,10 +571,10 @@ export function DashboardPage() {
         <div className="flex flex-col">
           <p className="font-medium text-sm text-gray-800">{cleanAction(log.action)}</p>
 
-          {meta.timeSpentSeconds != null && (
+          {log.metadata?.timeSpentSeconds != null && (
             <p className="text-xs text-gray-400 flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {meta.timeSpentSeconds}s spent
+              {log.metadata.timeSpentSeconds}s spent
             </p>
           )}
         </div>

@@ -45,9 +45,7 @@ interface ActivityLog {
 // Helper to safely parse context
 const parseContext = (value: unknown): Record<string, unknown> | null => {
   if (!value) return null;
-  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    return value as Record<string, unknown>;
-  }
+  if (typeof value === "object" && value !== null) return value as Record<string, unknown>;
   if (typeof value === "string") {
     try {
       return JSON.parse(value);

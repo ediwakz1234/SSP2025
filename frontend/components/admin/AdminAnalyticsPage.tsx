@@ -192,8 +192,8 @@ export function AdminAnalyticsPage() {
 
       setAnalysisStats({
         total: analysisList.length,
-        freqByDate: Array.from(freq).map(([date, count]) => ({ name: date, value: count as number })),
-        topUsers: Array.from(users).map(([userId, count]) => ({ user_id: userId as string, count: count as number })),
+        freqByDate: Array.from(freq).map(([date, count]) => ({ name: date as string, value: count as number, date: date as string })),
+        topUsers: Array.from(users).map(([user_id, count]) => ({ user_id: user_id as string, count: count as number })),
       });
 
       // 4. ACTIVITY LOGS (for top cards)
@@ -710,8 +710,8 @@ const loginCount = logs.filter((l) =>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={analysisStats.freqByDate}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                    <YAxis dataKey="value" tick={{ fontSize: 12 }} />
+                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip 
                       contentStyle={{ 
                         borderRadius: '12px', 
@@ -721,7 +721,7 @@ const loginCount = logs.filter((l) =>
                     />
                     <Line 
                       type="monotone" 
-                      dataKey="value" 
+                      dataKey="count" 
                       stroke="url(#lineGradient)" 
                       strokeWidth={3}
                       dot={{ fill: '#6366f1', strokeWidth: 2, r: 4 }}

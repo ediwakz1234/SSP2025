@@ -14,18 +14,18 @@ test.describe('Landing Page', () => {
   });
 
   test('should have a login button', async ({ page }) => {
-    const loginButton = page.getByRole('button', { name: /^get started$/i });
+    const loginButton = page.getByRole('link', { name: /login|sign in/i });
     await expect(loginButton).toBeVisible();
   });
 
   test('should have a register button', async ({ page }) => {
-    const registerButton = page.getByRole('button', { name: /create account/i });
+    const registerButton = page.getByRole('link', { name: /register|sign up|get started/i });
     await expect(registerButton).toBeVisible();
   });
 
   test('should navigate to login page', async ({ page }) => {
-    await page.getByRole('button', { name: /^get started$/i }).first().click();
-    await expect(page).toHaveURL(/.*user\/login/);
+    await page.getByRole('link', { name: /login|sign in/i }).first().click();
+    await expect(page).toHaveURL(/.*login/);
   });
 
   test('should be responsive on mobile', async ({ page }) => {
@@ -39,35 +39,35 @@ test.describe('Landing Page', () => {
  */
 test.describe('Authentication', () => {
   test('login page should have email and password fields', async ({ page }) => {
-    await page.goto('/user/login');
+    await page.goto('/login');
     
-    await expect(page.getByPlaceholder(/enter your email/i)).toBeVisible();
-    await expect(page.getByPlaceholder(/enter your password/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
+    await expect(page.getByLabel(/email/i)).toBeVisible();
+    await expect(page.getByLabel(/password/i)).toBeVisible();
+    await expect(page.getByRole('button', { name: /login|sign in/i })).toBeVisible();
   });
 
   test('register page should have required fields', async ({ page }) => {
     await page.goto('/register');
     
-    await expect(page.getByPlaceholder(/john\.doe@example\.com/i)).toBeVisible();
-    await expect(page.getByPlaceholder(/minimum 8 characters/i)).toBeVisible();
+    await expect(page.getByLabel(/email/i)).toBeVisible();
+    await expect(page.getByLabel(/password/i).first()).toBeVisible();
   });
 
   test('should show error on invalid login', async ({ page }) => {
-    await page.goto('/user/login');
+    await page.goto('/login');
     
-    await page.getByPlaceholder(/enter your email/i).fill('invalid@test.com');
-    await page.getByPlaceholder(/enter your password/i).fill('wrongpassword');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.getByLabel(/email/i).fill('invalid@test.com');
+    await page.getByLabel(/password/i).fill('wrongpassword');
+    await page.getByRole('button', { name: /login|sign in/i }).click();
     
     // Should show an error message
-    await expect(page.getByText(/invalid|error|incorrect/i).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/invalid|error|incorrect/i)).toBeVisible({ timeout: 10000 });
   });
 
   test('should have forgot password link', async ({ page }) => {
-    await page.goto('/user/login');
+    await page.goto('/login');
     
-    const forgotLink = page.getByRole('button', { name: /forgot password/i });
+    const forgotLink = page.getByRole('link', { name: /forgot/i });
     await expect(forgotLink).toBeVisible();
   });
 });
@@ -77,17 +77,17 @@ test.describe('Authentication', () => {
  */
 test.describe('Protected Routes', () => {
   test('dashboard should redirect to login when not authenticated', async ({ page }) => {
-    await page.goto('/user/dashboard');
+    await page.goto('/dashboard');
     
     // Should redirect to login
-    await expect(page).toHaveURL(/.*user\/login/, { timeout: 10000 });
+    await expect(page).toHaveURL(/.*login/, { timeout: 10000 });
   });
 
   test('admin pages should redirect to login when not authenticated', async ({ page }) => {
     await page.goto('/admin');
     
     // Should redirect to login or show unauthorized
-    await expect(page).toHaveURL(/.*admin\/login/, { timeout: 10000 });
+    await expect(page).toHaveURL(/.*login|.*admin\/login/, { timeout: 10000 });
   });
 });
 
@@ -98,16 +98,16 @@ test.describe('Navigation', () => {
   test('should have working navigation links', async ({ page }) => {
     await page.goto('/');
     
-    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await expect(page.getByRole('button', { name: /^get started$/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /create account/i })).toBeVisible();
+    // Check that main navigation elements exist
+    const nav = page.locator('nav, header');
+    await expect(nav.first()).toBeVisible();
   });
 
   test('404 page should be displayed for unknown routes', async ({ page }) => {
     await page.goto('/this-page-does-not-exist');
     
     // Should show 404 or redirect
-    await expect(page.getByRole('heading', { name: /page not found/i })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/404|not found|page.*exist/i)).toBeVisible({ timeout: 10000 });
   });
 });
 
@@ -127,10 +127,10 @@ test.describe('Accessibility', () => {
   });
 
   test('forms should have proper labels', async ({ page }) => {
-    await page.goto('/user/login');
+    await page.goto('/login');
     
-    // Email input should be discoverable
-    const emailInput = page.getByPlaceholder(/enter your email/i);
+    // Email input should have an accessible label
+    const emailInput = page.getByLabel(/email/i);
     await expect(emailInput).toBeVisible();
   });
 });

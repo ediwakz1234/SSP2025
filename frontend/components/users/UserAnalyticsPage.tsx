@@ -41,16 +41,25 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import { useActivity, logActivity } from "../../utils/activity";
 import { toast } from "sonner";
+import type { Business } from "../../types";
+
+interface AnalyticsStats {
+  totalBusinesses: number;
+  totalCategories: number;
+  commercialZones: number;
+  residentialZones: number;
+  avgDensity: number;
+}
 
 export function UserAnalyticsPage() {
   useActivity();
-  const [businesses, setBusinesses] = useState<any[]>([]);
+  const [businesses, setBusinesses] = useState<Business[]>([]);
   const [categories, setCategories] = useState<
     { name: string; value: number }[]
   >([]);
   const [zones, setZones] = useState<{ name: string; value: number }[]>([]);
   const [streets, setStreets] = useState<{ name: string; value: number }[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<AnalyticsStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
 

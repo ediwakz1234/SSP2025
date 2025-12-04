@@ -24,8 +24,6 @@ import { useActivity, logActivity } from "../../utils/activity";
 import { toast } from "sonner";
 import type L from "leaflet";
 
-// Minimal cluster group typing to avoid depending on plugin type defs
-type ClusterGroup = L.LayerGroup;
 
 // ---------------------------------------------------------
 // TYPES
@@ -89,10 +87,19 @@ const BRGY_BOUNDS = {
   maxLng: 120.9608,
 };
 
+// Leaflet marker cluster group type (from leaflet.markercluster plugin)
+interface MarkerClusterGroup extends L.LayerGroup {
+  addLayer(layer: L.Layer): this;
+  clearLayers(): this;
+}
+
 // Type for Leaflet on window object
 interface LeafletWindow extends Window {
   L: typeof L & {
-    markerClusterGroup?: (options?: L.MarkerClusterGroupOptions) => ClusterGroup;
+    markerClusterGroup: (options?: {
+      maxClusterRadius?: number;
+      disableClusteringAtZoom?: number;
+    }) => MarkerClusterGroup;
   };
 }
 
@@ -113,7 +120,7 @@ export function MapPage() {
   useActivity();
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMap = useRef<L.Map | null>(null);
-  const clusterLayer = useRef<ClusterGroup | null>(null);
+  const clusterLayer = useRef<MarkerClusterGroup | null>(null);
 const { state: _state } = useLocation();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -167,7 +174,8 @@ const { state: _state } = useLocation();
   useEffect(() => {
     const loadLeaflet = async () => {
       const w = window as unknown as LeafletWindow;
-      if (w.L && typeof w.L.markerClusterGroup === "function") {
+      // Check if Leaflet and marker cluster plugin are loaded
+      if (typeof w.L !== "undefined" && typeof w.L.markerClusterGroup === "function") {
         setIsLeafletReady(true);
         return;
       }
@@ -215,6 +223,7 @@ const { state: _state } = useLocation();
     if (!isLeafletReady || !businesses.length || leafletMap.current) return;
     initMap();
     renderClusters(businesses);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLeafletReady, businesses]);
 
   const initMap = () => {

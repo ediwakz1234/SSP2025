@@ -15,8 +15,7 @@ export default defineConfig({
     ['list'],
   ],
   use: {
-    // Align with Vite dev server port (vite.config.ts)
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5174',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'on-first-retry',
@@ -54,8 +53,7 @@ export default defineConfig({
     },
     {
       command: 'npm run _dev',
-      // Wait for Vite server on the correct port
-      url: 'http://localhost:5173',
+      url: 'http://localhost:5174',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
     },

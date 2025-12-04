@@ -2,6 +2,18 @@
 # CI/CD Pipeline for SSPTHESIS
 # Runs tests, linting, and builds on every push and PR
 # =============================================================================
+#
+# Required Repository Secrets:
+#   - SUPABASE_URL: Supabase project URL
+#   - SUPABASE_SERVICE_KEY: Supabase service role key
+#   - JWT_SECRET: JWT signing secret
+#   - GEMINI_API_KEY: Google Gemini API key
+#   - VITE_SUPABASE_URL: Supabase URL for frontend
+#   - VITE_SUPABASE_ANON_KEY: Supabase anonymous key for frontend
+#   - VERCEL_TOKEN: Vercel deployment token
+#   - VERCEL_ORG_ID: Vercel organization ID
+#   - VERCEL_PROJECT_ID: Vercel project ID
+# =============================================================================
 
 name: CI/CD Pipeline
 

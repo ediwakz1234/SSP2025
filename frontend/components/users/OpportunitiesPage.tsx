@@ -49,7 +49,17 @@ interface Opportunity {
 interface ClusteringRow {
   business_category: string;
   num_clusters: number | null;
-  locations: any;
+  locations: LocationData[];
+}
+
+interface LocationData {
+  street: string;
+  general_category: string;
+  zone_type: string;
+  business_density_200m: number;
+  competitor_density_200m: number;
+  latitude: number;
+  longitude: number;
 }
 
 interface BusinessRow {
@@ -401,7 +411,7 @@ if (loading) {
 
   // Build opportunities array
   const opportunities: Opportunity[] = clusteringResults.locations.map(
-    (loc: any): Opportunity => {
+    (loc: LocationData): Opportunity => {
       const businessDensity: number = loc.business_density_200m;
       const competitors: number = loc.competitor_density_200m;
 

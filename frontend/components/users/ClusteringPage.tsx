@@ -357,6 +357,7 @@ export function ClusteringPage() {
   const initializeMap = () => {
     if (!mapRef.current || !result) return;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!(window as any).L) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -390,6 +391,7 @@ export function ClusteringPage() {
   const createMap = () => {
     if (!result || !mapRef.current) return;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const L = (window as any).L;
 
     // Remove old map
@@ -650,11 +652,12 @@ export function ClusteringPage() {
       );
 
       // ✅ Inject grid points so map can render them
+      const clusteringResultWithGrid = clusteringResult as unknown as Record<string, unknown>;
       const enhancedResult: ExtendedResult = {
         ...clusteringResult,
         gridPoints:
-          (clusteringResult as any).grid ||
-          (clusteringResult as any).gridPoints ||
+          (clusteringResultWithGrid.grid as GridPoint[]) ||
+          (clusteringResultWithGrid.gridPoints as GridPoint[]) ||
           []
 
 
@@ -843,7 +846,7 @@ export function ClusteringPage() {
   };
 
 
-  async function _generateAIRecommendation(result: any) {
+  async function _generateAIRecommendation(result: ExtendedResult) {
     setAiLoading(true);
 
     const prompt = `
@@ -855,8 +858,8 @@ export function ClusteringPage() {
     Confidence: ${(result.analysis.confidence * 100).toFixed(0)}%
 
     Nearby Businesses:
-    ${result.nearbyBusinesses.slice(0, 10).map((b: any) =>
-      `- ${b.business.business_name} (${b.business.category})`
+    ${result.nearbyBusinesses.slice(0, 10).map((b) =>
+      `- ${b.business.business_name} (${b.business.general_category})`
     ).join("\n")}
 
     Please provide:
