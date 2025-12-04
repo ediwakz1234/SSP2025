@@ -1,8 +1,37 @@
 {
-  "installCommand": "npm install && cd frontend && npm install",
+  "installCommand": "npm install && cd frontend && npm install && cd ../backend && npm install",
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
+  "functions": {
+    "backend/api/**/*.js": {
+      "runtime": "@vercel/node@3"
+    }
+  },
   "rewrites": [
+    {
+      "source": "/api/ai/:path*",
+      "destination": "/backend/api/ai/:path*"
+    },
+    {
+      "source": "/api/auth/:path*",
+      "destination": "/backend/api/auth/:path*"
+    },
+    {
+      "source": "/api/admin/:path*",
+      "destination": "/backend/api/admin/:path*"
+    },
+    {
+      "source": "/api/businesses/:path*",
+      "destination": "/backend/api/businesses/:path*"
+    },
+    {
+      "source": "/api/users/:path*",
+      "destination": "/backend/api/users/:path*"
+    },
+    {
+      "source": "/api/clustering/:path*",
+      "destination": "/backend/api/clustering/:path*"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
