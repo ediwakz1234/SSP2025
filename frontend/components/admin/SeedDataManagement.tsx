@@ -25,6 +25,7 @@ import {
 import { supabase } from "../../lib/supabase";
 import * as api from "../../lib/api-client";
 import { toast } from "sonner";
+import { logActivity } from "../../utils/activity";
 
 
 
@@ -62,9 +63,9 @@ function StatsCard({ title, value, icon: Icon, bgColor = 'bg-purple-50' }: Stats
     'bg-blue-50': { from: 'from-blue-50', to: 'to-indigo-50', textGradient: 'from-blue-600 to-indigo-600' },
     'bg-green-50': { from: 'from-green-50', to: 'to-emerald-50', textGradient: 'from-green-600 to-emerald-600' },
   };
-  
+
   const gradient = gradientMap[bgColor] || gradientMap['bg-purple-50'];
-  
+
   return (
     <div className={`group relative overflow-hidden bg-linear-to-br ${gradient.from} ${gradient.to} rounded-xl border-0 p-6 shadow-md hover:shadow-xl transition-all duration-500 hover:-translate-y-1`}>
       <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-white/20 blur-2xl group-hover:bg-white/30 transition-colors duration-500"></div>
@@ -315,8 +316,8 @@ function SeedDataTable({ businesses, onEdit, onDelete, onToggleStatus }: SeedDat
               </tr>
             ) : (
               currentBusinesses.map((business, index) => (
-                <tr 
-                  key={business.id} 
+                <tr
+                  key={business.id}
                   className="group hover:bg-linear-to-r hover:from-purple-50/50 hover:to-violet-50/50 transition-all duration-300"
                   style={{ animationDelay: `${index * 30}ms` }}
                 >
@@ -402,10 +403,10 @@ function SeedDataTable({ businesses, onEdit, onDelete, onToggleStatus }: SeedDat
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`px-3 py-1.5 rounded-lg transition-all duration-200 ${currentPage === page 
-                    ? 'bg-linear-to-r from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-500/30' 
+                  className={`px-3 py-1.5 rounded-lg transition-all duration-200 ${currentPage === page
+                    ? 'bg-linear-to-r from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-500/30'
                     : 'text-gray-600 hover:bg-white hover:shadow-md'
-                  }`}
+                    }`}
                 >
                   {page}
                 </button>
@@ -525,7 +526,7 @@ function AddEditBusinessModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateBusinessForm()) return;
-    
+
     onSave(formData);
     toast.success(business ? "Business updated successfully!" : "Business added successfully!");
     onClose();
@@ -1024,10 +1025,10 @@ function parseCSVLine(line: string): string[] {
   const result: string[] = [];
   let current = '';
   let inQuotes = false;
-  
+
   for (let i = 0; i < line.length; i++) {
     const char = line[i];
-    
+
     if (char === '"') {
       inQuotes = !inQuotes;
     } else if (char === ',' && !inQuotes) {
@@ -1037,10 +1038,10 @@ function parseCSVLine(line: string): string[] {
       current += char;
     }
   }
-  
+
   // Push the last value
   result.push(current.trim());
-  
+
   return result;
 }
 
@@ -1062,37 +1063,37 @@ const CATEGORY_MAPPING: Record<string, string> = {
   "retail": "Retail", "grocery": "Retail", "pharmacy": "Retail", "drugstore": "Retail",
   "convenience store": "Retail", "supermarket": "Retail", "sari-sari": "Retail",
   "loading station": "Retail", "bakery": "Retail", "bakeshop": "Retail",
-  
+
   // Services
   "services": "Services", "service": "Services", "salon": "Services", "barbershop": "Services",
   "laundry": "Services", "car wash": "Services", "carwash": "Services", "repair": "Services",
   "clinic": "Services", "printing": "Services", "pawnshop": "Services", "tutorial": "Services",
   "pet grooming": "Services", "veterinary": "Services",
-  
+
   // Restaurant
   "restaurant": "Restaurant", "restaurants": "Restaurant", "eatery": "Restaurant",
   "fast food": "Restaurant", "fastfood": "Restaurant", "diner": "Restaurant",
   "carinderia": "Restaurant", "ihaw": "Restaurant", "grill": "Restaurant",
-  
+
   // Food & Beverages
   "food & beverages": "Food & Beverages", "food and beverages": "Food & Beverages",
   "f&b": "Food & Beverages", "cafe": "Food & Beverages", "coffee shop": "Food & Beverages",
   "milk tea": "Food & Beverages", "bar": "Food & Beverages", "water refilling": "Food & Beverages",
   "catering": "Food & Beverages", "ice cream": "Food & Beverages",
-  
+
   // Merchandise / Trading
   "merchandise / trading": "Merchandise / Trading", "merchandise": "Merchandise / Trading",
   "trading": "Merchandise / Trading", "hardware": "Merchandise / Trading",
   "electronics": "Merchandise / Trading", "furniture": "Merchandise / Trading",
   "wholesale": "Merchandise / Trading", "distributor": "Merchandise / Trading",
   "clothing": "Merchandise / Trading", "cellphone": "Merchandise / Trading",
-  
+
   // Entertainment / Leisure
   "entertainment / leisure": "Entertainment / Leisure", "entertainment": "Entertainment / Leisure",
   "hotel": "Entertainment / Leisure", "resort": "Entertainment / Leisure",
   "gym": "Entertainment / Leisure", "arcade": "Entertainment / Leisure",
   "karaoke": "Entertainment / Leisure", "billiards": "Entertainment / Leisure",
-  
+
   // Pet Store
   "pet store": "Pet Store", "pet shop": "Pet Store", "pet supplies": "Pet Store",
   "aquarium": "Pet Store", "pet food": "Pet Store",
@@ -1100,27 +1101,27 @@ const CATEGORY_MAPPING: Record<string, string> = {
 
 function normalizeCategory(inputCategory: string): string {
   if (!inputCategory) return "Retail";
-  
+
   const normalized = inputCategory.trim().toLowerCase();
-  
+
   // Direct mapping
   if (CATEGORY_MAPPING[normalized]) {
     return CATEGORY_MAPPING[normalized];
   }
-  
+
   // Check if already official
   const officialMatch = OFFICIAL_CATEGORIES.find(
     cat => cat.toLowerCase() === normalized
   );
   if (officialMatch) return officialMatch;
-  
+
   // Fuzzy match
   for (const [key, value] of Object.entries(CATEGORY_MAPPING)) {
     if (normalized.includes(key) || key.includes(normalized)) {
       return value;
     }
   }
-  
+
   // Keyword fallback
   if (normalized.includes("food") || normalized.includes("drink") || normalized.includes("beverage")) {
     return "Food & Beverages";
@@ -1131,7 +1132,7 @@ function normalizeCategory(inputCategory: string): string {
   if (normalized.includes("service") || normalized.includes("repair")) {
     return "Services";
   }
-  
+
   return "Retail"; // Default
 }
 
@@ -1356,6 +1357,13 @@ export default function SeedDataManagement() {
     const updated = [...businesses, newBusiness];
     setBusinesses(updated);
     saveBusinesses(updated);
+
+    // Log activity for seed data tracking
+    logActivity("Business Added", {
+      business_name: businessData.business_name,
+      category: businessData.category,
+      action_type: "seed_data_added"
+    });
     // triggerTraining(); // Removed: DB trigger handles this automatically
   };
 
@@ -1372,6 +1380,13 @@ export default function SeedDataManagement() {
     setBusinesses(updated);
     setEditingBusiness(null);
     saveBusinesses(updated);
+
+    // Log activity for seed data tracking
+    logActivity("Business Updated", {
+      business_name: businessData.business_name,
+      category: businessData.category,
+      action_type: "seed_data_updated"
+    });
     // triggerTraining(); // Removed: DB trigger handles this automatically
   };
 
@@ -1391,6 +1406,12 @@ export default function SeedDataManagement() {
     setBusinessToDelete(null);
     setIsDeleteModalOpen(false);
     toast.success(`"${businessName}" deleted successfully`);
+
+    // Log activity for seed data tracking
+    logActivity("Business Deleted", {
+      business_name: businessName,
+      action_type: "seed_data_deleted"
+    });
     // triggerTraining(); // Removed: DB trigger handles this automatically
   };
 
@@ -1439,16 +1460,16 @@ export default function SeedDataManagement() {
         const text = e.target?.result as string;
         const lines = text.split('\n');
         const headerLine = lines[0].toLowerCase();
-        
+
         // Check if this is the standard format with headers
         const hasHeaders = headerLine.includes('business_id') || headerLine.includes('business_name');
-        
+
         let newBusinesses: Business[] = [];
-        
+
         if (hasHeaders) {
           // Parse CSV with headers: business_id, business_name, general_category, latitude, longitude, street, zone_type, status
           const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase());
-          
+
           const getIndex = (name: string) => headers.indexOf(name);
           const idxId = getIndex('business_id');
           const idxName = getIndex('business_name');
@@ -1458,10 +1479,10 @@ export default function SeedDataManagement() {
           const idxStreet = getIndex('street');
           const idxZone = getIndex('zone_type');
           const idxStatus = getIndex('status');
-          
+
           console.log('📊 CSV Headers:', headers);
           console.log('📊 Column indices:', { idxId, idxName, idxCategory, idxLat, idxLng, idxStreet, idxZone, idxStatus });
-          
+
           newBusinesses = lines
             .slice(1)
             .filter((line) => line.trim())
@@ -1471,11 +1492,11 @@ export default function SeedDataManagement() {
               const lng = idxLng >= 0 ? values[idxLng] : '';
               const rawCategory = idxCategory >= 0 ? values[idxCategory] : '';
               const normalizedCategory = normalizeCategory(rawCategory);
-              
+
               if (index < 3) {
                 console.log(`📊 Row ${index + 1}: category="${rawCategory}" -> "${normalizedCategory}"`);
               }
-              
+
               return {
                 id: (idxId >= 0 && values[idxId]) ? values[idxId] : (Date.now().toString() + index),
                 business_name: idxName >= 0 ? values[idxName] : '',
@@ -1535,7 +1556,7 @@ export default function SeedDataManagement() {
         <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-white/10 blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-purple-400/20 blur-2xl translate-y-1/2 -translate-x-1/2"></div>
         <div className="absolute top-1/2 left-1/2 h-32 w-32 rounded-full bg-violet-300/30 blur-xl -translate-x-1/2 -translate-y-1/2"></div>
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

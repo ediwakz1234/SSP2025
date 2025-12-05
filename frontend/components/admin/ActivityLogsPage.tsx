@@ -170,14 +170,30 @@ export function ActivityLogsPage() {
       });
   }, [logs, actionFilter, searchQuery, dateFilter]);
 
-  // ---------------- STATS ----------------
+  // ---------------- STATS (match actual logged action strings) ----------------
   const totalActivities = logs.length;
-  const loginCount = logs.filter((l) => l.action === "user_login").length;
-  const analysisCount = logs.filter(
-    (l) => l.action === "clustering_analysis"
+  const loginCount = logs.filter((l) =>
+    l.action === "user_login" ||
+    l.action.toLowerCase().includes("login")
   ).length;
+
+  // Match both "clustering_analysis" (old) and "Ran Clustering" (new)
+  const analysisCount = logs.filter((l) =>
+    l.action === "clustering_analysis" ||
+    l.action.toLowerCase().includes("ran clustering") ||
+    l.action.toLowerCase().includes("clustering analysis")
+  ).length;
+
+  // Match seed data operations
   const dataChanges = logs.filter((l) =>
-    ["seed_data_reset", "seed_data_updated"].includes(l.action)
+    l.action === "seed_data_reset" ||
+    l.action === "seed_data_updated" ||
+    l.action === "seed_data_added" ||
+    l.action === "seed_data_deleted" ||
+    l.action.toLowerCase().includes("seed") ||
+    l.action.toLowerCase().includes("business added") ||
+    l.action.toLowerCase().includes("business updated") ||
+    l.action.toLowerCase().includes("business deleted")
   ).length;
 
   // ---------------- HELPERS ----------------
