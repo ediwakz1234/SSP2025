@@ -118,7 +118,7 @@ export default async function handler(req, res) {
         }
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
         const prompt = `
 You are a business validation expert for the Philippines. Analyze this business idea and determine if it's valid.
