@@ -36,8 +36,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "AI service not configured" });
     }
 
+    console.log("🤖 AI Recommendations: Starting with key:", process.env.GEMINI_API_KEY.slice(0, 10) + "...");
+
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    // Use gemini-1.5-flash (stable) instead of gemini-2.0-flash
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     // Build the comprehensive prompt based on the specification
     const prompt = `
@@ -72,14 +75,14 @@ Use ONLY the data provided. Do NOT assume population density, foot traffic, or c
 - Opportunity Level: ${opportunity || "Moderate"}
 
 🏪 Nearby Businesses (${nearbyBusinesses?.length || 0} total):
-${nearbyBusinesses?.slice(0, 15).map((b, i) => 
-  `${i+1}. ${b.business?.business_name || b.name} - ${b.business?.general_category || b.category} (${(b.distance * 1000).toFixed(0)}m away)`
-).join('\n') || "No nearby businesses data"}
+${nearbyBusinesses?.slice(0, 15).map((b, i) =>
+      `${i + 1}. ${b.business?.business_name || b.name} - ${b.business?.general_category || b.category} (${(b.distance * 1000).toFixed(0)}m away)`
+    ).join('\n') || "No nearby businesses data"}
 
 🏢 Nearby Competitors (${nearbyCompetitors?.length || 0} in same category):
-${nearbyCompetitors?.slice(0, 10).map((c, i) => 
-  `${i+1}. ${c.business?.business_name || c.name} (${(c.distance * 1000).toFixed(0)}m away)`
-).join('\n') || "No direct competitors nearby"}
+${nearbyCompetitors?.slice(0, 10).map((c, i) =>
+      `${i + 1}. ${c.business?.business_name || c.name} (${(c.distance * 1000).toFixed(0)}m away)`
+    ).join('\n') || "No direct competitors nearby"}
 
 === YOUR TASK ===
 
@@ -156,7 +159,7 @@ IMPORTANT RULES:
       }
 
       const recommendations = JSON.parse(cleanedText);
-      
+
       return res.status(200).json({
         success: true,
         recommendations,
@@ -166,7 +169,7 @@ IMPORTANT RULES:
     } catch (parseErr) {
       console.error("Failed to parse AI response:", parseErr);
       console.error("Raw response:", text);
-      
+
       // Return a fallback structured response
       return res.status(200).json({
         success: false,
@@ -184,9 +187,9 @@ IMPORTANT RULES:
 
   } catch (err) {
     console.error("AI Recommendation Error:", err);
-    return res.status(500).json({ 
-      error: "AI service error", 
-      message: err.message 
+    return res.status(500).json({
+      error: "AI service error",
+      message: err.message
     });
   }
 }

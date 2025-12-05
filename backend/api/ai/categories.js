@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
     // Use the current stable Gemini model
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
       You are a business categorization expert. Analyze the following business idea and:
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
     // Valid categories that exactly match DB and frontend
     const VALID_CATEGORIES = [
       "Retail",
-      "Services", 
+      "Services",
       "Restaurant",
       "Food & Beverages",
       "Merchandise / Trading",
@@ -65,12 +65,12 @@ export default async function handler(req, res) {
     function normalizeCategory(cat) {
       if (!cat) return "Retail";
       const lower = cat.toLowerCase().trim();
-      
+
       // Exact matches (case-insensitive)
       for (const valid of VALID_CATEGORIES) {
         if (lower === valid.toLowerCase()) return valid;
       }
-      
+
       // Partial matches
       if (lower.includes("food") || lower.includes("beverage") || lower.includes("cafe") || lower.includes("coffee") || lower.includes("milk tea")) {
         return "Food & Beverages";
@@ -85,7 +85,7 @@ export default async function handler(req, res) {
         return "Entertainment / Leisure";
       }
       if (lower.includes("pet")) return "Pet Store";
-      
+
       return "Retail"; // Default fallback
     }
 
@@ -98,10 +98,10 @@ export default async function handler(req, res) {
       } else if (cleanedText.startsWith("```")) {
         cleanedText = cleanedText.replace(/^```\n?/, "").replace(/\n?```$/, "");
       }
-      
+
       const parsed = JSON.parse(cleanedText);
       const normalizedCategory = normalizeCategory(parsed.category);
-      
+
       return res.status(200).json({
         category: normalizedCategory,
         explanation: parsed.explanation || "AI categorization based on business characteristics."
