@@ -71,20 +71,20 @@ export function UserAnalyticsPage() {
   const [endDate, setEndDate] = useState("");
 
   // QUICK FILTER function
- const applyQuickFilter = (days?: number | "year") => {
-  if (days === 0) {
-    toast.message("Filtering analytics: Today");
-    logActivity("Filtered Analytics", { range: "Today" });
-  } else if (days === 7) {
-    toast.message("Filtering analytics: Last 7 days");
-    logActivity("Filtered Analytics", { range: "Last 7 Days" });
-  } else if (days === 30) {
-    toast.message("Filtering analytics: Last 30 days");
-    logActivity("Filtered Analytics", { range: "Last 30 Days" });
-  } else if (days === "year") {
-    toast.message("Filtering analytics: This Year");
-    logActivity("Filtered Analytics", { range: "This Year" });
-  }
+  const applyQuickFilter = (days?: number | "year") => {
+    if (days === 0) {
+      toast.message("Filtering analytics: Today");
+      logActivity("Filtered Analytics", { range: "Today" });
+    } else if (days === 7) {
+      toast.message("Filtering analytics: Last 7 days");
+      logActivity("Filtered Analytics", { range: "Last 7 Days" });
+    } else if (days === 30) {
+      toast.message("Filtering analytics: Last 30 days");
+      logActivity("Filtered Analytics", { range: "Last 30 Days" });
+    } else if (days === "year") {
+      toast.message("Filtering analytics: This Year");
+      logActivity("Filtered Analytics", { range: "This Year" });
+    }
 
 
     const today = new Date();
@@ -124,41 +124,75 @@ export function UserAnalyticsPage() {
       const list = bizData || [];
       setBusinesses(list);
 
-      // Category normalization
-      const normalizeCategoryName = (name: string) => {
-        if (!name) return "Unknown";
-
-        return name
-          .trim()
-          .toLowerCase()
-          .replace(/&/g, "/")
-          .replace(/\s+/g, " ")
-          .replace("merchandising/trading", "merchandise / trading")
-          .replace("merchandising / trading", "merchandise / trading")
-          .replace("merchandise/trading", "merchandise / trading")
-          .replace("merchandizing / trading", "merchandise / trading")
-          .replace("merchandizing/trading", "merchandise / trading");
+      // Standard category names (must match DB values)
+      const STANDARD_CATEGORIES: Record<string, string> = {
+        "retail": "Retail",
+        "services": "Services",
+        "service": "Services",
+        "restaurant": "Restaurant",
+        "restaurants": "Restaurant",
+        "food & beverages": "Food / Beverages",
+        "food and beverages": "Food / Beverages",
+        "food/beverages": "Food / Beverages",
+        "food / beverages": "Food / Beverages",
+        "f&b": "Food / Beverages",
+        "entertainment / leisure": "Entertainment / Leisure",
+        "entertainment/leisure": "Entertainment / Leisure",
+        "entertainment and leisure": "Entertainment / Leisure",
+        "entertainment": "Entertainment / Leisure",
+        "leisure": "Entertainment / Leisure",
+        "merchandise / trading": "Merchandise / Trading",
+        "merchandise/trading": "Merchandise / Trading",
+        "merchandising / trading": "Merchandise / Trading",
+        "merchandising/trading": "Merchandise / Trading",
+        "merchandizing / trading": "Merchandise / Trading",
+        "merchandizing/trading": "Merchandise / Trading",
+        "trading": "Merchandise / Trading",
+        "merchandise": "Merchandise / Trading",
+        "pet store": "Pet Store",
+        "pet stores": "Pet Store",
+        "pets": "Pet Store",
       };
 
-      const toTitleCase = (str: string) => {
-        return str.replace(/\w\S*/g, (txt) =>
+      // Category normalization function
+      const normalizeCategoryName = (name: string): string => {
+        if (!name || typeof name !== 'string') return "Unknown";
+
+        const cleaned = name.trim().toLowerCase();
+        if (!cleaned) return "Unknown";
+
+        // Check for exact match in standard categories
+        if (STANDARD_CATEGORIES[cleaned]) {
+          return STANDARD_CATEGORIES[cleaned];
+        }
+
+        // Check for partial matches
+        for (const [key, value] of Object.entries(STANDARD_CATEGORIES)) {
+          if (cleaned.includes(key) || key.includes(cleaned)) {
+            return value;
+          }
+        }
+
+        // Fallback: Title case the original
+        return name.trim().replace(/\w\S*/g, (txt) =>
           txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
         );
       };
 
       // CATEGORY AGGREGATION
-      const catMap = new Map();
+      const catMap = new Map<string, number>();
       list.forEach((b) => {
-        if (b.general_category) {
-          const clean = normalizeCategoryName(b.general_category);
-          const finalName = toTitleCase(clean);
-          catMap.set(finalName, (catMap.get(finalName) || 0) + 1);
+        const rawCategory = b.general_category;
+        if (rawCategory) {
+          const normalized = normalizeCategoryName(rawCategory);
+          catMap.set(normalized, (catMap.get(normalized) || 0) + 1);
         }
       });
-      const catArr = Array.from(catMap).map(([name, value]) => ({
-        name,
-        value,
-      }));
+
+      // Convert to array and sort by count (highest first)
+      const catArr = Array.from(catMap)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value);
       setCategories(catArr);
 
       // ZONE AGGREGATION
@@ -207,24 +241,24 @@ export function UserAnalyticsPage() {
     loadAnalytics();
   }, [loadAnalytics]);
 
- if (loading || !stats) {
-  return (
-    <div className="min-h-[60vh] flex items-center justify-center">
-      <div className="text-center space-y-4">
-        <div className="relative">
-          <div className="w-16 h-16 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto animate-pulse">
-            <Activity className="w-8 h-8 text-white" />
+  if (loading || !stats) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto animate-pulse">
+              <Activity className="w-8 h-8 text-white" />
+            </div>
+            <div className="absolute inset-0 w-16 h-16 mx-auto rounded-full border-4 border-blue-200 border-t-blue-500 animate-spin" />
           </div>
-          <div className="absolute inset-0 w-16 h-16 mx-auto rounded-full border-4 border-blue-200 border-t-blue-500 animate-spin" />
-        </div>
-        <div>
-          <p className="text-lg font-semibold text-gray-900">Loading Analytics</p>
-          <p className="text-sm text-gray-500">Crunching the numbers...</p>
+          <div>
+            <p className="text-lg font-semibold text-gray-900">Loading Analytics</p>
+            <p className="text-sm text-gray-500">Crunching the numbers...</p>
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
 
   const categoryData = categories;
@@ -282,7 +316,7 @@ export function UserAnalyticsPage() {
     pdf.save("business_analytics.pdf");
   };
 
-  
+
   // ========================
   // RETURN UI
   // ========================
@@ -327,7 +361,7 @@ export function UserAnalyticsPage() {
         <CardHeader className="bg-linear-to-r from-slate-50 to-gray-50 border-b">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-linear-to-br from-slate-600 to-gray-700 rounded-xl text-white shadow-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
             </div>
             <div>
               <CardTitle className="text-lg">Filter by Date Range</CardTitle>
@@ -405,7 +439,7 @@ export function UserAnalyticsPage() {
 
           {startDate && endDate && (
             <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-xl border border-blue-100">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
               <p className="text-sm text-blue-700">
                 Showing results from <span className="font-semibold">{startDate}</span> to <span className="font-semibold">{endDate}</span>
               </p>
@@ -502,10 +536,10 @@ export function UserAnalyticsPage() {
             <div className="space-y-3">
               <button
                 onClick={() => {
-                 exportCSV();
-                 toast.success("Exported analytics as CSV");
-                 logActivity("Exported Analytics Report", { format: "CSV" });
-                 setShowExportModal(false);
+                  exportCSV();
+                  toast.success("Exported analytics as CSV");
+                  logActivity("Exported Analytics Report", { format: "CSV" });
+                  setShowExportModal(false);
                 }}
                 className="w-full h-14 flex items-center gap-3 bg-gray-50 hover:bg-gray-100 px-4 rounded-xl transition-all hover:scale-[1.02] border-2 border-transparent hover:border-gray-200"
               >
@@ -517,10 +551,10 @@ export function UserAnalyticsPage() {
 
               <button
                 onClick={() => {
-                 exportExcel();
-                 toast.success("Exported analytics as Excel");
-                 logActivity("Exported Analytics Report", { format: "Excel" });
-                 setShowExportModal(false);
+                  exportExcel();
+                  toast.success("Exported analytics as Excel");
+                  logActivity("Exported Analytics Report", { format: "Excel" });
+                  setShowExportModal(false);
                 }}
                 className="w-full h-14 flex items-center gap-3 bg-green-50 hover:bg-green-100 px-4 rounded-xl transition-all hover:scale-[1.02] border-2 border-transparent hover:border-green-200"
               >
@@ -532,10 +566,10 @@ export function UserAnalyticsPage() {
 
               <button
                 onClick={() => {
-                 exportPDF();
-                 toast.success("Exported analytics as PDF");
-                 logActivity("Exported Analytics Report", { format: "PDF" });
-                 setShowExportModal(false);
+                  exportPDF();
+                  toast.success("Exported analytics as PDF");
+                  logActivity("Exported Analytics Report", { format: "PDF" });
+                  setShowExportModal(false);
                 }}
                 className="w-full h-14 flex items-center gap-3 bg-red-50 hover:bg-red-100 px-4 rounded-xl transition-all hover:scale-[1.02] border-2 border-transparent hover:border-red-200"
               >
@@ -620,13 +654,13 @@ export function UserAnalyticsPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'white', 
-                        borderRadius: '12px', 
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        borderRadius: '12px',
                         border: 'none',
                         boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-                      }} 
+                      }}
                     />
                     <Bar dataKey="value" fill="url(#colorGradient)" radius={[8, 8, 0, 0]} />
                     <defs>
@@ -674,13 +708,13 @@ export function UserAnalyticsPage() {
                         />
                       ))}
                     </Pie>
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'white', 
-                        borderRadius: '12px', 
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        borderRadius: '12px',
                         border: 'none',
                         boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-                      }} 
+                      }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -758,13 +792,13 @@ export function UserAnalyticsPage() {
                       />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'white', 
-                      borderRadius: '12px', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      borderRadius: '12px',
                       border: 'none',
                       boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-                    }} 
+                    }}
                   />
                   <Legend />
                 </PieChart>
@@ -778,7 +812,7 @@ export function UserAnalyticsPage() {
               <Card key={zone.name} className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all hover:scale-[1.02]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <div 
+                    <div
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     />
@@ -797,10 +831,9 @@ export function UserAnalyticsPage() {
                     <div
                       className="h-full rounded-full transition-all"
                       style={{
-                        width: `${
-                          (zone.value / stats.total_businesses) *
+                        width: `${(zone.value / stats.total_businesses) *
                           100
-                        }%`,
+                          }%`,
                         backgroundColor:
                           COLORS[index % COLORS.length],
                       }}
