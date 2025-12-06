@@ -21,7 +21,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 🔥 Listen for login/logout changes (fires immediately with current session)
+    // 🔥 First, restore any existing session from storage
+    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+      setSession(existingSession);
+      setUser(existingSession?.user ?? null);
+      setLoading(false);
+    });
+
+    // 🔥 Then listen for login/logout changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
         setSession(newSession);
