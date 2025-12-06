@@ -32,12 +32,18 @@ import {
   Building2,
   FileDown,
   BarChart2,
+  Trophy,
+  Eye,
+  Filter,
+  ArrowUpDown,
 } from "lucide-react";
 
 import { supabase } from "../../lib/supabase";
 import { useActivity, logActivity } from "../../utils/activity";
 import { toast } from "sonner";
 import type { Business, ChartDataPoint, AnalysisStats, ActivityStats } from "../../types";
+import { ClusteringAnalysisModal, ClusteringAnalysisResult } from "./ClusteringAnalysisModal";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 // Local types for analytics data
 interface AnalysisRecord {
@@ -69,6 +75,13 @@ export function AdminAnalyticsPage() {
     analyses: 0,
     dataChanges: 0,
   });
+
+  // Top Clustering Results state
+  const [topClusteringResults, setTopClusteringResults] = useState<ClusteringAnalysisResult[]>([]);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<ClusteringAnalysisResult | null>(null);
+  const [analysisModalOpen, setAnalysisModalOpen] = useState(false);
+  const [analysisSortBy, setAnalysisSortBy] = useState<"score" | "recent">("score");
+  const [analysisCategoryFilter, setAnalysisCategoryFilter] = useState<string>("all");
 
   const [_showExportModal, setShowExportModal] = useState(false);
 
@@ -174,7 +187,7 @@ export function AdminAnalyticsPage() {
       });
       setStreets(Array.from(streetMap).map(([n, v]) => ({ name: n, value: v })));
 
-      // 3. ANALYSIS (clustering_results)
+      // 3. ANALYSIS (clustering_results) with user profiles
       const { data: analysisData } = await supabase
         .from("clustering_results")
         .select("*");
@@ -196,6 +209,39 @@ export function AdminAnalyticsPage() {
         freqByDate: Array.from(freq).map(([date, count]) => ({ name: date as string, value: count as number, date: date as string })),
         topUsers: Array.from(users).map(([user_id, count]) => ({ user_id: user_id as string, count: count as number })),
       });
+
+      // 3b. Fetch user profiles to join with clustering results
+      const userIds = [...new Set(analysisList.map(a => a.user_id).filter(Boolean))];
+      let profilesMap: Record<string, { first_name: string; last_name: string; email: string }> = {};
+
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, email")
+          .in("id", userIds);
+
+        (profilesData || []).forEach(p => {
+          profilesMap[p.id] = {
+            first_name: p.first_name || "",
+            last_name: p.last_name || "",
+            email: p.email || ""
+          };
+        });
+      }
+
+      // Create top clustering results with user info
+      const topResults: ClusteringAnalysisResult[] = analysisList
+        .map(a => ({
+          ...a,
+          user_name: profilesMap[a.user_id]
+            ? `${profilesMap[a.user_id].first_name} ${profilesMap[a.user_id].last_name}`.trim() || "Unknown"
+            : "Unknown",
+          user_email: profilesMap[a.user_id]?.email || "N/A"
+        }))
+        .sort((a, b) => b.confidence - a.confidence);
+
+      setTopClusteringResults(topResults);
+
 
       // 4. ACTIVITY LOGS (for top cards)
       let activityQuery = supabase.from("activity_logs").select("*");
@@ -739,38 +785,141 @@ export function AdminAnalyticsPage() {
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-purple-500" />
-                  Most Active Users
-                </h3>
-                <div className="space-y-3">
-                  {analysisStats.topUsers.map((u, index) => (
-                    <div
-                      key={u.user_id}
-                      className="flex items-center justify-between p-4 rounded-xl bg-linear-to-r from-gray-50 to-slate-50 border hover:from-purple-50 hover:to-violet-50 transition-colors duration-300"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Badge
-                          variant="outline"
-                          className={`h-8 w-8 flex items-center justify-center rounded-full border-0 ${index === 0 ? 'bg-linear-to-r from-yellow-400 to-amber-500 text-white' :
-                            index === 1 ? 'bg-linear-to-r from-gray-300 to-gray-400 text-white' :
-                              index === 2 ? 'bg-linear-to-r from-amber-600 to-orange-600 text-white' :
-                                'bg-gray-100 text-gray-600'
-                            }`}
-                        >
-                          {index + 1}
-                        </Badge>
-                        <span className="font-medium text-gray-700">User ID: <span className="font-mono text-purple-600">{u.user_id}</span></span>
-                      </div>
-                      <span className="font-bold text-purple-600">{u.count} analyses</span>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <Trophy className="h-4 w-4 text-yellow-500" />
+                    Top Clustering Scores (All-Time)
+                  </h3>
+
+                  {/* Filters */}
+                  <div className="flex items-center gap-2">
+                    <Select value={analysisCategoryFilter} onValueChange={setAnalysisCategoryFilter}>
+                      <SelectTrigger className="w-[140px] h-8 text-xs bg-white">
+                        <Filter className="w-3 h-3 mr-1" />
+                        <SelectValue placeholder="Category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Categories</SelectItem>
+                        {[...new Set(topClusteringResults.map(r => r.business_category))].map(cat => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={analysisSortBy} onValueChange={(v) => setAnalysisSortBy(v as "score" | "recent")}>
+                      <SelectTrigger className="w-[120px] h-8 text-xs bg-white">
+                        <ArrowUpDown className="w-3 h-3 mr-1" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="score">Highest Score</SelectItem>
+                        <SelectItem value="recent">Most Recent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                  {topClusteringResults.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <Trophy className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                      <p className="font-medium">No analyses available</p>
+                      <p className="text-sm">Clustering results will appear here</p>
                     </div>
-                  ))}
+                  ) : (
+                    [...topClusteringResults]
+                      .filter(r => analysisCategoryFilter === "all" || r.business_category === analysisCategoryFilter)
+                      .sort((a, b) => {
+                        if (analysisSortBy === "recent") {
+                          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                        }
+                        return b.confidence - a.confidence;
+                      })
+                      .slice(0, 20)
+                      .map((result, index) => {
+                        const confidencePercent = Math.round(result.confidence * 100);
+                        const isTop3 = index < 3 && analysisSortBy === "score";
+
+                        return (
+                          <div
+                            key={result.id}
+                            onClick={() => {
+                              setSelectedAnalysis(result);
+                              setAnalysisModalOpen(true);
+                            }}
+                            className="group flex items-center justify-between p-4 rounded-xl bg-linear-to-r from-gray-50 to-slate-50 border hover:from-purple-50 hover:to-violet-50 transition-all duration-300 cursor-pointer hover:shadow-md hover:-translate-y-0.5"
+                          >
+                            <div className="flex items-center gap-3">
+                              {/* Rank Badge */}
+                              <Badge
+                                variant="outline"
+                                className={`h-8 w-8 flex items-center justify-center rounded-full border-0 ${isTop3 && index === 0 ? 'bg-linear-to-r from-yellow-400 to-amber-500 text-white' :
+                                  isTop3 && index === 1 ? 'bg-linear-to-r from-gray-300 to-gray-400 text-white' :
+                                    isTop3 && index === 2 ? 'bg-linear-to-r from-amber-600 to-orange-600 text-white' :
+                                      'bg-gray-100 text-gray-600'
+                                  }`}
+                              >
+                                {isTop3 ? <Trophy className="h-4 w-4" /> : index + 1}
+                              </Badge>
+
+                              {/* User & Business Info */}
+                              <div className="min-w-0">
+                                <p className="font-medium text-gray-800 truncate">
+                                  {result.user_name}
+                                </p>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs bg-purple-50 text-purple-700 border-purple-200"
+                                  >
+                                    {result.business_category}
+                                  </Badge>
+                                  <span className="text-xs text-gray-400">
+                                    {new Date(result.created_at).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Score & View Button */}
+                            <div className="flex items-center gap-3">
+                              {/* Confidence Score */}
+                              <div className="text-right">
+                                <p className={`text-lg font-bold ${confidencePercent >= 70 ? 'text-green-600' :
+                                  confidencePercent >= 40 ? 'text-amber-600' :
+                                    'text-red-600'
+                                  }`}>
+                                  {confidencePercent}%
+                                </p>
+                                <p className="text-xs text-gray-400">match</p>
+                              </div>
+
+                              {/* View Details */}
+                              <button className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg bg-purple-100 text-purple-600 hover:bg-purple-200">
+                                <Eye className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })
+                  )}
                 </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Clustering Analysis Details Modal */}
+      <ClusteringAnalysisModal
+        analysis={selectedAnalysis}
+        open={analysisModalOpen}
+        onClose={() => {
+          setAnalysisModalOpen(false);
+          setSelectedAnalysis(null);
+        }}
+        rank={selectedAnalysis ? topClusteringResults.findIndex(r => r.id === selectedAnalysis.id) + 1 : undefined}
+      />
     </div>
   );
 }
