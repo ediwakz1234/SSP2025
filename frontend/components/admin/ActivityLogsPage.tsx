@@ -170,22 +170,22 @@ export function ActivityLogsPage() {
       });
   }, [logs, actionFilter, searchQuery, dateFilter]);
 
-  // ---------------- STATS (match actual logged action strings) ----------------
-  const totalActivities = logs.length;
-  const loginCount = logs.filter((l) =>
+  // ---------------- STATS (based on filtered logs for accurate daily counts) ----------------
+  const totalActivities = filteredLogs.length;
+  const loginCount = filteredLogs.filter((l) =>
     l.action === "user_login" ||
     l.action.toLowerCase().includes("login")
   ).length;
 
   // Match both "clustering_analysis" (old) and "Ran Clustering" (new)
-  const analysisCount = logs.filter((l) =>
+  const analysisCount = filteredLogs.filter((l) =>
     l.action === "clustering_analysis" ||
     l.action.toLowerCase().includes("ran clustering") ||
     l.action.toLowerCase().includes("clustering analysis")
   ).length;
 
   // Match seed data operations
-  const dataChanges = logs.filter((l) =>
+  const dataChanges = filteredLogs.filter((l) =>
     l.action === "seed_data_reset" ||
     l.action === "seed_data_updated" ||
     l.action === "seed_data_added" ||
@@ -274,12 +274,16 @@ export function ActivityLogsPage() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-indigo-500">
                 <Activity className="h-4 w-4 text-white" />
               </div>
-              <CardTitle className="text-sm font-medium text-gray-600">Total Activities</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                {dateFilter === "today" ? "Today's Activities" : dateFilter === "week" ? "This Week's Activities" : "Total Activities"}
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{totalActivities}</div>
-            <p className="text-xs text-muted-foreground mt-1">Logged actions</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {dateFilter === "today" ? "Logged today" : dateFilter === "week" ? "Logged this week" : "All logged actions"}
+            </p>
           </CardContent>
         </Card>
 
@@ -290,12 +294,16 @@ export function ActivityLogsPage() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-green-500 to-emerald-500">
                 <LogIn className="h-4 w-4 text-white" />
               </div>
-              <CardTitle className="text-sm font-medium text-gray-600">User Logins</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                {dateFilter === "today" ? "Today's Logins" : dateFilter === "week" ? "This Week's Logins" : "Total Logins"}
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{loginCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">Authentication events</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {dateFilter === "today" ? "Logins today" : dateFilter === "week" ? "Logins this week" : "All logins"}
+            </p>
           </CardContent>
         </Card>
 

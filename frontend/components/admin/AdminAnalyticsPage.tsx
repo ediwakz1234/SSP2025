@@ -72,9 +72,10 @@ export function AdminAnalyticsPage() {
 
   const [_showExportModal, setShowExportModal] = useState(false);
 
-  // Date Filter
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  // Date Filter - Default to today so counters reset at midnight
+  const today = new Date().toISOString().split("T")[0];
+  const [startDate, setStartDate] = useState(today);
+  const [endDate, setEndDate] = useState(today);
 
   // Color palette
   const COLORS = [
@@ -209,11 +210,11 @@ export function AdminAnalyticsPage() {
       const logs = activityData || [];
 
       // Count login events (matches your new logActivity action)
-const loginCount = logs.filter((l) =>
-  ["user_login", "SIGNED_IN", "login", "user_logged_in"].includes(
-    (l.action || "").toLowerCase()
-  )
-).length;
+      const loginCount = logs.filter((l) =>
+        ["user_login", "SIGNED_IN", "login", "user_logged_in"].includes(
+          (l.action || "").toLowerCase()
+        )
+      ).length;
 
       const analysisCount = logs.filter((l) => l.action === "clustering_analysis").length;
       const dataChangeCount = logs.filter((l) => l.action === "seed_data_reset").length;
@@ -230,9 +231,9 @@ const loginCount = logs.filter((l) =>
     [startDate, endDate]
   );
 
-  // Load analytics on mount
+  // Load analytics on mount (with today's filter applied)
   useEffect(() => {
-    loadAnalytics();
+    loadAnalytics(true); // Apply filter from the start
   }, [loadAnalytics]);
 
   // Reload when date filter changes
@@ -268,7 +269,7 @@ const loginCount = logs.filter((l) =>
       <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-600 via-purple-600 to-indigo-700 p-8 text-white shadow-xl">
         <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-white/10 blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-blue-400/20 blur-2xl translate-y-1/2 -translate-x-1/2"></div>
-        
+
         <div className="relative z-10 flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
             <BarChart2 className="h-7 w-7 text-white" />
@@ -317,26 +318,26 @@ const loginCount = logs.filter((l) =>
           </div>
 
           <div className="flex flex-wrap gap-2 mt-2">
-            <button 
-              onClick={() => applyQuickFilter(0)} 
+            <button
+              onClick={() => applyQuickFilter(0)}
               className="px-4 py-2 bg-linear-to-r from-gray-100 to-gray-50 rounded-xl hover:from-gray-200 hover:to-gray-100 transition-all duration-300 font-medium text-sm border hover:shadow-md"
             >
               Today
             </button>
-            <button 
-              onClick={() => applyQuickFilter(7)} 
+            <button
+              onClick={() => applyQuickFilter(7)}
               className="px-4 py-2 bg-linear-to-r from-blue-100 to-indigo-50 text-blue-700 rounded-xl hover:from-blue-200 hover:to-indigo-100 transition-all duration-300 font-medium text-sm border border-blue-200 hover:shadow-md"
             >
               Last 7 Days
             </button>
-            <button 
-              onClick={() => applyQuickFilter(30)} 
+            <button
+              onClick={() => applyQuickFilter(30)}
               className="px-4 py-2 bg-linear-to-r from-purple-100 to-violet-50 text-purple-700 rounded-xl hover:from-purple-200 hover:to-violet-100 transition-all duration-300 font-medium text-sm border border-purple-200 hover:shadow-md"
             >
               Last 30 Days
             </button>
-            <button 
-              onClick={() => applyQuickFilter("year")} 
+            <button
+              onClick={() => applyQuickFilter("year")}
               className="px-4 py-2 bg-linear-to-r from-green-100 to-emerald-50 text-green-700 rounded-xl hover:from-green-200 hover:to-emerald-100 transition-all duration-300 font-medium text-sm border border-green-200 hover:shadow-md"
             >
               This Year
@@ -366,12 +367,12 @@ const loginCount = logs.filter((l) =>
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-indigo-500">
                 <Activity className="h-4 w-4 text-white" />
               </div>
-              <CardTitle className="text-sm font-medium text-gray-600">Total Activities</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Today's Activities</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{activityStats.total}</div>
-            <p className="text-xs text-muted-foreground mt-1">Logged actions</p>
+            <p className="text-xs text-muted-foreground mt-1">Logged today</p>
           </CardContent>
         </Card>
 
@@ -382,12 +383,12 @@ const loginCount = logs.filter((l) =>
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-green-500 to-emerald-500">
                 <TrendingUp className="h-4 w-4 text-white" />
               </div>
-              <CardTitle className="text-sm font-medium text-gray-600">User Logins</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Today's Logins</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{activityStats.logins}</div>
-            <p className="text-xs text-muted-foreground mt-1">Authentication events</p>
+            <p className="text-xs text-muted-foreground mt-1">Logins today</p>
           </CardContent>
         </Card>
 
@@ -450,25 +451,25 @@ const loginCount = logs.filter((l) =>
         }}
       >
         <TabsList className="bg-white/80 backdrop-blur-sm p-1.5 rounded-xl shadow-md border-0 h-auto flex-wrap">
-          <TabsTrigger 
-            value="category" 
+          <TabsTrigger
+            value="category"
             className="data-[state=active]:bg-linear-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white rounded-lg px-4 py-2 transition-all duration-300"
           >
             By Category
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="zone"
             className="data-[state=active]:bg-linear-to-r data-[state=active]:from-purple-500 data-[state=active]:to-violet-500 data-[state=active]:text-white rounded-lg px-4 py-2 transition-all duration-300"
           >
             By Zone
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="distribution"
             className="data-[state=active]:bg-linear-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white rounded-lg px-4 py-2 transition-all duration-300"
           >
             Distribution
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="analysis"
             className="data-[state=active]:bg-linear-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white rounded-lg px-4 py-2 transition-all duration-300"
           >
@@ -496,12 +497,12 @@ const loginCount = logs.filter((l) =>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        borderRadius: '12px', 
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: '12px',
                         border: 'none',
                         boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-                      }} 
+                      }}
                     />
                     <Bar dataKey="value" fill="url(#blueGradient)" radius={[6, 6, 0, 0]} />
                     <defs>
@@ -542,12 +543,12 @@ const loginCount = logs.filter((l) =>
                         <Cell key={index} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip 
-                      contentStyle={{ 
-                        borderRadius: '12px', 
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: '12px',
                         border: 'none',
                         boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-                      }} 
+                      }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -584,12 +585,12 @@ const loginCount = logs.filter((l) =>
                       <Cell key={index} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      borderRadius: '12px', 
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: '12px',
                       border: 'none',
                       boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-                    }} 
+                    }}
                   />
                   <Legend />
                 </PieChart>
@@ -622,12 +623,12 @@ const loginCount = logs.filter((l) =>
                     .sort((a, b) => b.value - a.value)
                     .slice(0, 5)
                     .map((c, index) => (
-                      <div 
-                        key={c.name} 
+                      <div
+                        key={c.name}
                         className="flex items-center gap-3 p-3 rounded-xl bg-linear-to-r from-gray-50 to-slate-50 hover:from-purple-50 hover:to-violet-50 transition-colors duration-300"
                       >
-                        <Badge 
-                          variant="outline" 
+                        <Badge
+                          variant="outline"
                           className="bg-linear-to-r from-purple-500 to-violet-500 text-white border-0 h-7 w-7 flex items-center justify-center rounded-full"
                         >
                           {index + 1}
@@ -712,17 +713,17 @@ const loginCount = logs.filter((l) =>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        borderRadius: '12px', 
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: '12px',
                         border: 'none',
                         boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-                      }} 
+                      }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="count" 
-                      stroke="url(#lineGradient)" 
+                    <Line
+                      type="monotone"
+                      dataKey="count"
+                      stroke="url(#lineGradient)"
                       strokeWidth={3}
                       dot={{ fill: '#6366f1', strokeWidth: 2, r: 4 }}
                       activeDot={{ r: 6, fill: '#3b82f6' }}
@@ -744,19 +745,18 @@ const loginCount = logs.filter((l) =>
                 </h3>
                 <div className="space-y-3">
                   {analysisStats.topUsers.map((u, index) => (
-                    <div 
-                      key={u.user_id} 
+                    <div
+                      key={u.user_id}
                       className="flex items-center justify-between p-4 rounded-xl bg-linear-to-r from-gray-50 to-slate-50 border hover:from-purple-50 hover:to-violet-50 transition-colors duration-300"
                     >
                       <div className="flex items-center gap-3">
-                        <Badge 
-                          variant="outline" 
-                          className={`h-8 w-8 flex items-center justify-center rounded-full border-0 ${
-                            index === 0 ? 'bg-linear-to-r from-yellow-400 to-amber-500 text-white' :
+                        <Badge
+                          variant="outline"
+                          className={`h-8 w-8 flex items-center justify-center rounded-full border-0 ${index === 0 ? 'bg-linear-to-r from-yellow-400 to-amber-500 text-white' :
                             index === 1 ? 'bg-linear-to-r from-gray-300 to-gray-400 text-white' :
-                            index === 2 ? 'bg-linear-to-r from-amber-600 to-orange-600 text-white' :
-                            'bg-gray-100 text-gray-600'
-                          }`}
+                              index === 2 ? 'bg-linear-to-r from-amber-600 to-orange-600 text-white' :
+                                'bg-gray-100 text-gray-600'
+                            }`}
                         >
                           {index + 1}
                         </Badge>

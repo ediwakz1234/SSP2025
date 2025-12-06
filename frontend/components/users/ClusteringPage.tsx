@@ -1446,17 +1446,6 @@ ${result?.competitorAnalysis.recommendedStrategy}
                         </Button>
 
                         <Button
-                          className="w-full h-12 bg-linear-to-r from-gray-600 to-slate-700 hover:from-gray-700 hover:to-slate-800 text-white rounded-xl shadow-lg shadow-gray-200 transition-all hover:scale-[1.02]"
-                          onClick={() => {
-                            exportCSV();
-                            setIsExportModalOpen(false);
-                          }}
-                        >
-                          <FileSpreadsheet className="w-5 h-5 mr-2" />
-                          Export as CSV
-                        </Button>
-
-                        <Button
                           className="w-full h-12 bg-linear-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-xl shadow-lg shadow-emerald-200 transition-all hover:scale-[1.02]"
                           onClick={() => {
                             exportExcel();
