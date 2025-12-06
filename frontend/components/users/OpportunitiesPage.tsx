@@ -117,6 +117,110 @@ interface MarketGap {
   recommendedLocations: string[];
 }
 
+// User Preferences for personalized scoring
+interface UserPreferences {
+  businessType: string;
+  radiusRange: number; // in meters (0-2000)
+  budgetMin: number;
+  budgetMax: number;
+  startupCapital: number;
+  competitorTolerance: "Low" | "Medium" | "High";
+  customerPriority: number; // 0-100
+}
+
+const DEFAULT_PREFERENCES: UserPreferences = {
+  businessType: "",
+  radiusRange: 1000,
+  budgetMin: 10000,
+  budgetMax: 50000,
+  startupCapital: 100000,
+  competitorTolerance: "Medium",
+  customerPriority: 50,
+};
+
+// Normalize value to 0-1 range
+function normalize(value: number, min: number, max: number): number {
+  if (max === min) return 0.5;
+  return Math.max(0, Math.min(1, (value - min) / (max - min)));
+}
+
+// Calculate predictive score for each opportunity based on user preferences
+function calculatePredictiveScore(
+  loc: LocationData,
+  preferences: UserPreferences,
+  allLocations: LocationData[]
+): number {
+  // Find min/max for normalization
+  const densities = allLocations.map(l => l.business_density_200m);
+  const competitors = allLocations.map(l => l.competitor_density_200m);
+  const minDensity = Math.min(...densities);
+  const maxDensity = Math.max(...densities);
+  const minCompetitors = Math.min(...competitors);
+  const maxCompetitors = Math.max(...competitors);
+
+  // 1. Density Score (higher density = higher foot traffic = better)
+  const densityScore = normalize(loc.business_density_200m, minDensity, maxDensity);
+
+  // 2. Competition Score (lower = better, so invert)
+  const rawCompetitionScore = normalize(loc.competitor_density_200m, minCompetitors, maxCompetitors);
+  let competitionScore = 1 - rawCompetitionScore;
+
+  // Adjust based on competitor tolerance
+  if (preferences.competitorTolerance === "Low" && rawCompetitionScore > 0.3) {
+    competitionScore *= 0.5; // Penalize high competition
+  } else if (preferences.competitorTolerance === "High") {
+    competitionScore = 0.5 + competitionScore * 0.5; // Be lenient
+  }
+
+  // 3. Zone Score (Commercial > Mixed > Residential)
+  let zoneScore = 0.5;
+  const zone = loc.zone_type?.toLowerCase() || "";
+  if (zone === "commercial") {
+    zoneScore = 1.0;
+  } else if (zone === "mixed") {
+    zoneScore = 0.7;
+  } else if (zone === "residential") {
+    zoneScore = 0.4;
+  }
+
+  // 4. Business Match Score (category match)
+  let businessMatchScore = 0.5;
+  if (preferences.businessType) {
+    const userBusiness = preferences.businessType.toLowerCase();
+    const locCategory = (loc.general_category || "").toLowerCase();
+    if (locCategory.includes(userBusiness) || userBusiness.includes(locCategory)) {
+      businessMatchScore = 1.0;
+    } else if (
+      (userBusiness.includes("food") && locCategory.includes("restaurant")) ||
+      (userBusiness.includes("restaurant") && locCategory.includes("food"))
+    ) {
+      businessMatchScore = 0.9;
+    }
+  }
+
+  // 5. Customer Priority Score (high density areas preferred when high priority)
+  const customerScore = (preferences.customerPriority / 100) * densityScore +
+    ((100 - preferences.customerPriority) / 100) * competitionScore;
+
+  // 6. Capital/Budget Score (estimate based on zone type)
+  const estimatedRent = zoneScore === 1.0 ? 35000 : zoneScore === 0.7 ? 25000 : 15000;
+  const budgetMatch = estimatedRent >= preferences.budgetMin && estimatedRent <= preferences.budgetMax;
+  const budgetScore = budgetMatch ? 1.0 : 0.4;
+
+  // Calculate weighted predictive score
+  const predictiveScore =
+    (0.25 * densityScore) +
+    (0.25 * competitionScore) +
+    (0.20 * zoneScore) +
+    (0.15 * customerScore) +
+    (0.15 * budgetScore * businessMatchScore);
+
+  // Add some variance based on location features
+  const variance = (loc.latitude % 0.001) * 10; // Small variance from coordinates
+
+  return Math.round((predictiveScore + variance * 0.05) * 100);
+}
+
 // -----------------------------------------------------------------------------
 // Utility Functions
 // -----------------------------------------------------------------------------
@@ -560,6 +664,10 @@ export function OpportunitiesPage() {
   const [openExportModal, setOpenExportModal] = useState(false);
   const [_showExportModal, setShowExportModal] = useState(false);
 
+  // Preferences state
+  const [showPreferencesModal, setShowPreferencesModal] = useState(false);
+  const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
+  const [appliedPreferences, setAppliedPreferences] = useState<UserPreferences | null>(null);
 
   // Load clustering result and active businesses
   const loadData = async () => {
@@ -619,13 +727,20 @@ export function OpportunitiesPage() {
   const numClusters = clusteringResults?.num_clusters ?? 0;
   const locations = clusteringResults?.locations || [];
 
-  // Build opportunities array (safe for empty data)
+  // Build opportunities array with predictive scoring
   const opportunities: Opportunity[] = useMemo(() => {
     if (!locations || locations.length === 0) return [];
+
+    const activePrefs = appliedPreferences || DEFAULT_PREFERENCES;
 
     return locations.map((loc: LocationData): Opportunity => {
       const businessDensity: number = loc.business_density_200m || 0;
       const competitors: number = loc.competitor_density_200m || 0;
+
+      // Use predictive score when preferences are applied
+      const score = appliedPreferences
+        ? calculatePredictiveScore(loc, activePrefs, locations)
+        : computeOpportunityScore(businessDensity, competitors, loc.zone_type || "Mixed");
 
       return {
         title: `${businessType || "Business"} near ${loc.street || "Unknown"}`,
@@ -635,7 +750,7 @@ export function OpportunitiesPage() {
         competitors,
         zone_type: loc.zone_type || "Mixed",
         saturation: computeSaturation(businessDensity, competitors),
-        score: computeOpportunityScore(businessDensity, competitors, loc.zone_type || "Mixed"),
+        score,
         cluster: loc.cluster,
         coordinates: {
           lat: loc.latitude || 0,
@@ -647,8 +762,10 @@ export function OpportunitiesPage() {
           zone_type: loc.zone_type || "Mixed",
         }),
       };
-    });
-  }, [locations, businessType]);
+    })
+      // Sort by score descending (best opportunities first)
+      .sort((a, b) => b.score - a.score);
+  }, [locations, businessType, appliedPreferences]);
 
   // Build enhanced opportunities with new fields
   const enhancedOpportunities: EnhancedOpportunityData[] = useMemo(() => {
@@ -1134,6 +1251,24 @@ export function OpportunitiesPage() {
             <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-lg backdrop-blur-sm">
               <MapPin className="w-4 h-4" />
               <span className="text-sm font-medium">{totalBusinesses} Active Businesses</span>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex-1 flex justify-end gap-2">
+              <Button
+                onClick={() => setShowPreferencesModal(true)}
+                className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Preferences
+              </Button>
+              <Button
+                onClick={() => setOpenExportModal(true)}
+                className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm"
+              >
+                <FileDown className="w-4 h-4 mr-2" />
+                Export
+              </Button>
             </div>
           </div>
         </div>
@@ -1730,6 +1865,222 @@ export function OpportunitiesPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Preferences Modal */}
+      {showPreferencesModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b bg-linear-to-r from-blue-50 to-indigo-50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl text-white">
+                    <Zap className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Preferences</h2>
+                    <p className="text-sm text-gray-500">Personalize your opportunity scores</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setShowPreferencesModal(false)}>
+                  ✕
+                </Button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Business Type */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Business Type</label>
+                <select
+                  value={preferences.businessType}
+                  onChange={(e) => setPreferences({ ...preferences, businessType: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Any Category</option>
+                  <option value="Food">Food / Restaurant</option>
+                  <option value="Retail">Retail</option>
+                  <option value="Services">Services</option>
+                  <option value="Pharmacy">Pharmacy</option>
+                  <option value="Entertainment">Entertainment / Leisure</option>
+                  <option value="Trading">Merchandise / Trading</option>
+                </select>
+              </div>
+
+              {/* Radius Range */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Radius Range: <span className="text-blue-600">{preferences.radiusRange}m</span>
+                </label>
+                <input
+                  type="range"
+                  min="100"
+                  max="2000"
+                  step="100"
+                  value={preferences.radiusRange}
+                  onChange={(e) => setPreferences({ ...preferences, radiusRange: Number(e.target.value) })}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>100m</span>
+                  <span>2000m</span>
+                </div>
+              </div>
+
+              {/* Budget Range */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Monthly Budget: <span className="text-blue-600">₱{preferences.budgetMin.toLocaleString()} - ₱{preferences.budgetMax.toLocaleString()}</span>
+                </label>
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={preferences.budgetMin}
+                    onChange={(e) => setPreferences({ ...preferences, budgetMin: Number(e.target.value) })}
+                    className="px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={preferences.budgetMax}
+                    onChange={(e) => setPreferences({ ...preferences, budgetMax: Number(e.target.value) })}
+                    className="px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Startup Capital */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Startup Capital: <span className="text-blue-600">₱{preferences.startupCapital.toLocaleString()}</span>
+                </label>
+                <input
+                  type="range"
+                  min="20000"
+                  max="1000000"
+                  step="10000"
+                  value={preferences.startupCapital}
+                  onChange={(e) => setPreferences({ ...preferences, startupCapital: Number(e.target.value) })}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>₱20k</span>
+                  <span>₱1M</span>
+                </div>
+              </div>
+
+              {/* Competitor Tolerance */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Competitor Tolerance</label>
+                <div className="flex gap-3">
+                  {(["Low", "Medium", "High"] as const).map((level) => (
+                    <button
+                      key={level}
+                      onClick={() => setPreferences({ ...preferences, competitorTolerance: level })}
+                      className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition-all ${preferences.competitorTolerance === level
+                          ? "bg-blue-600 text-white shadow-lg"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Customer Priority */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Customer Demand Priority: <span className="text-blue-600">{preferences.customerPriority}%</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={preferences.customerPriority}
+                  onChange={(e) => setPreferences({ ...preferences, customerPriority: Number(e.target.value) })}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Low priority</span>
+                  <span>High priority</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t bg-gray-50 flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setPreferences(DEFAULT_PREFERENCES);
+                  setAppliedPreferences(null);
+                  setShowPreferencesModal(false);
+                  toast.success("Preferences reset to default");
+                }}
+              >
+                Reset
+              </Button>
+              <Button
+                className="flex-1 bg-linear-to-r from-blue-600 to-indigo-600 text-white"
+                onClick={() => {
+                  setAppliedPreferences({ ...preferences });
+                  setShowPreferencesModal(false);
+                  toast.success("Preferences applied! Opportunities reranked.");
+                }}
+              >
+                Apply Preferences
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Export Modal */}
+      {openExportModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            <div className="p-6 border-b">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold">Export Report</h2>
+                <Button variant="ghost" size="sm" onClick={() => setOpenExportModal(false)}>
+                  ✕
+                </Button>
+              </div>
+            </div>
+            <div className="p-6 space-y-3">
+              <Button
+                className="w-full justify-start gap-3 h-14"
+                variant="outline"
+                onClick={() => {
+                  exportPDF();
+                  setOpenExportModal(false);
+                }}
+              >
+                <FileText className="w-5 h-5 text-red-500" />
+                <div className="text-left">
+                  <div className="font-medium">PDF Report</div>
+                  <div className="text-xs text-gray-500">Dashboard metrics, charts, insights</div>
+                </div>
+              </Button>
+              <Button
+                className="w-full justify-start gap-3 h-14"
+                variant="outline"
+                onClick={() => {
+                  exportExcel();
+                  setOpenExportModal(false);
+                }}
+              >
+                <FileType className="w-5 h-5 text-green-500" />
+                <div className="text-left">
+                  <div className="font-medium">Excel Workbook</div>
+                  <div className="text-xs text-gray-500">3 sheets: Clusters, Raw Data, Insights</div>
+                </div>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
