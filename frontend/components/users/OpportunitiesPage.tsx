@@ -427,54 +427,75 @@ function calculateClusterKPIs(locations: LocationData[], numClusters: number): C
   };
 }
 
-// Generate auto-insights from K-means cluster analysis
-function generateClusterInsights(kpis: ClusterKPIs): string[] {
+// Generate auto-insights from K-means cluster analysis with REAL DATA
+function generateClusterInsights(kpis: ClusterKPIs, locations: LocationData[]): string[] {
   const insights: string[] = [];
 
   if (kpis.totalOpportunities === 0) {
     return ["No clustering data available. Run a clustering analysis first."];
   }
 
-  // Best cluster insight
+  // 1. TOP CATEGORY - using categoryDistribution from kpis
+  if (kpis.categoryDistribution.length > 0) {
+    const topCat = kpis.categoryDistribution[0];
+    insights.push(`Top category: ${topCat.name} — ${topCat.count} businesses detected (highest presence in the area)`);
+  }
+
+  // 2. LOWEST COMPETITION CLUSTER - with street name
+  if (kpis.lowestCompetitionCluster) {
+    // Find a representative street from this cluster's locations
+    const clusterLocations = locations.filter(loc => loc.cluster === kpis.lowestCompetitionCluster?.clusterId);
+    const streetName = clusterLocations[0]?.street || `Cluster ${kpis.lowestCompetitionCluster.clusterId}`;
+    const competitorCount = kpis.lowestCompetitionCluster.avgCompetition;
+
+    if (competitorCount === 0) {
+      insights.push(`Lowest competition: Near ${streetName} — no direct competitors (ideal for first movers)`);
+    } else {
+      insights.push(`Lowest competition: Near ${streetName} — only ${competitorCount} competitor${competitorCount > 1 ? 's' : ''} nearby`);
+    }
+  }
+
+  // 3. AVERAGE BUSINESS DENSITY
+  if (kpis.avgBusinessDensity > 0) {
+    insights.push(`Average business density: ${kpis.avgBusinessDensity} nearby businesses across opportunity clusters`);
+  }
+
+  // 4. BEST CLUSTER with opportunity score
   if (kpis.bestCluster) {
-    insights.push(`Cluster ${kpis.bestCluster.clusterId} has the highest opportunity score (${kpis.bestCluster.opportunityScore}) with ${kpis.bestCluster.locationCount} locations`);
+    const bestLocs = locations.filter(loc => loc.cluster === kpis.bestCluster?.clusterId);
+    const bestStreet = bestLocs[0]?.street || `Zone ${kpis.bestCluster.clusterId}`;
+    insights.push(`Best opportunity: Near ${bestStreet} — Score ${kpis.bestCluster.opportunityScore} (${kpis.bestCluster.locationCount} locations)`);
   }
 
-  // Lowest competition cluster
-  if (kpis.lowestCompetitionCluster && kpis.lowestCompetitionCluster.avgCompetition < 3) {
-    insights.push(`Cluster ${kpis.lowestCompetitionCluster.clusterId} has lowest competition (${kpis.lowestCompetitionCluster.avgCompetition}) — great for new market entry`);
+  // 5. COMMERCIAL VS RESIDENTIAL ZONE DISTRIBUTION
+  const commercialPct = kpis.totalOpportunities > 0
+    ? Math.round((kpis.commercialZoneCount / kpis.totalOpportunities) * 100)
+    : 0;
+  const residentialPct = kpis.totalOpportunities > 0
+    ? Math.round((kpis.residentialZoneCount / kpis.totalOpportunities) * 100)
+    : 0;
+
+  if (commercialPct > 50) {
+    insights.push(`Zone analysis: ${commercialPct}% commercial zones — high foot traffic areas dominate`);
+  } else if (residentialPct > 50) {
+    insights.push(`Zone analysis: ${residentialPct}% residential zones — community-focused businesses recommended`);
+  } else {
+    insights.push(`Zone analysis: Balanced mix — ${commercialPct}% commercial, ${residentialPct}% residential`);
   }
 
-  // Highest density cluster
-  if (kpis.highestDensityCluster && kpis.highestDensityCluster.avgDensity > 15) {
-    insights.push(`Cluster ${kpis.highestDensityCluster.clusterId} has highest business density (${kpis.highestDensityCluster.avgDensity}) indicating strong commercial activity`);
+  // 6. HIGHEST DENSITY CLUSTER
+  if (kpis.highestDensityCluster && kpis.highestDensityCluster.avgDensity > 0) {
+    const denseLocs = locations.filter(loc => loc.cluster === kpis.highestDensityCluster?.clusterId);
+    const denseStreet = denseLocs[0]?.street || `Cluster ${kpis.highestDensityCluster.clusterId}`;
+    insights.push(`Highest activity: Near ${denseStreet} — ${kpis.highestDensityCluster.avgDensity} businesses nearby (high traffic zone)`);
   }
 
-  // High-value opportunity areas (low competition + high density)
-  kpis.clusterStats.forEach(cluster => {
-    if (cluster.avgCompetition < 2 && cluster.avgDensity > 10) {
-      insights.push(`High-value opportunity: Cluster ${cluster.clusterId} has low competition (${cluster.avgCompetition}) with high business activity`);
-    }
-  });
-
-  // Untapped areas
-  kpis.clusterStats.forEach(cluster => {
-    if (cluster.avgDensity < 5 && cluster.avgCompetition === 0) {
-      insights.push(`Untapped market: Cluster ${cluster.clusterId} has minimal business presence — first mover advantage available`);
-    }
-  });
-
-  // Commercial vs Residential balance
-  const commercialPct = Math.round((kpis.commercialZoneCount / kpis.totalOpportunities) * 100);
-  if (commercialPct > 70) {
-    insights.push(`${commercialPct}% of opportunities are in commercial zones — high foot traffic expected`);
-  } else if (commercialPct < 30) {
-    insights.push(`${commercialPct}% of opportunities are in commercial zones — consider community-focused business models`);
-  }
-
-  // Category gaps
-  if (kpis.categoryDistribution.length < 3) {
-    insights.push("Market gap detected: Limited category diversity — opportunity to introduce new business types");
+  // 7. CATEGORY DIVERSITY check
+  if (kpis.categoryDistribution.length >= 3) {
+    const top3 = kpis.categoryDistribution.slice(0, 3).map(c => c.name).join(", ");
+    insights.push(`Category diversity: Top 3 are ${top3}`);
+  } else if (kpis.categoryDistribution.length > 0) {
+    insights.push(`Market gap detected: Limited category diversity — opportunity to introduce new business types`);
   }
 
   return insights.slice(0, 6); // Limit to top 6 insights
@@ -866,10 +887,10 @@ export function OpportunitiesPage() {
     [locations, numClusters]
   );
 
-  // Auto-generated cluster insights
+  // Auto-generated cluster insights with REAL DATA
   const clusterInsights = useMemo(() =>
-    generateClusterInsights(clusterKPIs),
-    [clusterKPIs]
+    generateClusterInsights(clusterKPIs, locations),
+    [clusterKPIs, locations]
   );
 
   const categoryStats = useMemo(() => buildCategoryStats(businesses), [businesses]);
@@ -1568,40 +1589,17 @@ export function OpportunitiesPage() {
           </Button>
 
 
-          {/* Export Modal */}
+          {/* Export Modal (PDF and Excel only) */}
           {openExportModal && (
             <>
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
               <div className="fixed z-50 bg-white p-8 rounded-2xl shadow-2xl w-[420px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 <h2 className="text-xl font-bold mb-1">Export Report</h2>
                 <p className="text-sm text-gray-500 mb-6">
-                  Choose a file format. PDF is best for sharing. Excel and CSV
-                  are best for editing.
+                  Choose a file format. PDF includes charts and insights.
                 </p>
 
                 <div className="space-y-3">
-                  <Button
-                    variant="outline"
-                    className="w-full h-14 flex justify-start gap-3 rounded-xl hover:bg-green-50 hover:border-green-300 transition-all"
-                    onClick={exportCSV}
-                  >
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <FileType className="w-5 h-5 text-green-600" />
-                    </div>
-                    <span className="font-medium">Export as CSV</span>
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    className="w-full h-14 flex justify-start gap-3 rounded-xl hover:bg-blue-50 hover:border-blue-300 transition-all"
-                    onClick={exportExcel}
-                  >
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <FileSpreadsheet className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <span className="font-medium">Export as Excel (.xlsx)</span>
-                  </Button>
-
                   <Button
                     variant="outline"
                     className="w-full h-14 flex justify-start gap-3 rounded-xl hover:bg-red-50 hover:border-red-300 transition-all"
@@ -1610,7 +1608,24 @@ export function OpportunitiesPage() {
                     <div className="p-2 bg-red-100 rounded-lg">
                       <FileText className="w-5 h-5 text-red-600" />
                     </div>
-                    <span className="font-medium">Export as PDF</span>
+                    <div className="text-left">
+                      <span className="font-medium block">Export as PDF</span>
+                      <span className="text-xs text-gray-500">Dashboard, charts, insights</span>
+                    </div>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="w-full h-14 flex justify-start gap-3 rounded-xl hover:bg-green-50 hover:border-green-300 transition-all"
+                    onClick={exportExcel}
+                  >
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <FileType className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div className="text-left">
+                      <span className="font-medium block">Export as Excel</span>
+                      <span className="text-xs text-gray-500">3 sheets: Clusters, Raw Data, Insights</span>
+                    </div>
                   </Button>
                 </div>
 
@@ -1978,8 +1993,8 @@ export function OpportunitiesPage() {
                       key={level}
                       onClick={() => setPreferences({ ...preferences, competitorTolerance: level })}
                       className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition-all ${preferences.competitorTolerance === level
-                          ? "bg-blue-600 text-white shadow-lg"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-blue-600 text-white shadow-lg"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                         }`}
                     >
                       {level}
