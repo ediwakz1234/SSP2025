@@ -14,6 +14,24 @@ export default async function handler(req, res) {
         if (!businessIdea) return res.status(400).json({ error: "Missing businessIdea" });
         if (!process.env.GEMINI_API_KEY) return res.status(500).json({ error: "AI not configured" });
 
+        // HARDCODED PROHIBITED CHECK (Pre-AI)
+        const PROHIBITED_KEYWORDS = [
+            "spakol", "prostitution", "escort", "sexual", "trafficking",
+            "drugs", "narcotics", "cannabis", "weed", "marijuana",
+            "gambling", "casino", "betting", "lottery",
+            "weapon", "firearm", "explosive", "bomb",
+            "scam", "fraud", "cybercrime", "piracy", "fake id"
+        ];
+
+        const lowerIdea = businessIdea.toLowerCase();
+        if (PROHIBITED_KEYWORDS.some(word => lowerIdea.includes(word))) {
+            return res.status(200).json({
+                category: "prohibited",
+                confidence: 1, // 100% confident it's prohibited
+                explanation: "This business idea involves restricted or illegal activities (detected by keyword security filter)."
+            });
+        }
+
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
