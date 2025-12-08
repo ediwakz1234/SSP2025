@@ -127,7 +127,9 @@ SSPTHESIS/
 
 3. **Set up environment variables**
    
-   Create `.env` files in both `backend/` and `frontend/` directories (see [Environment Variables](#-environment-variables)).
+   Copy the samples to locals and fill them (see [Environment Variables](#-environment-variables)):
+   - `backend/.env.example` → `backend/.env.local`
+   - `frontend/.env.example` → `frontend/.env.local`
 
 4. **Start development servers**
    ```bash
@@ -157,6 +159,8 @@ PORT=3000
 NODE_ENV=development
 ```
 
+For local npm runs, create `backend/.env.local` from `backend/.env.example` and add your real values (especially `GEMINI_API_KEY`, Supabase keys, and `JWT_SECRET`). The backend dev server and the Vercel-style API handlers now load both `.env` and `.env.local`, so the Gemini key is available without Vercel.
+
 ### Frontend (`frontend/.env`)
 
 ```env
@@ -167,6 +171,8 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 # API Configuration (optional - defaults to proxy)
 VITE_API_URL=http://localhost:3000
 ```
+
+Frontend dev can use `frontend/.env.local` copied from `frontend/.env.example` to keep local overrides out of version control.
 
 ## 📚 API Documentation
 

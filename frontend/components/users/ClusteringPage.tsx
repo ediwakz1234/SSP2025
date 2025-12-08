@@ -1213,7 +1213,7 @@ ${result?.competitorAnalysis.recommendedStrategy}
                     aiCategoryLoading ||
                     isValidating ||
                     !businessIdea.trim() ||
-                    (businessValidation && !businessValidation.valid)
+                    !!(businessValidation && !businessValidation.valid)
                   }
                   className="h-11 rounded-xl border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300"
                 >
