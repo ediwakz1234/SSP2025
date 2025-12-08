@@ -1,8 +1,9 @@
 // Merged Analytics Page combining full UI with realtime Supabase data
 // Final Clean + Export Modal + Category Normalization + Icons + User-friendly features
 // ⭐ Now includes DATE RANGE FILTER + QUICK FILTERS
+// ⭐ Export: PDF (full visuals) + Excel (full datasets) - CSV removed
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -34,11 +35,11 @@ import {
   Target,
   FileDown,
   FileSpreadsheet,
-  FileText,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import { useActivity, logActivity } from "../../utils/activity";
 import { toast } from "sonner";
 import type { Business } from "../../types";
@@ -65,6 +66,10 @@ export function UserAnalyticsPage() {
   const [stats, setStats] = useState<AnalyticsStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Ref for capturing analytics content for PDF export
+  const analyticsContentRef = useRef<HTMLDivElement>(null);
 
   // Date filter states
   const [startDate, setStartDate] = useState("");
@@ -149,9 +154,9 @@ export function UserAnalyticsPage() {
         "merchandizing/trading": "Merchandise / Trading",
         "trading": "Merchandise / Trading",
         "merchandise": "Merchandise / Trading",
-        "pet store": "Pet Store",
-        "pet stores": "Pet Store",
-        "pets": "Pet Store",
+        "pet store": "Services",
+        "pet stores": "Services",
+        "pets": "Services",
       };
 
       // Category normalization function
@@ -277,43 +282,255 @@ export function UserAnalyticsPage() {
   // EXPORT FUNCTIONS
   // ========================
 
-  const exportCSV = () => {
-    const rows = [
-      ["Category", "Count"],
-      ...categories.map((c) => [c.name, c.value]),
-    ];
-
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      rows.map((e) => e.join(",")).join("\n");
-
-    const link = document.createElement("a");
-    link.href = encodeURI(csvContent);
-    link.download = "business_analytics.csv";
-    link.click();
-  };
-
+  // Enhanced Excel Export with multiple sheets containing full datasets
   const exportExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(categories);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Categories");
-    XLSX.writeFile(wb, "business_analytics.xlsx");
+    const workbook = XLSX.utils.book_new();
+    const totalBusinesses = stats?.total_businesses || 0;
+
+    // Sheet 1: Summary
+    const summaryData = [
+      { Metric: "Total Businesses", Value: totalBusinesses },
+      { Metric: "Total Categories", Value: categories.length },
+      { Metric: "Total Zone Types", Value: zones.length },
+      { Metric: "Total Streets", Value: streets.length },
+      { Metric: "Avg. Businesses per Street", Value: streets.length ? (totalBusinesses / streets.length).toFixed(2) : "0" },
+      { Metric: "Avg. Businesses per Zone", Value: zones.length ? (totalBusinesses / zones.length).toFixed(2) : "0" },
+      { Metric: "Report Generated", Value: new Date().toLocaleString() },
+    ];
+    const summarySheet = XLSX.utils.json_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
+
+    // Sheet 2: Categories (full breakdown)
+    const categorySheetData = categories.map((c) => ({
+      Category: c.name,
+      Count: c.value,
+      Percentage: ((c.value / totalBusinesses) * 100).toFixed(2) + "%",
+    }));
+    const categorySheet = XLSX.utils.json_to_sheet(categorySheetData);
+    XLSX.utils.book_append_sheet(workbook, categorySheet, "Categories");
+
+    // Sheet 3: Zones (full breakdown)
+    const zoneSheetData = zones.map((z) => ({
+      "Zone Type": z.name,
+      Count: z.value,
+      Percentage: ((z.value / totalBusinesses) * 100).toFixed(2) + "%",
+    }));
+    const zoneSheet = XLSX.utils.json_to_sheet(zoneSheetData);
+    XLSX.utils.book_append_sheet(workbook, zoneSheet, "Zones");
+
+    // Sheet 4: Streets (full breakdown)
+    const streetSheetData = streets
+      .sort((a, b) => b.value - a.value)
+      .map((s) => ({
+        Street: s.name,
+        "Business Count": s.value,
+        Percentage: ((s.value / totalBusinesses) * 100).toFixed(2) + "%",
+      }));
+    const streetSheet = XLSX.utils.json_to_sheet(streetSheetData);
+    XLSX.utils.book_append_sheet(workbook, streetSheet, "Streets");
+
+    // Sheet 5: Raw Data (all business records)
+    const rawData = businesses.map((b) => ({
+      "Business Name": b.business_name || "N/A",
+      Category: b.general_category || "N/A",
+      "Zone Type": b.zone_type || "N/A",
+      Street: b.street || "N/A",
+      Status: b.status || "N/A",
+      "Created At": b.created_at || "N/A",
+    }));
+    const rawDataSheet = XLSX.utils.json_to_sheet(rawData);
+    XLSX.utils.book_append_sheet(workbook, rawDataSheet, "Raw Data");
+
+    // Save the workbook
+    const fileName = `business_analytics_${new Date().toISOString().split("T")[0]}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
   };
 
-  const exportPDF = () => {
-    const pdf = new jsPDF();
-    pdf.setFontSize(16);
-    pdf.text("Business Analytics Report", 10, 10);
+  // Enhanced PDF Export with full visual content using html2canvas
+  const exportPDF = async () => {
+    if (!analyticsContentRef.current) {
+      toast.error("Unable to capture analytics content");
+      return;
+    }
 
-    pdf.setFontSize(12);
-    let y = 20;
+    setIsExporting(true);
+    toast.message("Generating PDF with all charts and data...");
 
-    categories.forEach((c) => {
-      pdf.text(`${c.name}: ${c.value}`, 10, y);
-      y += 8;
-    });
+    try {
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 15;
+      let yPos = margin;
 
-    pdf.save("business_analytics.pdf");
+      // Title
+      pdf.setFontSize(22);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(59, 130, 246); // Blue
+      pdf.text("Business Analytics Report", pageWidth / 2, yPos, { align: "center" });
+      yPos += 10;
+
+      // Subtitle with date
+      pdf.setFontSize(11);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, yPos, { align: "center" });
+      yPos += 15;
+
+      // Summary Statistics Section
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(0, 0, 0);
+      pdf.text("Summary Statistics", margin, yPos);
+      yPos += 8;
+
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+      const totalBusinesses = stats?.total_businesses || 0;
+      const summaryItems = [
+        `Total Businesses: ${totalBusinesses}`,
+        `Categories: ${categories.length}`,
+        `Zone Types: ${zones.length}`,
+        `Streets Covered: ${streets.length}`,
+        `Avg. per Street: ${streets.length ? (totalBusinesses / streets.length).toFixed(1) : 0}`,
+        `Avg. per Zone: ${zones.length ? (totalBusinesses / zones.length).toFixed(1) : 0}`,
+      ];
+      summaryItems.forEach((item) => {
+        pdf.text(`• ${item}`, margin + 5, yPos);
+        yPos += 6;
+      });
+      yPos += 10;
+
+      // Capture the analytics content as image
+      const canvas = await html2canvas(analyticsContentRef.current, {
+        scale: 2, // High quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const imgWidth = pageWidth - margin * 2;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // Add new page if needed for the chart image
+      if (yPos + 50 > pageHeight) {
+        pdf.addPage();
+        yPos = margin;
+      }
+
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Visual Analytics", margin, yPos);
+      yPos += 8;
+
+      // Add the captured image (may span multiple pages)
+      let remainingHeight = imgHeight;
+      let sourceY = 0;
+      const maxImageHeightPerPage = pageHeight - yPos - margin;
+
+      while (remainingHeight > 0) {
+        const heightToDraw = Math.min(remainingHeight, maxImageHeightPerPage);
+        const sourceHeight = (heightToDraw / imgHeight) * canvas.height;
+
+        // Create a temporary canvas for the slice
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = sourceHeight;
+        const tempCtx = tempCanvas.getContext("2d");
+        if (tempCtx) {
+          tempCtx.drawImage(canvas, 0, sourceY, canvas.width, sourceHeight, 0, 0, canvas.width, sourceHeight);
+          const sliceData = tempCanvas.toDataURL("image/png");
+          pdf.addImage(sliceData, "PNG", margin, yPos, imgWidth, heightToDraw);
+        }
+
+        remainingHeight -= heightToDraw;
+        sourceY += sourceHeight;
+
+        if (remainingHeight > 0) {
+          pdf.addPage();
+          yPos = margin;
+        }
+      }
+
+      // Add a new page for data tables
+      pdf.addPage();
+      yPos = margin;
+
+      // Categories Table
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Category Breakdown", margin, yPos);
+      yPos += 8;
+
+      pdf.setFontSize(9);
+      pdf.setFont("helvetica", "normal");
+      categories.forEach((cat, idx) => {
+        if (yPos > pageHeight - margin) {
+          pdf.addPage();
+          yPos = margin;
+        }
+        const percentage = ((cat.value / totalBusinesses) * 100).toFixed(1);
+        pdf.text(`${idx + 1}. ${cat.name}: ${cat.value} (${percentage}%)`, margin + 5, yPos);
+        yPos += 5;
+      });
+      yPos += 10;
+
+      // Zone Distribution Table
+      if (yPos > pageHeight - 40) {
+        pdf.addPage();
+        yPos = margin;
+      }
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Zone Distribution", margin, yPos);
+      yPos += 8;
+
+      pdf.setFontSize(9);
+      pdf.setFont("helvetica", "normal");
+      zones.forEach((zone) => {
+        if (yPos > pageHeight - margin) {
+          pdf.addPage();
+          yPos = margin;
+        }
+        const percentage = ((zone.value / totalBusinesses) * 100).toFixed(1);
+        pdf.text(`• ${zone.name}: ${zone.value} businesses (${percentage}%)`, margin + 5, yPos);
+        yPos += 5;
+      });
+      yPos += 10;
+
+      // Key Insights Section
+      if (yPos > pageHeight - 60) {
+        pdf.addPage();
+        yPos = margin;
+      }
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Key Insights", margin, yPos);
+      yPos += 8;
+
+      pdf.setFontSize(9);
+      pdf.setFont("helvetica", "normal");
+      const insights = [
+        `Most popular category: ${categories[0]?.name || "N/A"} with ${categories[0]?.value || 0} businesses`,
+        `Commercial zone coverage: ${((zones.find((z) => z.name === "Commercial")?.value || 0) / totalBusinesses * 100).toFixed(1)}%`,
+        `Average business density: ${streets.length ? (totalBusinesses / streets.length).toFixed(1) : 0} per street`,
+        `Top 3 categories account for ${categories.slice(0, 3).reduce((acc, c) => acc + c.value, 0)} businesses (${((categories.slice(0, 3).reduce((acc, c) => acc + c.value, 0) / totalBusinesses) * 100).toFixed(1)}%)`,
+      ];
+      insights.forEach((insight) => {
+        pdf.text(`• ${insight}`, margin + 5, yPos, { maxWidth: pageWidth - margin * 2 - 10 });
+        yPos += 6;
+      });
+
+      // Save the PDF
+      const fileName = `business_analytics_${new Date().toISOString().split("T")[0]}.pdf`;
+      pdf.save(fileName);
+    } catch (error) {
+      console.error("PDF Export Error:", error);
+      toast.error("Failed to generate PDF. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
 
@@ -534,57 +751,53 @@ export function UserAnalyticsPage() {
             </div>
 
             <div className="space-y-3">
+              {/* PDF Export - Full visuals and data */}
               <button
-                onClick={() => {
-                  exportCSV();
-                  toast.success("Exported analytics as CSV");
-                  logActivity("Exported Analytics Report", { format: "CSV" });
+                onClick={async () => {
                   setShowExportModal(false);
+                  await exportPDF();
+                  toast.success("Exported analytics as PDF with all charts and data");
+                  logActivity("Exported Analytics Report", { format: "PDF", content: "full_visuals" });
                 }}
-                className="w-full h-14 flex items-center gap-3 bg-gray-50 hover:bg-gray-100 px-4 rounded-xl transition-all hover:scale-[1.02] border-2 border-transparent hover:border-gray-200"
+                disabled={isExporting}
+                className="w-full h-16 flex items-center gap-4 bg-red-50 hover:bg-red-100 px-5 rounded-xl transition-all hover:scale-[1.02] border-2 border-transparent hover:border-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <div className="p-2 bg-gray-200 rounded-lg">
-                  <FileText className="w-5 h-5 text-gray-600" />
+                <div className="p-2.5 bg-red-200 rounded-lg">
+                  <FileDown className="w-5 h-5 text-red-600" />
                 </div>
-                <span className="font-medium">Export as CSV</span>
+                <div className="text-left">
+                  <span className="font-semibold text-red-700 block">Export as PDF</span>
+                  <span className="text-xs text-red-500">Full visuals, charts &amp; insights</span>
+                </div>
               </button>
 
+              {/* Excel Export - Full datasets */}
               <button
                 onClick={() => {
                   exportExcel();
-                  toast.success("Exported analytics as Excel");
-                  logActivity("Exported Analytics Report", { format: "Excel" });
+                  toast.success("Exported analytics as Excel (5 sheets)");
+                  logActivity("Exported Analytics Report", { format: "Excel", sheets: 5, content: "full_datasets" });
                   setShowExportModal(false);
                 }}
-                className="w-full h-14 flex items-center gap-3 bg-green-50 hover:bg-green-100 px-4 rounded-xl transition-all hover:scale-[1.02] border-2 border-transparent hover:border-green-200"
+                disabled={isExporting}
+                className="w-full h-16 flex items-center gap-4 bg-green-50 hover:bg-green-100 px-5 rounded-xl transition-all hover:scale-[1.02] border-2 border-transparent hover:border-green-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <div className="p-2 bg-green-200 rounded-lg">
+                <div className="p-2.5 bg-green-200 rounded-lg">
                   <FileSpreadsheet className="w-5 h-5 text-green-600" />
                 </div>
-                <span className="font-medium text-green-700">Export as Excel (.xlsx)</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  exportPDF();
-                  toast.success("Exported analytics as PDF");
-                  logActivity("Exported Analytics Report", { format: "PDF" });
-                  setShowExportModal(false);
-                }}
-                className="w-full h-14 flex items-center gap-3 bg-red-50 hover:bg-red-100 px-4 rounded-xl transition-all hover:scale-[1.02] border-2 border-transparent hover:border-red-200"
-              >
-                <div className="p-2 bg-red-200 rounded-lg">
-                  <FileDown className="w-5 h-5 text-red-600" />
+                <div className="text-left">
+                  <span className="font-semibold text-green-700 block">Export as Excel (.xlsx)</span>
+                  <span className="text-xs text-green-500">Full datasets &amp; raw data (5 sheets)</span>
                 </div>
-                <span className="font-medium text-red-700">Export as PDF</span>
               </button>
             </div>
 
             <button
               onClick={() => setShowExportModal(false)}
-              className="w-full h-12 rounded-xl bg-linear-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white font-medium transition-all"
+              disabled={isExporting}
+              className="w-full h-12 rounded-xl bg-linear-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white font-medium transition-all disabled:opacity-50"
             >
-              Close
+              {isExporting ? "Exporting..." : "Close"}
             </button>
           </div>
         </div>
@@ -634,127 +847,130 @@ export function UserAnalyticsPage() {
 
         {/* CATEGORY TAB */}
         <TabsContent value="category" className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* BAR CHART */}
-            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-              <CardHeader className="bg-linear-to-r from-blue-50 to-indigo-50 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl text-white shadow-lg shadow-blue-200">
-                    <Activity className="w-5 h-5" />
+          {/* Wrapper for PDF capture */}
+          <div ref={analyticsContentRef}>
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* BAR CHART */}
+              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+                <CardHeader className="bg-linear-to-r from-blue-50 to-indigo-50 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl text-white shadow-lg shadow-blue-200">
+                      <Activity className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Business Count by Category</CardTitle>
+                      <CardDescription>Distribution of business types</CardDescription>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className="text-lg">Business Count by Category</CardTitle>
-                    <CardDescription>Distribution of business types</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={categoryData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'white',
-                        borderRadius: '12px',
-                        border: 'none',
-                        boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-                      }}
-                    />
-                    <Bar dataKey="value" fill="url(#colorGradient)" radius={[8, 8, 0, 0]} />
-                    <defs>
-                      <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#6366f1" />
-                        <stop offset="100%" stopColor="#3b82f6" />
-                      </linearGradient>
-                    </defs>
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={categoryData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 12 }} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'white',
+                          borderRadius: '12px',
+                          border: 'none',
+                          boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
+                        }}
+                      />
+                      <Bar dataKey="value" fill="url(#colorGradient)" radius={[8, 8, 0, 0]} />
+                      <defs>
+                        <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#6366f1" />
+                          <stop offset="100%" stopColor="#3b82f6" />
+                        </linearGradient>
+                      </defs>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
 
-            {/* PIE CHART */}
-            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-              <CardHeader className="bg-linear-to-r from-purple-50 to-violet-50 border-b">
+              {/* PIE CHART */}
+              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+                <CardHeader className="bg-linear-to-r from-purple-50 to-violet-50 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-linear-to-br from-purple-500 to-violet-600 rounded-xl text-white shadow-lg shadow-purple-200">
+                      <Target className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Category Percentage</CardTitle>
+                      <CardDescription>Proportional distribution</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={categoryData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) =>
+                          `${name}: ${(percent * 100).toFixed(0)}%`
+                        }
+                        outerRadius={80}
+                        dataKey="value"
+                      >
+                        {categoryData.map((entry, index) => (
+                          <Cell
+                            key={index}
+                            fill={COLORS[index % COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'white',
+                          borderRadius: '12px',
+                          border: 'none',
+                          boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* SUMMARY */}
+            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden mt-6">
+              <CardHeader className="bg-linear-to-r from-emerald-50 to-teal-50 border-b">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-linear-to-br from-purple-500 to-violet-600 rounded-xl text-white shadow-lg shadow-purple-200">
-                    <Target className="w-5 h-5" />
+                  <div className="p-2.5 bg-linear-to-br from-emerald-500 to-teal-600 rounded-xl text-white shadow-lg shadow-emerald-200">
+                    <Building2 className="w-5 h-5" />
                   </div>
-                  <div>
-                    <CardTitle className="text-lg">Category Percentage</CardTitle>
-                    <CardDescription>Proportional distribution</CardDescription>
-                  </div>
+                  <CardTitle className="text-lg">Category Summary</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
-                      }
-                      outerRadius={80}
-                      dataKey="value"
+                <div className="grid md:grid-cols-3 gap-4">
+                  {categoryData.map((cat, index) => (
+                    <div
+                      key={cat.name}
+                      className="flex items-center justify-between p-4 bg-linear-to-r from-gray-50 to-slate-50 border rounded-xl hover:shadow-md transition-all hover:scale-[1.02] group"
                     >
-                      {categoryData.map((entry, index) => (
-                        <Cell
-                          key={index}
-                          fill={COLORS[index % COLORS.length]}
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-4 h-4 rounded-full shadow-sm"
+                          style={{
+                            backgroundColor:
+                              COLORS[index % COLORS.length],
+                          }}
                         />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'white',
-                        borderRadius: '12px',
-                        border: 'none',
-                        boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                        <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">{cat.name}</span>
+                      </div>
+                      <Badge className="bg-linear-to-r from-blue-500 to-indigo-600 text-white border-0 shadow-md">{cat.value}</Badge>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>
-
-          {/* SUMMARY */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-linear-to-r from-emerald-50 to-teal-50 border-b">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-linear-to-br from-emerald-500 to-teal-600 rounded-xl text-white shadow-lg shadow-emerald-200">
-                  <Building2 className="w-5 h-5" />
-                </div>
-                <CardTitle className="text-lg">Category Summary</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid md:grid-cols-3 gap-4">
-                {categoryData.map((cat, index) => (
-                  <div
-                    key={cat.name}
-                    className="flex items-center justify-between p-4 bg-linear-to-r from-gray-50 to-slate-50 border rounded-xl hover:shadow-md transition-all hover:scale-[1.02] group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-4 h-4 rounded-full shadow-sm"
-                        style={{
-                          backgroundColor:
-                            COLORS[index % COLORS.length],
-                        }}
-                      />
-                      <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">{cat.name}</span>
-                    </div>
-                    <Badge className="bg-linear-to-r from-blue-500 to-indigo-600 text-white border-0 shadow-md">{cat.value}</Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* ZONE TAB */}

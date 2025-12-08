@@ -101,10 +101,6 @@ const CATEGORY_OPTIONS = [
     value: "Entertainment / Leisure",
     label: "Entertainment / Leisure",
   },
-  {
-    value: "Pet Store",
-    label: "Pet Store",
-  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -340,80 +336,63 @@ export function ClusteringPage() {
     };
   }, [businessIdea]);
 
-  // ===== CATEGORY DETECTION EFFECT (only if validated) =====
-  useEffect(() => {
-    if (!businessIdea.trim()) {
-      setAiCategory(null);
-      setAiCategoryExplanation(null);
-      setAiCategoryLoading(false);
-      setCategoryLockedByUser(false);
+  // Manual AI category suggestion (triggered via button)
+  const requestAiCategory = async () => {
+    const idea = businessIdea.trim();
+
+    if (!idea) {
+      toast.error("Enter a business idea first.");
       return;
     }
 
-    // Don't detect category if business is invalid - but keep loading state as-is
-    // to avoid visual flash when validation completes
+    if (isValidating) {
+      toast.error("Finish validation before asking AI.");
+      return;
+    }
+
     if (businessValidation && !businessValidation.valid) {
-      setAiCategory(null);
-      setAiCategoryExplanation(null);
-      // Don't reset loading here - let the UI handle invalid state separately
+      toast.error(businessValidation.message || "Business idea is invalid.");
       return;
     }
 
     setAiCategoryLoading(true);
+    setAiCategory(null);
+    setAiCategoryExplanation(null);
 
-    const controller = new AbortController();
+    try {
+      const response = await fetch(`${API_BASE}/api/ai/categories`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ businessIdea: idea }),
+      });
 
-    const timeoutId = setTimeout(async () => {
-      try {
-        console.log("🤖 Fetching AI category for:", businessIdea);
-
-        const response = await fetch(
-          `${API_BASE}/api/ai/categories`,   // ✅ Auto-switching endpoint
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ businessIdea }),
-            signal: controller.signal,
-          }
-        );
-
-        console.log("📡 AI Response status:", response.status);
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("❌ AI API Error:", errorText);
-          throw new Error("Failed to detect category");
-        }
-
-        const data = await response.json();
-        console.log("✅ AI Category Result:", data);
-
-        const detected = data.category?.trim() || "";
-        const explanation = data.explanation || null;
-
-        if (detected) {
-          setAiCategory(detected);
-          setAiCategoryExplanation(explanation);
-
-          if (!categoryLockedByUser) {
-            setSelectedCategory(detected);
-          }
-        }
-      } catch (err) {
-        if ((err as Error).name !== "AbortError") {
-          console.error("🔥 AI Category Error:", err);
-        }
-      } finally {
-        setAiCategoryLoading(false);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("AI API Error:", errorText);
+        throw new Error("Failed to detect category");
       }
-    }, 300); // Reduced debounce for faster response
 
-    return () => {
-      clearTimeout(timeoutId);
-      controller.abort();
-    };
-  }, [businessIdea, categoryLockedByUser, businessValidation]);
+      const data = await response.json();
+      const detected = data.category?.trim() || "";
+      const explanation = data.explanation || null;
 
+      if (detected) {
+        setAiCategory(detected);
+        setAiCategoryExplanation(explanation);
+
+        if (!categoryLockedByUser) {
+          setSelectedCategory(detected);
+        }
+      } else {
+        toast.error("AI could not suggest a category.");
+      }
+    } catch (err) {
+      console.error("AI Category Error:", err);
+      toast.error("Failed to fetch AI category.");
+    } finally {
+      setAiCategoryLoading(false);
+    }
+  };
 
   // ---------------------------------------------------------------------------
   // MAP INITIALIZATION
@@ -1128,7 +1107,7 @@ ${result?.competitorAnalysis.recommendedStrategy}
             <div>
               <CardTitle className="text-xl">Clustering Configuration</CardTitle>
               <CardDescription className="text-gray-600">
-                Enter your business idea — AI will categorize and find the optimal location
+                Enter your business idea - choose a category or ask AI to suggest one
               </CardDescription>
             </div>
           </div>
@@ -1157,6 +1136,8 @@ ${result?.competitorAnalysis.recommendedStrategy}
                   onChange={(e) => {
                     setBusinessIdea(e.target.value);
                     setCategoryLockedByUser(false);
+                    setAiCategory(null);
+                    setAiCategoryExplanation(null);
                   }}
                   className={`h-12 pl-4 pr-12 bg-white border-gray-200 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 rounded-xl shadow-sm text-base ${businessValidation && !businessValidation.valid
                     ? 'border-red-400 focus-visible:ring-red-400 focus-visible:border-red-400'
@@ -1192,7 +1173,7 @@ ${result?.competitorAnalysis.recommendedStrategy}
               {(!businessValidation || businessValidation.valid) && (
                 <p className="text-xs text-gray-500 flex items-center gap-1.5">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  AI will automatically determine the most suitable business category
+                  Need help? Click "Suggest with AI" to get a category for your idea.
                 </p>
               )}
             </div>
@@ -1212,7 +1193,7 @@ ${result?.competitorAnalysis.recommendedStrategy}
                 }}
               >
                 <SelectTrigger className="h-12 bg-white border-gray-200 focus:ring-emerald-500 rounded-xl shadow-sm">
-                  <SelectValue placeholder="Select or let AI decide" />
+                  <SelectValue placeholder="Select a category or ask AI to suggest" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl shadow-xl border-0">
                   {CATEGORY_OPTIONS.map((cat) => (
@@ -1222,6 +1203,36 @@ ${result?.competitorAnalysis.recommendedStrategy}
                   ))}
                 </SelectContent>
               </Select>
+
+              <div className="flex flex-wrap items-center gap-3 mt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={requestAiCategory}
+                  disabled={
+                    aiCategoryLoading ||
+                    isValidating ||
+                    !businessIdea.trim() ||
+                    (businessValidation && !businessValidation.valid)
+                  }
+                  className="h-11 rounded-xl border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300"
+                >
+                  {aiCategoryLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Asking AI...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Suggest with AI
+                    </>
+                  )}
+                </Button>
+                <p className="text-xs text-gray-500">
+                  Optional: use the AI classifier prompt to map your idea to an allowed category.
+                </p>
+              </div>
 
               {/* AI STATUS + RESULT */}
               <div className="mt-3">
@@ -1261,7 +1272,7 @@ ${result?.competitorAnalysis.recommendedStrategy}
                   </div>
                 ) : (
                   <p className="text-sm text-gray-500 italic">
-                    💡 AI will suggest a category once you type your business idea above
+                    Click "Suggest with AI" after typing your business idea to get a suggested category.
                   </p>
                 )}
               </div>

@@ -7,9 +7,10 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: "Method not allowed" });
     }
 
-    const { business_name } = req.body;
+    const { business_name, businessIdea } = req.body;
+    const businessInput = (businessIdea ?? business_name ?? "").toString().trim();
 
-    if (!business_name || typeof business_name !== "string" || business_name.trim() === "") {
+    if (!businessInput) {
         return res.status(400).json({ valid: false, message: "Please enter a valid business type." });
     }
 
@@ -19,32 +20,13 @@ export default async function handler(req, res) {
         });
 
         const prompt = `
-      You are an AI assistant validating business names entered by the user.
-
-      Reject any input that is not a realistic business, such as:
-      - random words (e.g., 'Scatter', 'Buyer', 'Orange', 'Table')
-      - verbs or adjectives
-      - personal names with no business context
-      - nonsense text (e.g., 'asdfs', '123abc', 'aaa bbb')
-      - single words that are NOT business types
-
-      Accept only inputs that look like actual business names, such as:
-      - 'Computer Shop'
-      - 'Milk Tea Shop'
-      - 'Car Wash'
-      - 'Pharmacy'
-      - 'Hardware Store'
-
-      Input: "${business_name}"
-
-      If the input is NOT a valid business:
-      Return: { "valid": false, "message": "Please enter a valid business type." }
-
-      If the input IS valid:
-      Return: { "valid": true, "clean_value": "<normalized input>" }
-
-      Return JSON only, no explanation.
-    `;
+Business text: "${businessInput}"
+If it looks like a real business type/name (e.g., "Milk Tea Shop", "Hardware Store"), return:
+{"valid": true, "clean_value": "<short normalized text>"}
+If it is nonsense, personal name, random word, or not a business, return:
+{"valid": false, "message": "Please enter a valid business type."}
+Return JSON only.
+`;
 
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
@@ -57,6 +39,13 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error("Business validation error:", error);
+        const msg = error?.message || "";
+        if (msg.includes("429") || msg.toLowerCase().includes("quota")) {
+            return res.status(429).json({
+                valid: false,
+                message: "Gemini quota exceeded. Please wait a moment or use a key with higher limits."
+            });
+        }
         return res.status(500).json({ valid: false, message: "Validation service unavailable." });
     }
 }

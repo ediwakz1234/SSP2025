@@ -1054,8 +1054,7 @@ const OFFICIAL_CATEGORIES = [
   "Restaurant",
   "Food & Beverages",
   "Merchandise / Trading",
-  "Entertainment / Leisure",
-  "Pet Store"
+  "Entertainment / Leisure"
 ];
 
 const CATEGORY_MAPPING: Record<string, string> = {
@@ -1094,9 +1093,9 @@ const CATEGORY_MAPPING: Record<string, string> = {
   "gym": "Entertainment / Leisure", "arcade": "Entertainment / Leisure",
   "karaoke": "Entertainment / Leisure", "billiards": "Entertainment / Leisure",
 
-  // Pet Store
-  "pet store": "Pet Store", "pet shop": "Pet Store", "pet supplies": "Pet Store",
-  "aquarium": "Pet Store", "pet food": "Pet Store",
+  // Pet-related -> Services
+  "pet store": "Services", "pet shop": "Services", "pet supplies": "Services",
+  "aquarium": "Services", "pet food": "Services",
 };
 
 function normalizeCategory(inputCategory: string): string {

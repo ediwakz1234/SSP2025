@@ -16,8 +16,9 @@ import { startLogPruner } from "./lib/logPruner.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load .env from the same directory as server.js
+// Load .env files from the same directory (local overrides default)
 config({ path: join(__dirname, ".env") });
+config({ path: join(__dirname, ".env.local"), override: true });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -83,7 +84,9 @@ const routes = [
   { path: "/api/ai/categories", handler: () => import("./api/ai/categories.js") },
   { path: "/api/ai/recommendations", handler: () => import("./api/ai/recommendations.js") },
   { path: "/api/ai/business-recommendations", handler: () => import("./api/ai/business-recommendations.js") },
+  // Support both underscore and hyphen variants for the validation route
   { path: "/api/ai/validate_business", handler: () => import("./api/ai/validate_business.js") },
+  { path: "/api/ai/validate-business", handler: () => import("./api/ai/validate_business.js") },
   { path: "/api/ai", handler: () => import("./api/ai/index.js") },
   
   // Auth routes

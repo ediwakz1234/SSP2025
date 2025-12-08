@@ -1,3 +1,4 @@
+import "../_loadEnv.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Prohibited business keywords (checked before AI call for efficiency)

@@ -24,28 +24,11 @@ export default async function handler(req, res) {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
-      You are a business categorization expert. Analyze the following business idea and:
-      1. Classify it into the BEST matching category from this list:
-         - Retail
-         - Services
-         - Restaurant
-         - Food & Beverages
-         - Merchandise / Trading
-         - Entertainment / Leisure
-         - Pet Store
-      
-      2. Provide a brief explanation (1-2 sentences) of why this category fits best.
-
-      Business Idea: "${businessIdea}"
-
-      Respond in this exact JSON format:
-      {
-        "category": "Category Name",
-        "explanation": "Brief explanation of the classification"
-      }
-
-      Important: Return ONLY valid JSON, no markdown or additional text.
-    `;
+Business idea: "${businessIdea}"
+Pick ONE category: Retail; Services; Restaurant; Food & Beverages; Merchandise / Trading; Entertainment / Leisure.
+Return JSON only:
+{"category":"<one from list>","explanation":"why in <=12 words"}
+`;
 
     const aiRes = await model.generateContent(prompt);
     const text = aiRes.response.text();
@@ -57,8 +40,7 @@ export default async function handler(req, res) {
       "Restaurant",
       "Food & Beverages",
       "Merchandise / Trading",
-      "Entertainment / Leisure",
-      "Pet Store"
+      "Entertainment / Leisure"
     ];
 
     // Normalize category to match exactly
@@ -84,7 +66,7 @@ export default async function handler(req, res) {
       if (lower.includes("entertainment") || lower.includes("leisure") || lower.includes("gaming") || lower.includes("arcade")) {
         return "Entertainment / Leisure";
       }
-      if (lower.includes("pet")) return "Pet Store";
+      if (lower.includes("pet")) return "Services"; // Pet stores map to Services
 
       return "Retail"; // Default fallback
     }
@@ -117,6 +99,13 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error("Gemini API Error:", err);
-    return res.status(500).json({ error: "AI error", message: err.message });
+    const msg = err?.message || "";
+    if (msg.includes("429") || msg.toLowerCase().includes("quota")) {
+      return res.status(429).json({
+        error: "quota_exceeded",
+        message: "Gemini quota exceeded. Please wait a moment or use a key with higher limits."
+      });
+    }
+    return res.status(500).json({ error: "AI error", message: "Gemini service unavailable" });
   }
 }

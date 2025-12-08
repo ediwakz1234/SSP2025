@@ -137,7 +137,7 @@ export function evaluateZoneSuitability(
 
     // Categories more suited for residential areas
     const residentialCategories = [
-        "Services", "Food & Beverages", "Pet Store"
+        "Services", "Food & Beverages"
     ];
 
     // Categories more suited for commercial areas
@@ -213,7 +213,6 @@ export function evaluateTimeWorkFeasibility(
         "Services": ["9:00 AM - 12:00 PM", "2:00 PM - 5:00 PM"],
         "Retail": ["10:00 AM - 12:00 PM", "4:00 PM - 7:00 PM"],
         "Entertainment / Leisure": ["2:00 PM - 5:00 PM", "7:00 PM - 10:00 PM"],
-        "Pet Store": ["9:00 AM - 11:00 AM", "4:00 PM - 6:00 PM"],
         "Merchandise / Trading": ["9:00 AM - 12:00 PM", "3:00 PM - 6:00 PM"],
     };
 
@@ -256,7 +255,7 @@ export function evaluateTimeWorkFeasibility(
     let profitImpact: "Low" | "Medium" | "High" = "Medium";
     if (["Restaurant", "Entertainment / Leisure"].some(c => safeCategory.includes(c))) {
         profitImpact = "High"; // These are very time-sensitive
-    } else if (["Services", "Pet Store"].some(c => safeCategory.includes(c))) {
+    } else if (["Services"].some(c => safeCategory.includes(c))) {
         profitImpact = "Low"; // More consistent throughout day
     }
 
@@ -284,7 +283,7 @@ function formatHour(hour: number): string {
  */
 export function estimateRequiredCapital(category: string, zoneType: string): CapitalLevel {
     const highCapitalCategories = ["Restaurant", "Entertainment / Leisure"];
-    const lowCapitalCategories = ["Services", "Pet Store"];
+    const lowCapitalCategories = ["Services"];
     const safeCategory = category || "";
 
     const normalizedZone = zoneType?.toLowerCase() || "";
@@ -365,7 +364,6 @@ export function suggestBusinessModel(
         "Services": ["Mobile/on-demand service", "Subscription-based", "Premium boutique service"],
         "Retail": ["Convenience store format", "Specialty/niche retail", "Hybrid retail-service"],
         "Entertainment / Leisure": ["Experience-based venue", "Membership model", "Event-focused"],
-        "Pet Store": ["Full-service pet center", "Specialty pet products", "Pet services + retail"],
         "Merchandise / Trading": ["Wholesale-retail hybrid", "Specialty trading", "E-commerce enabled"],
     };
 
