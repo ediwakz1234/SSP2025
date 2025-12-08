@@ -320,6 +320,7 @@ export function ClusteringPage() {
     setIsValidating(true);
 
     const controller = new AbortController();
+    let isCurrent = true; // 🔒 Lock to prevent race conditions
 
     const timeoutId = setTimeout(async () => {
       try {
@@ -330,28 +331,34 @@ export function ClusteringPage() {
           signal: controller.signal
         });
 
+        if (!isCurrent) return; // 🚫 Ignore if component unmounted or dependency changed
+
         if (response.ok) {
           const data = await response.json();
-          setBusinessValidation({
-            valid: data.valid,
-            errorType: data.errorType || "none",
-            message: data.message || "",
-          });
+          // Double check current again after await
+          if (isCurrent) {
+            setBusinessValidation({
+              valid: data.valid,
+              errorType: data.errorType || "none",
+              message: data.message || "",
+            });
+          }
         } else {
           // On error, be lenient
-          setBusinessValidation({ valid: true, errorType: "none", message: "" });
+          if (isCurrent) setBusinessValidation({ valid: true, errorType: "none", message: "" });
         }
       } catch (err) {
-        if ((err as Error).name !== "AbortError") {
+        if ((err as Error).name !== "AbortError" && isCurrent) {
           // On error, be lenient
           setBusinessValidation({ valid: true, errorType: "none", message: "" });
         }
       } finally {
-        setIsValidating(false);
+        if (isCurrent) setIsValidating(false);
       }
-    }, 400); // Slightly faster than category detection
+    }, 400);
 
     return () => {
+      isCurrent = false; // 🔓 Invalidate this run
       clearTimeout(timeoutId);
       controller.abort();
     };
