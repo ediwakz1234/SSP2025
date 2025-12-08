@@ -19,60 +19,99 @@ export default async function handler(req, res) {
 
         const prompt = `You are an AI business-category classifier for a Strategic Store Placement System.
 
-Your job:
-1. Analyze the user's business idea.
-2. Assign the correct business category ONLY if the idea is clear and you are at least 60% confident.
-3. If the idea is unclear, random, or not a valid business return "no_category".
-4. If the idea involves illegal, harmful, or restricted activities return "prohibited".
+Your responsibilities:
+1. Analyze the user’s business idea based purely on meaning and intent.
+2. Assign the correct business category ONLY if the business idea clearly fits one of the allowed categories.
+3. If the idea is unclear, vague, nonsense, random words, or not a real business → return "no_category".
+4. If the idea involves illegal, harmful, or restricted activities → return "prohibited".
 
+────────────────────────
 VALID CATEGORIES (USE ONLY THESE):
+
 - Retail
-- Services
 - Restaurant
-- Food & Beverages
-- Merchandise / Trading
 - Entertainment / Leisure
+- Merchandising / Trading
+- Service
+
+Do NOT output any category outside this list.
+────────────────────────
 
 ILLEGAL / PROHIBITED BUSINESS IDEAS (NEVER CLASSIFY):
+
 - Drugs, narcotics, cannabis (unless legally regulated)
-- Cigarettes, vapes, tobacco distribution (if restricted)
-- Gambling, casino, betting, illegal lottery
-- Prostitution, escorting, adult sexual services
-- Human trafficking, exploitation
+- Cigarettes, vapes, tobacco distribution (if legally restricted)
+- Gambling, casinos, betting, illegal lottery operations
+- Prostitution, escorting, “spakol,” massage with sexual intent, adult sexual services
+- Human trafficking or exploitation
 - Selling weapons, firearms, explosives (if illegal)
-- Cybercrime, fraud, piracy, scams
-- Any explicitly illegal activity
+- Cybercrime, fraud, piracy, scamming
+- Any activity that is clearly illegal or harmful
 
-If the input contains any prohibited activity, return:
-{ "category": "prohibited", "confidence": 1, "reasoning": "The business idea involves illegal or restricted activities." }
-
-OUTPUT FORMAT (STRICT):
+If the input contains ANY prohibited activity, return exactly:
 {
-  "category": "<Retail | Services | Restaurant | Food & Beverages | Merchandise / Trading | Entertainment / Leisure | no_category | prohibited>",
-  "confidence": <number between 0 and 1>,
+  "category": "prohibited",
+  "reasoning": "The business idea involves illegal or restricted activities."
+}
+────────────────────────
+
+OUTPUT FORMAT (STRICT — FOLLOW EXACT STRUCTURE):
+
+{
+  "category": "<Retail | Restaurant | Entertainment / Leisure | Merchandising / Trading | Service | no_category | prohibited>",
   "reasoning": "<brief explanation>"
 }
 
-RULES:
-- If AI confidence < 0.60, return "no_category".
-- Do NOT guess or assign a random category.
-- Do NOT default to "Service" when uncertain.
-- If the idea is too vague (e.g., scatter, ... , random), return:
-  { "category": "no_category", "confidence": 0, "reasoning": "The input does not describe a valid business idea." }
+────────────────────────
+CLASSIFICATION RULES:
 
+- Do NOT guess or approximate a category.
+- Do NOT default to "Service" when the idea is unclear.
+- If the input is ambiguous, incomplete, inappropriate, slang, or nonsense 
+  (examples: "scatter", "spakol", "asdf", "123", random words) → return:
+
+{
+  "category": "no_category",
+  "reasoning": "The input does not describe a valid business idea."
+}
+
+────────────────────────
 EXAMPLES:
 
 Input: "Milk tea shop"
-Output: { "category": "Restaurant", "confidence": 0.92, "reasoning": "Milk tea shops serve prepared food and beverages." }
+Output:
+{
+  "category": "Restaurant",
+  "reasoning": "Milk tea shops serve prepared beverages and food."
+}
 
 Input: "Clothing boutique"
-Output: { "category": "Retail", "confidence": 0.94, "reasoning": "A boutique sells apparel directly to consumers." }
+Output:
+{
+  "category": "Retail",
+  "reasoning": "A boutique sells clothing directly to customers."
+}
 
 Input: "Online casino"
-Output: { "category": "prohibited", "confidence": 1, "reasoning": "Gambling is restricted or illegal." }
+Output:
+{
+  "category": "prohibited",
+  "reasoning": "Gambling activities are restricted or illegal."
+}
+
+Input: "Spakol"
+Output:
+{
+  "category": "prohibited",
+  "reasoning": "This term refers to sexual services, which are prohibited."
+}
 
 Input: "scatter"
-Output: { "category": "no_category", "confidence": 0, "reasoning": "Not a business idea." }
+Output:
+{
+  "category": "no_category",
+  "reasoning": "This is not a recognizable business idea."
+}
 
 Now classify this business idea: "${businessIdea}"
 
@@ -129,7 +168,13 @@ Reply with ONLY the JSON object, no markdown formatting.`;
                 normalizedCategory = "no_category";
             }
 
-            const confidence = parseFloat(data.confidence) || 0;
+            // New prompt doesn't return confidence, so we imply it from validity
+            let confidence = 0.9;
+            if (normalizedCategory === "no_category" || normalizedCategory === "prohibited") {
+                confidence = 0;
+            } else if (normalizedCategory === "Services") {
+                confidence = 0.7; // Service is a catch-all, so treat as lower confidence
+            }
 
             return res.status(200).json({
                 category: normalizedCategory,
