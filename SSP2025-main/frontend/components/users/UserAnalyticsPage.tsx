@@ -154,9 +154,9 @@ export function UserAnalyticsPage() {
         "merchandizing/trading": "Merchandise / Trading",
         "trading": "Merchandise / Trading",
         "merchandise": "Merchandise / Trading",
-        "pet store": "Pet Store",
-        "pet stores": "Pet Store",
-        "pets": "Pet Store",
+        "pet store": "Services",
+        "pet stores": "Services",
+        "pets": "Services",
       };
 
       // Category normalization function

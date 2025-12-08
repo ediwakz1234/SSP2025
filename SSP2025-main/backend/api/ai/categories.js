@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
     const prompt = `
 Business idea: "${businessIdea}"
-Pick ONE category: Retail; Services; Restaurant; Food & Beverages; Merchandise / Trading; Entertainment / Leisure; Pet Store.
+Pick ONE category: Retail; Services; Restaurant; Food & Beverages; Merchandise / Trading; Entertainment / Leisure.
 Return JSON only:
 {"category":"<one from list>","explanation":"why in <=12 words"}
 `;
@@ -40,8 +40,7 @@ Return JSON only:
       "Restaurant",
       "Food & Beverages",
       "Merchandise / Trading",
-      "Entertainment / Leisure",
-      "Pet Store"
+      "Entertainment / Leisure"
     ];
 
     // Normalize category to match exactly
@@ -67,7 +66,7 @@ Return JSON only:
       if (lower.includes("entertainment") || lower.includes("leisure") || lower.includes("gaming") || lower.includes("arcade")) {
         return "Entertainment / Leisure";
       }
-      if (lower.includes("pet")) return "Pet Store";
+      if (lower.includes("pet")) return "Services"; // Pet stores map to Services
 
       return "Retail"; // Default fallback
     }
@@ -98,15 +97,15 @@ Return JSON only:
       });
     }
 
-    } catch (err) {
-        console.error("Gemini API Error:", err);
-        const msg = err?.message || "";
-        if (msg.includes("429") || msg.toLowerCase().includes("quota")) {
-            return res.status(429).json({
-                error: "quota_exceeded",
-                message: "Gemini quota exceeded. Please wait a moment or use a key with higher limits."
-            });
-        }
-        return res.status(500).json({ error: "AI error", message: "Gemini service unavailable" });
+  } catch (err) {
+    console.error("Gemini API Error:", err);
+    const msg = err?.message || "";
+    if (msg.includes("429") || msg.toLowerCase().includes("quota")) {
+      return res.status(429).json({
+        error: "quota_exceeded",
+        message: "Gemini quota exceeded. Please wait a moment or use a key with higher limits."
+      });
     }
+    return res.status(500).json({ error: "AI error", message: "Gemini service unavailable" });
+  }
 }

@@ -27,10 +27,11 @@ Your job:
 
 VALID CATEGORIES (USE ONLY THESE):
 - Retail
+- Services
 - Restaurant
+- Food & Beverages
+- Merchandise / Trading
 - Entertainment / Leisure
-- Merchandising / Trading
-- Service
 
 ILLEGAL / PROHIBITED BUSINESS IDEAS (NEVER CLASSIFY):
 - Drugs, narcotics, cannabis (unless legally regulated)
@@ -47,7 +48,7 @@ If the input contains any prohibited activity, return:
 
 OUTPUT FORMAT (STRICT):
 {
-  "category": "<Retail | Restaurant | Entertainment / Leisure | Merchandising / Trading | Service | no_category | prohibited>",
+  "category": "<Retail | Services | Restaurant | Food & Beverages | Merchandise / Trading | Entertainment / Leisure | no_category | prohibited>",
   "confidence": <number between 0 and 1>,
   "reasoning": "<brief explanation>"
 }
@@ -85,10 +86,11 @@ Reply with ONLY the JSON object, no markdown formatting.`;
 
             const validCategories = [
                 "Retail",
+                "Services",
                 "Restaurant",
+                "Food & Beverages",
+                "Merchandise / Trading",
                 "Entertainment / Leisure",
-                "Merchandising / Trading",
-                "Service",
                 "no_category",
                 "prohibited",
             ];
@@ -99,15 +101,18 @@ Reply with ONLY the JSON object, no markdown formatting.`;
                     "entertainment": "Entertainment / Leisure",
                     "entertainment/leisure": "Entertainment / Leisure",
                     "leisure": "Entertainment / Leisure",
-                    "merchandising": "Merchandising / Trading",
-                    "merchandising/trading": "Merchandising / Trading",
-                    "trading": "Merchandising / Trading",
-                    "merchandise": "Merchandising / Trading",
-                    "merchandise / trading": "Merchandising / Trading",
-                    "services": "Service",
-                    "food and beverages": "Restaurant",
-                    "food & beverages": "Restaurant",
-                    "f&b": "Restaurant",
+                    "merchandising": "Merchandise / Trading",
+                    "merchandising/trading": "Merchandise / Trading",
+                    "trading": "Merchandise / Trading",
+                    "merchandise": "Merchandise / Trading",
+                    "merchandise / trading": "Merchandise / Trading",
+                    "service": "Services",
+                    "food and beverages": "Food & Beverages",
+                    "food & beverages": "Food & Beverages",
+                    "f&b": "Food & Beverages",
+                    "pet store": "Services",
+                    "pet shop": "Services",
+                    "pet": "Services",
                 };
 
                 const lowerCategory = normalizedCategory.toLowerCase().trim();
