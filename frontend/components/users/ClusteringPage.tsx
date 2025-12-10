@@ -162,6 +162,7 @@ export function ClusteringPage() {
     string | null
   >(null);
   const [aiCategoryLoading, setAiCategoryLoading] = useState<boolean>(false);
+  const [allowedCategories, setAllowedCategories] = useState<string[]>([]); // NEW: track valid categories
   const [categoryLockedByUser, setCategoryLockedByUser] =
     useState<boolean>(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -498,8 +499,10 @@ export function ClusteringPage() {
       }
 
       const data = await response.json();
-      const detected = data.category?.trim() || "";
+      // NEW: Use structured response format
+      const detected = data.primaryCategory || data.category?.trim() || "";
       const explanation = data.explanation || "";
+      const validCategories = data.allowedCategories || [];
 
       // 🔍 VALIDATION: Handle Prohibited
       if (detected === "prohibited") {
@@ -510,8 +513,7 @@ export function ClusteringPage() {
         });
         setAiCategory(null);
         setAiCategoryExplanation(null);
-
-        // Force the validation UI to update
+        setAllowedCategories([]);
         toast.error("Business idea is prohibited.");
         return;
       }
@@ -525,6 +527,7 @@ export function ClusteringPage() {
         });
         setAiCategory(null);
         setAiCategoryExplanation(null);
+        setAllowedCategories([]);
         toast.error("Could not categorize this business idea.");
         return;
       }
@@ -532,6 +535,7 @@ export function ClusteringPage() {
       if (detected) {
         setAiCategory(detected);
         setAiCategoryExplanation(explanation);
+        setAllowedCategories(validCategories); // NEW: store allowed categories
 
         // Clear any previous validation errors since we got a good result
         setBusinessValidation({ valid: true, errorType: "none", message: "" });
@@ -818,6 +822,18 @@ export function ClusteringPage() {
     const validationError = validateCategory(categoryToAnalyze);
     if (validationError) {
       toast.error(validationError);
+      return;
+    }
+
+    // NEW: Validate that selected category is in allowedCategories (if AI was used)
+    if (allowedCategories.length > 0 && !allowedCategories.includes(categoryToAnalyze)) {
+      const primaryCat = aiCategory || allowedCategories[0];
+      toast.error(`Incorrect Category: This business idea belongs to "${primaryCat}". The selected category "${categoryToAnalyze}" is not allowed.`);
+      setBusinessValidation({
+        valid: false,
+        errorType: "unrecognized",
+        message: `This business idea should be in "${primaryCat}", not "${categoryToAnalyze}".`
+      });
       return;
     }
 

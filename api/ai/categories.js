@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
     try {
-        const { businessIdea } = req.body;
+        const { businessIdea, selectedCategory } = req.body;
         if (!businessIdea) return res.status(400).json({ error: "Missing businessIdea" });
         if (!process.env.GEMINI_API_KEY) return res.status(500).json({ error: "AI not configured" });
 
@@ -26,114 +26,57 @@ export default async function handler(req, res) {
         const lowerIdea = businessIdea.toLowerCase();
         if (PROHIBITED_KEYWORDS.some(word => lowerIdea.includes(word))) {
             return res.status(200).json({
-                category: "prohibited",
-                confidence: 1, // 100% confident it's prohibited
-                explanation: "This business idea involves restricted or illegal activities (detected by keyword security filter)."
+                primaryCategory: "prohibited",
+                secondaryCategories: [],
+                allowedCategories: [],
+                explanation: "This business idea involves restricted or illegal activities.",
+                isValid: false,
+                validationError: "Prohibited business type"
             });
         }
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-        const prompt = `You are an AI business-category classifier for a Strategic Store Placement System.
+        const prompt = `You are an AI business-category classifier for a Strategic Store Placement System in the Philippines.
 
-Your responsibilities:
-1. Analyze the user’s business idea based purely on meaning and intent.
-2. Assign the correct business category ONLY if the business idea clearly fits one of the allowed categories.
-3. If the idea is unclear, vague, nonsense, random words, or not a real business → return "no_category".
-4. If the idea involves illegal, harmful, or restricted activities → return "prohibited".
+VALID CATEGORIES (ONLY USE THESE 6):
+1. Retail - Stores selling physical goods: pharmacy, hardware, minimart, convenience store, grocery
+2. Services - Laundry, barbershop, salon, clinic, spa, car wash, pet grooming, repair shops
+3. Restaurant - Full-meal service, dine-in, fast food, eateries, carinderias
+4. Food & Beverages - Food stalls, beverage shops, cafés, milk tea, bakeries, snack stands
+5. Merchandise / Trading - Buy & sell goods, wholesale, market stalls, ukay-ukay, RTW
+6. Entertainment / Leisure - Computer shops, gaming lounges, gyms, fitness centers, recreation
 
-────────────────────────
-VALID CATEGORIES (USE ONLY THESE):
+TASK: Analyze this business idea and determine which category/categories it fits.
 
-- Retail
-- Restaurant
-- Entertainment / Leisure
-- Merchandising / Trading
-- Service
+BUSINESS IDEA: "${businessIdea}"
 
-Do NOT output any category outside this list.
-────────────────────────
-
-ILLEGAL / PROHIBITED BUSINESS IDEAS (NEVER CLASSIFY):
-
-- Drugs, narcotics, cannabis (unless legally regulated)
-- Cigarettes, vapes, tobacco distribution (if legally restricted)
-- Gambling, casinos, betting, illegal lottery operations
-- Prostitution, escorting, “spakol,” massage with sexual intent, adult sexual services
-- Human trafficking or exploitation
-- Selling weapons, firearms, explosives (if illegal)
-- Cybercrime, fraud, piracy, scamming
-- Any activity that is clearly illegal or harmful
-
-If the input contains ANY prohibited activity, return exactly:
-{
-  "category": "prohibited",
-  "reasoning": "The business idea involves illegal or restricted activities."
-}
-────────────────────────
-
-OUTPUT FORMAT (STRICT — FOLLOW EXACT STRUCTURE):
-
-{
-  "category": "<Retail | Restaurant | Entertainment / Leisure | Merchandising / Trading | Service | no_category | prohibited>",
-  "reasoning": "<brief explanation>"
-}
-
-────────────────────────
 CLASSIFICATION RULES:
+- Some businesses can fit MULTIPLE categories. Return ALL valid categories.
+- Primary category = best fit. Secondary = also valid alternatives.
+- Be STRICT: only include categories that genuinely apply.
 
-- Do NOT guess or approximate a category.
-- Do NOT default to "Service" when the idea is unclear.
-- If the input is ambiguous, incomplete, inappropriate, slang, or nonsense 
-  (examples: "scatter", "spakol", "asdf", "123", random words) → return:
-
-{
-  "category": "no_category",
-  "reasoning": "The input does not describe a valid business idea."
-}
-
-────────────────────────
 EXAMPLES:
+- "Milk Tea Shop" → Primary: Food & Beverages, Also valid: Restaurant
+- "Pharmacy" → Primary: Retail, Only Retail applies
+- "Computer Shop" → Primary: Entertainment / Leisure, Also valid: Services (if offering repairs)
+- "Hardware Store" → Primary: Retail, Only Retail applies
+- "Barbershop" → Primary: Services, Only Services applies
+- "Ukay-Ukay" → Primary: Merchandise / Trading, Also valid: Retail
+- "Gym" → Primary: Entertainment / Leisure, Only Entertainment / Leisure applies
+- "Sari-Sari Store" → Primary: Retail, Only Retail applies
+- "Fast Food" → Primary: Restaurant, Also valid: Food & Beverages
+- "Laundry Shop" → Primary: Services, Only Services applies
+- "Pet Shop" → Primary: Retail (if selling pets/supplies), Also valid: Services (if grooming)
+- "Internet Cafe" → Primary: Entertainment / Leisure, Only Entertainment / Leisure applies
 
-Input: "Milk tea shop"
-Output:
+RESPOND WITH ONLY THIS JSON (no markdown):
 {
-  "category": "Restaurant",
-  "reasoning": "Milk tea shops serve prepared beverages and food."
-}
-
-Input: "Clothing boutique"
-Output:
-{
-  "category": "Retail",
-  "reasoning": "A boutique sells clothing directly to customers."
-}
-
-Input: "Online casino"
-Output:
-{
-  "category": "prohibited",
-  "reasoning": "Gambling activities are restricted or illegal."
-}
-
-Input: "Spakol"
-Output:
-{
-  "category": "prohibited",
-  "reasoning": "This term refers to sexual services, which are prohibited."
-}
-
-Input: "scatter"
-Output:
-{
-  "category": "no_category",
-  "reasoning": "This is not a recognizable business idea."
-}
-
-Now classify this business idea: "${businessIdea}"
-
-Reply with ONLY the JSON object, no markdown formatting.`;
+  "primaryCategory": "<one of the 6 categories OR 'no_category' OR 'prohibited'>",
+  "secondaryCategories": ["<other valid categories if any>"],
+  "explanation": "<brief 1-sentence explanation>"
+}`;
 
         const result = await model.generateContent(prompt);
         const text = result.response.text().trim().replace(/^```json\n?/, "").replace(/\n?```$/, "");
@@ -147,23 +90,25 @@ Reply with ONLY the JSON object, no markdown formatting.`;
                 "Restaurant",
                 "Food & Beverages",
                 "Merchandise / Trading",
-                "Entertainment / Leisure",
-                "no_category",
-                "prohibited",
+                "Entertainment / Leisure"
             ];
 
-            let normalizedCategory = data.category;
-            if (normalizedCategory) {
+            // Normalize category names
+            const normalizeCategory = (cat) => {
+                if (!cat) return null;
                 const categoryMap = {
                     "entertainment": "Entertainment / Leisure",
                     "entertainment/leisure": "Entertainment / Leisure",
+                    "entertainment / leisure": "Entertainment / Leisure",
                     "leisure": "Entertainment / Leisure",
                     "merchandising": "Merchandise / Trading",
                     "merchandising/trading": "Merchandise / Trading",
+                    "merchandise/trading": "Merchandise / Trading",
+                    "merchandise / trading": "Merchandise / Trading",
                     "trading": "Merchandise / Trading",
                     "merchandise": "Merchandise / Trading",
-                    "merchandise / trading": "Merchandise / Trading",
                     "service": "Services",
+                    "services": "Services",
                     "food and beverages": "Food & Beverages",
                     "food & beverages": "Food & Beverages",
                     "food & beverage": "Food & Beverages",
@@ -171,52 +116,97 @@ Reply with ONLY the JSON object, no markdown formatting.`;
                     "f&b": "Food & Beverages",
                     "beverage": "Food & Beverages",
                     "beverages": "Food & Beverages",
-                    "pet store": "Services",
-                    "pet shop": "Services",
-                    "pet": "Services",
+                    "retail": "Retail",
+                    "restaurant": "Restaurant",
                 };
+                const lower = cat.toLowerCase().trim();
+                return categoryMap[lower] || (validCategories.includes(cat) ? cat : null);
+            };
 
-                const lowerCategory = normalizedCategory.toLowerCase().trim();
-                if (categoryMap[lowerCategory]) {
-                    normalizedCategory = categoryMap[lowerCategory];
+            let primaryCategory = normalizeCategory(data.primaryCategory);
+            let secondaryCategories = (data.secondaryCategories || [])
+                .map(normalizeCategory)
+                .filter(c => c && c !== primaryCategory);
+
+            // Handle special cases
+            if (primaryCategory === "no_category" || primaryCategory === "prohibited") {
+                return res.status(200).json({
+                    primaryCategory: primaryCategory,
+                    secondaryCategories: [],
+                    allowedCategories: [],
+                    explanation: data.explanation || "Not a valid business idea",
+                    isValid: false,
+                    validationError: primaryCategory === "prohibited"
+                        ? "Prohibited business type"
+                        : "Not recognized as a valid business"
+                });
+            }
+
+            // Ensure primary is valid
+            if (!primaryCategory || !validCategories.includes(primaryCategory)) {
+                primaryCategory = "no_category";
+                return res.status(200).json({
+                    primaryCategory: "no_category",
+                    secondaryCategories: [],
+                    allowedCategories: [],
+                    explanation: "Could not determine business category",
+                    isValid: false,
+                    validationError: "Unrecognized business type"
+                });
+            }
+
+            // Build allowedCategories (primary + valid secondaries)
+            const allowedCategories = [primaryCategory, ...secondaryCategories];
+
+            // Validate selected category if provided
+            let isValid = true;
+            let validationError = null;
+
+            if (selectedCategory) {
+                const normalizedSelected = normalizeCategory(selectedCategory);
+                if (!normalizedSelected || !allowedCategories.includes(normalizedSelected)) {
+                    isValid = false;
+                    validationError = `This business idea belongs to "${primaryCategory}". The selected category "${selectedCategory}" is not allowed.`;
                 }
             }
 
-            if (!validCategories.includes(normalizedCategory)) {
-                normalizedCategory = "no_category";
-            }
-
-            // New prompt doesn't return confidence, so we imply it from validity
-            let confidence = 0.9;
-            if (normalizedCategory === "no_category" || normalizedCategory === "prohibited") {
-                confidence = 0;
-            } else if (normalizedCategory === "Services") {
-                confidence = 0.7; // Service is a catch-all, so treat as lower confidence
-            }
-
             return res.status(200).json({
-                category: normalizedCategory,
-                confidence: confidence,
-                explanation: data.reasoning || data.explanation || "Classified by AI",
+                primaryCategory,
+                secondaryCategories,
+                allowedCategories,
+                explanation: data.explanation || `Classified as ${primaryCategory}`,
+                isValid,
+                validationError,
+                // Legacy fields for backwards compatibility
+                category: primaryCategory,
+                confidence: 0.9,
             });
-        } catch {
+
+        } catch (parseError) {
             console.error("Failed to parse AI response:", text);
             return res.status(200).json({
-                category: "no_category",
-                confidence: 0,
+                primaryCategory: "no_category",
+                secondaryCategories: [],
+                allowedCategories: [],
                 explanation: "Could not parse AI response",
+                isValid: false,
+                validationError: "AI parsing error"
             });
         }
     } catch (err) {
         console.error("AI Category Error:", err.message);
         if (err.message?.includes("429") || err.message?.includes("quota")) {
             return res.status(200).json({
-                category: "no_category",
-                confidence: 0,
+                primaryCategory: "no_category",
+                secondaryCategories: [],
+                allowedCategories: [],
                 explanation: "Rate limited - please try again",
+                isValid: false,
+                validationError: "Rate limited",
                 rate_limited: true,
             });
         }
         return res.status(500).json({ error: "AI error", message: err.message });
     }
 }
+
