@@ -195,6 +195,103 @@ export function ClusteringPage() {
   } | null>(null);
   const [isValidating, setIsValidating] = useState<boolean>(false);
 
+  // ===== NEW: LIVE ANALYTICS STATE (computed from recommended location) =====
+  interface LiveAnalytics {
+    businessPresence: { r50: number; r100: number; r200: number };
+    competitorPressure: { r50: number; r100: number; r200: number };
+    competitorSummary: { total: number; within500: number; within1000: number; within2000: number };
+    interpretation: string[];
+  }
+  const [liveAnalytics, setLiveAnalytics] = useState<LiveAnalytics | null>(null);
+
+  // ===== NEW: COMPUTE LIVE ANALYTICS FROM RECOMMENDED LOCATION =====
+  function computeLiveAnalytics(
+    recommendedLocation: { latitude: number; longitude: number },
+    allBusinesses: Business[],
+    category: string
+  ): LiveAnalytics {
+    const normalizedCategory = category.trim().toLowerCase();
+
+    // Filter competitors (same category)
+    const competitors = allBusinesses.filter(
+      b => b.general_category.trim().toLowerCase() === normalizedCategory
+    );
+
+    // Helper to count businesses within radius (in km)
+    const countWithinRadius = (items: Business[], radiusKm: number) =>
+      items.filter(b =>
+        haversineDistance(recommendedLocation, { latitude: b.latitude, longitude: b.longitude }) <= radiusKm
+      ).length;
+
+    // Business Presence (all businesses near the location)
+    const businessPresence = {
+      r50: countWithinRadius(allBusinesses, 0.05),   // 50m
+      r100: countWithinRadius(allBusinesses, 0.1),  // 100m
+      r200: countWithinRadius(allBusinesses, 0.2),  // 200m
+    };
+
+    // Competitor Pressure (same category only)
+    const competitorPressure = {
+      r50: countWithinRadius(competitors, 0.05),
+      r100: countWithinRadius(competitors, 0.1),
+      r200: countWithinRadius(competitors, 0.2),
+    };
+
+    // Competitor Summary (larger radii)
+    const competitorSummary = {
+      total: competitors.length,
+      within500: countWithinRadius(competitors, 0.5),
+      within1000: countWithinRadius(competitors, 1.0),
+      within2000: countWithinRadius(competitors, 2.0),
+    };
+
+    // Generate data-driven interpretation
+    const interpretation = generateInterpretation(businessPresence, competitorPressure, competitorSummary);
+
+    return { businessPresence, competitorPressure, competitorSummary, interpretation };
+  }
+
+  // ===== NEW: GENERATE AI INTERPRETATION FROM DATA =====
+  function generateInterpretation(
+    bp: { r50: number; r100: number; r200: number },
+    cp: { r50: number; r100: number; r200: number },
+    cs: { total: number; within500: number; within1000: number; within2000: number }
+  ): string[] {
+    const insights: string[] = [];
+
+    // Competitor analysis
+    if (cp.r50 === 0 && cp.r200 < 3) {
+      insights.push("✅ Low competitive pressure — minimal direct competitors nearby.");
+    } else if (cp.r50 >= 3) {
+      insights.push("⚠️ High competition within 50m — differentiation is critical.");
+    } else if (cp.r100 >= 5) {
+      insights.push("⚠️ Moderate competition in immediate area — focus on unique value proposition.");
+    }
+
+    // Business presence analysis
+    if (bp.r100 >= 10) {
+      insights.push("✅ Strong commercial activity — high foot traffic expected.");
+    } else if (bp.r100 >= 5) {
+      insights.push("📊 Moderate business density — established commercial area.");
+    } else if (bp.r100 < 3) {
+      insights.push("📍 Low business density — may indicate emerging or underserved area.");
+    }
+
+    // Opportunity assessment
+    if (cp.r50 === 0 && bp.r100 >= 5) {
+      insights.push("🎯 Good opportunity — existing foot traffic with no direct competition.");
+    } else if (cs.within500 >= 10) {
+      insights.push("🔴 Saturated market within 500m — consider alternative locations.");
+    }
+
+    // Road proximity (inferred from business presence)
+    if (bp.r50 >= 3) {
+      insights.push("🛣️ Located near main commercial corridor.");
+    }
+
+    return insights.length > 0 ? insights : ["📊 Standard market conditions — proceed with due diligence."];
+  }
+
   // VALIDATION (for new general categories)
   const validateCategory = (value: string) => {
     const v = value.trim();
@@ -777,7 +874,13 @@ export function ClusteringPage() {
 
       setResult(enhancedResult);
 
-
+      // ===== NEW: COMPUTE LIVE ANALYTICS FROM RECOMMENDED LOCATION =====
+      const analytics = computeLiveAnalytics(
+        enhancedResult.recommendedLocation,
+        businesses,
+        categoryToAnalyze
+      );
+      setLiveAnalytics(analytics);
 
       await supabase.from("clustering_opportunities").insert({
         // ✔ must match DB column: business_category
@@ -1617,7 +1720,7 @@ ${result?.competitorAnalysis.recommendedStrategy}
             <CardContent className="p-6">
               {(() => {
                 const anchor = getAnchorBusiness();
-                if (!anchor)
+                if (!anchor || !liveAnalytics)
                   return (
                     <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
                       <div className="p-2 bg-gray-200 rounded-lg">
@@ -1627,12 +1730,13 @@ ${result?.competitorAnalysis.recommendedStrategy}
                     </div>
                   );
 
-                const bd50 = anchor.business_density_50m ?? 0;
-                const bd100 = anchor.business_density_100m ?? 0;
-                const bd200 = anchor.business_density_200m ?? 0;
-                const cd50 = anchor.competitor_density_50m ?? 0;
-                const cd100 = anchor.competitor_density_100m ?? 0;
-                const cd200 = anchor.competitor_density_200m ?? 0;
+                // NEW: Use liveAnalytics instead of anchor's pre-stored values
+                const bd50 = liveAnalytics.businessPresence.r50;
+                const bd100 = liveAnalytics.businessPresence.r100;
+                const bd200 = liveAnalytics.businessPresence.r200;
+                const cd50 = liveAnalytics.competitorPressure.r50;
+                const cd100 = liveAnalytics.competitorPressure.r100;
+                const cd200 = liveAnalytics.competitorPressure.r200;
 
                 return (
                   <div className="space-y-6">
@@ -1705,18 +1809,13 @@ ${result?.competitorAnalysis.recommendedStrategy}
                           <p className="text-sky-900 font-semibold">AI Interpretation</p>
                         </div>
                         <div className="space-y-2 text-sm">
-                          <div className="p-2 bg-white/70 rounded-lg text-sky-800 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                            Prioritizes streets with activity
-                          </div>
-                          <div className="p-2 bg-white/70 rounded-lg text-sky-800 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                            Favors {anchor.zone_type} zones
-                          </div>
-                          <div className="p-2 bg-white/70 rounded-lg text-sky-800 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                            Avoids isolated outlier points
-                          </div>
+                          {/* NEW: Dynamic interpretation from liveAnalytics */}
+                          {liveAnalytics.interpretation.map((insight, idx) => (
+                            <div key={idx} className="p-2 bg-white/70 rounded-lg text-sky-800 flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0" />
+                              <span>{insight}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
