@@ -825,16 +825,84 @@ export function ClusteringPage() {
       return;
     }
 
-    // NEW: Validate that selected category is in allowedCategories (if AI was used)
-    if (allowedCategories.length > 0 && !allowedCategories.includes(categoryToAnalyze)) {
-      const primaryCat = aiCategory || allowedCategories[0];
-      toast.error(`Incorrect Category: This business idea belongs to "${primaryCat}". The selected category "${categoryToAnalyze}" is not allowed.`);
-      setBusinessValidation({
-        valid: false,
-        errorType: "unrecognized",
-        message: `This business idea should be in "${primaryCat}", not "${categoryToAnalyze}".`
-      });
-      return;
+    // VALIDATION: If business idea is provided, validate category match
+    if (businessIdea.trim()) {
+      // If AI was already used and allowedCategories populated
+      if (allowedCategories.length > 0) {
+        if (!allowedCategories.includes(categoryToAnalyze)) {
+          const primaryCat = aiCategory || allowedCategories[0];
+          toast.error(`Incorrect Category: "${businessIdea}" belongs to "${primaryCat}". You selected "${categoryToAnalyze}" which is not allowed.`);
+          setBusinessValidation({
+            valid: false,
+            errorType: "unrecognized",
+            message: `This business idea should be in "${primaryCat}", not "${categoryToAnalyze}".`
+          });
+          return;
+        }
+      } else {
+        // AI wasn't used yet - call API to validate before proceeding
+        try {
+          setIsProcessing(true);
+          setProgress(5);
+
+          const response = await fetch(`${API_BASE}/api/ai/categories`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              businessIdea: businessIdea.trim(),
+              selectedCategory: categoryToAnalyze
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const allowed = data.allowedCategories || [];
+            const primaryCat = data.primaryCategory || data.category;
+
+            // Check if prohibited or no_category
+            if (primaryCat === "prohibited") {
+              setIsProcessing(false);
+              toast.error("This business idea is prohibited.");
+              setBusinessValidation({
+                valid: false,
+                errorType: "prohibited",
+                message: data.explanation || "This business idea is prohibited."
+              });
+              return;
+            }
+
+            if (primaryCat === "no_category") {
+              setIsProcessing(false);
+              toast.error("Could not recognize this business idea.");
+              setBusinessValidation({
+                valid: false,
+                errorType: "nonsense",
+                message: data.explanation || "Not a valid business idea."
+              });
+              return;
+            }
+
+            // Store for future reference
+            setAllowedCategories(allowed);
+            setAiCategory(primaryCat);
+
+            // Validate selected category
+            if (allowed.length > 0 && !allowed.includes(categoryToAnalyze)) {
+              setIsProcessing(false);
+              toast.error(`Incorrect Category: "${businessIdea}" belongs to "${primaryCat}". You selected "${categoryToAnalyze}" which is not allowed.`);
+              setBusinessValidation({
+                valid: false,
+                errorType: "unrecognized",
+                message: `This business idea should be in "${primaryCat}", not "${categoryToAnalyze}".`
+              });
+              return;
+            }
+          }
+        } catch (err) {
+          console.error("Category validation error:", err);
+          // Continue with clustering if validation API fails
+        }
+      }
     }
 
     if (!businesses.length) {
