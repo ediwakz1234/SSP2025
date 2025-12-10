@@ -56,7 +56,7 @@ export interface ClusteringResult {
     competitorsWithin2km: number;
     marketSaturation: number;
     recommendedStrategy: string;
-   opportunity_score?: number;
+    opportunity_score?: number;
 
 
   };
@@ -173,6 +173,391 @@ function clampToBarangay(lat: number, lng: number) {
     latitude: Math.min(Math.max(lat, BRGY_BOUNDS.minLat), BRGY_BOUNDS.maxLat),
     longitude: Math.min(Math.max(lng, BRGY_BOUNDS.minLng), BRGY_BOUNDS.maxLng),
   };
+}
+
+// -----------------------------------------------------------------------------
+// NEW: RANDOMIZATION UTILITIES
+// -----------------------------------------------------------------------------
+
+/**
+ * Generate a unique run ID for this clustering execution
+ */
+function generateRunId(): string {
+  return `run_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+}
+
+/**
+ * Add controlled jitter to a geographic point
+ * @param point Original point
+ * @param maxJitterMeters Maximum jitter in meters (default 30m)
+ */
+function addJitter(point: GeoPoint, maxJitterMeters: number = 30): GeoPoint {
+  // Convert meters to approximate degrees (at this latitude ~14.8°N)
+  // 1 degree latitude ≈ 111km, 1 degree longitude ≈ 107km at this latitude
+  const jitterLatDeg = maxJitterMeters / 111000;
+  const jitterLngDeg = maxJitterMeters / 107000;
+
+  return {
+    latitude: point.latitude + (Math.random() - 0.5) * 2 * jitterLatDeg,
+    longitude: point.longitude + (Math.random() - 0.5) * 2 * jitterLngDeg,
+  };
+}
+
+/**
+ * Fisher-Yates shuffle for randomized selection
+ */
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+/**
+ * Get a random element from array with optional weighting
+ */
+function weightedRandomSelect<T>(items: T[], weights: number[]): T {
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+  let random = Math.random() * totalWeight;
+
+  for (let i = 0; i < items.length; i++) {
+    random -= weights[i];
+    if (random <= 0) return items[i];
+  }
+  return items[items.length - 1];
+}
+
+// -----------------------------------------------------------------------------
+// NEW: GEOGRAPHIC VALIDATION (Polygon-based)
+// -----------------------------------------------------------------------------
+
+/**
+ * Approximate polygon for Sta. Cruz, Santa Maria, Bulacan
+ * More precise than bounding box
+ */
+const STA_CRUZ_POLYGON: GeoPoint[] = [
+  { latitude: 14.8340, longitude: 120.9520 },
+  { latitude: 14.8340, longitude: 120.9605 },
+  { latitude: 14.8380, longitude: 120.9608 },
+  { latitude: 14.8410, longitude: 120.9600 },
+  { latitude: 14.8413, longitude: 120.9560 },
+  { latitude: 14.8405, longitude: 120.9520 },
+  { latitude: 14.8370, longitude: 120.9518 },
+];
+
+/**
+ * Ray-casting algorithm to check if point is inside polygon
+ */
+function isPointInPolygon(point: GeoPoint, polygon: GeoPoint[]): boolean {
+  let inside = false;
+  const x = point.longitude;
+  const y = point.latitude;
+
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].longitude;
+    const yi = polygon[i].latitude;
+    const xj = polygon[j].longitude;
+    const yj = polygon[j].latitude;
+
+    const intersect = ((yi > y) !== (yj > y)) &&
+      (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+
+  return inside;
+}
+
+/**
+ * Check if a point is in the valid area (inside polygon + near businesses)
+ */
+function isValidLocation(
+  point: GeoPoint,
+  businesses: Business[],
+  maxDistanceToBusinessKm: number = 0.15 // 150 meters
+): boolean {
+  // Must be inside barangay bounds
+  if (point.latitude < BRGY_BOUNDS.minLat || point.latitude > BRGY_BOUNDS.maxLat ||
+    point.longitude < BRGY_BOUNDS.minLng || point.longitude > BRGY_BOUNDS.maxLng) {
+    return false;
+  }
+
+  // Must be inside the polygon (or close to boundary)
+  if (!isPointInPolygon(point, STA_CRUZ_POLYGON)) {
+    // Allow points just outside polygon if very close to a business
+    const nearestBizDist = Math.min(
+      ...businesses.map(b =>
+        haversineDistance(point, { latitude: b.latitude, longitude: b.longitude })
+      )
+    );
+    if (nearestBizDist > 0.05) return false; // More than 50m from any business
+  }
+
+  // Must be near at least one existing business (proxy for "not in empty field")
+  const nearbyBusinessCount = businesses.filter(b =>
+    haversineDistance(point, { latitude: b.latitude, longitude: b.longitude }) <= maxDistanceToBusinessKm
+  ).length;
+
+  return nearbyBusinessCount >= 1;
+}
+
+// -----------------------------------------------------------------------------
+// NEW: LOCATION QUALITY SCORING
+// -----------------------------------------------------------------------------
+
+interface LocationScore {
+  total: number;
+  roadProximity: number;
+  poiDensity: number;
+  competitorPenalty: number;
+  zoneBonus: number;
+}
+
+/**
+ * Compute a quality score for a candidate location
+ * Higher score = better location
+ */
+function computeLocationScore(
+  point: GeoPoint,
+  businesses: Business[],
+  competitors: Business[],
+  streetStats: Record<string, number>,
+  majorRoads: string[]
+): LocationScore {
+  // 1. Road Proximity Score (0-25 points)
+  // Distance to nearest business on a major road
+  const roadBusinesses = businesses.filter(b =>
+    majorRoads.includes(b.street?.toLowerCase() || "")
+  );
+
+  let roadProximity = 0;
+  if (roadBusinesses.length > 0) {
+    const nearestRoadBizDist = Math.min(
+      ...roadBusinesses.map(b =>
+        haversineDistance(point, { latitude: b.latitude, longitude: b.longitude })
+      )
+    );
+    // Score: 25 if on road (0m), 0 if >250m away
+    roadProximity = Math.max(0, 25 * (1 - nearestRoadBizDist / 0.25));
+  }
+
+  // 2. POI Density Score (0-30 points)
+  // Number of businesses within 100m
+  const poisWithin100m = businesses.filter(b =>
+    haversineDistance(point, { latitude: b.latitude, longitude: b.longitude }) <= 0.1
+  ).length;
+  // Score: 30 if 10+ businesses, scales down
+  const poiDensity = Math.min(30, poisWithin100m * 3);
+
+  // 3. Competitor Penalty (0 to -25 points)
+  // Penalty for nearby competitors
+  const competitorsWithin100m = competitors.filter(c =>
+    haversineDistance(point, { latitude: c.latitude, longitude: c.longitude }) <= 0.1
+  ).length;
+  const competitorsWithin200m = competitors.filter(c =>
+    haversineDistance(point, { latitude: c.latitude, longitude: c.longitude }) <= 0.2
+  ).length;
+  const competitorPenalty = -(competitorsWithin100m * 8 + competitorsWithin200m * 2);
+
+  // 4. Zone Bonus (0-20 points)
+  // Bonus for being in commercial zones
+  const nearestBiz = businesses
+    .map(b => ({
+      business: b,
+      distance: haversineDistance(point, { latitude: b.latitude, longitude: b.longitude })
+    }))
+    .sort((a, b) => a.distance - b.distance)[0];
+
+  let zoneBonus = 0;
+  if (nearestBiz && nearestBiz.distance < 0.1) {
+    const zoneType = nearestBiz.business.zone_type?.toLowerCase() || "";
+    if (zoneType.includes("commercial") || zoneType.includes("business")) {
+      zoneBonus = 20;
+    } else if (zoneType.includes("mixed") || zoneType.includes("residential")) {
+      zoneBonus = 10;
+    }
+  }
+
+  const total = roadProximity + poiDensity + competitorPenalty + zoneBonus;
+
+  return { total, roadProximity, poiDensity, competitorPenalty, zoneBonus };
+}
+
+// -----------------------------------------------------------------------------
+// NEW: DYNAMIC CONFIDENCE CALCULATION
+// -----------------------------------------------------------------------------
+
+/**
+ * Compute dynamic confidence score based on multiple factors
+ * Returns value between 0.40 and 0.95
+ */
+function computeDynamicConfidence(
+  recommended: GeoPoint,
+  clusterPoints: ClusterPoint[],
+  allPoints: Business[],
+  competitors: Business[],
+  streetStats: Record<string, number>,
+  majorRoads: string[]
+): number {
+  // Factor 1: Cluster cohesion (0-0.25)
+  // How tight is the cluster around the recommended point
+  const avgDistToRecommended = clusterPoints.reduce((sum, p) =>
+    sum + haversineDistance(recommended, { latitude: p.latitude, longitude: p.longitude }), 0
+  ) / Math.max(1, clusterPoints.length);
+  const cohesionScore = Math.max(0, 0.25 * (1 - avgDistToRecommended / 0.5));
+
+  // Factor 2: Competitor distance (0-0.25)
+  // Farther from competitors = higher confidence
+  const nearestCompetitorDist = competitors.length > 0
+    ? Math.min(...competitors.map(c =>
+      haversineDistance(recommended, { latitude: c.latitude, longitude: c.longitude })
+    ))
+    : 0.5; // If no competitors, assume 500m
+  const competitorScore = Math.min(0.25, nearestCompetitorDist * 0.5);
+
+  // Factor 3: Road proximity (0-0.20)
+  const roadBusinesses = allPoints.filter(b =>
+    majorRoads.includes(b.street?.toLowerCase() || "")
+  );
+  let roadScore = 0;
+  if (roadBusinesses.length > 0) {
+    const nearestRoadDist = Math.min(
+      ...roadBusinesses.map(b =>
+        haversineDistance(recommended, { latitude: b.latitude, longitude: b.longitude })
+      )
+    );
+    roadScore = Math.max(0, 0.20 * (1 - nearestRoadDist / 0.2));
+  }
+
+  // Factor 4: POI density (0-0.15)
+  const poisWithin100m = allPoints.filter(b =>
+    haversineDistance(recommended, { latitude: b.latitude, longitude: b.longitude }) <= 0.1
+  ).length;
+  const densityScore = Math.min(0.15, poisWithin100m * 0.015);
+
+  // Factor 5: Random variance (±0.05)
+  // Adds natural variation between runs
+  const randomVariance = (Math.random() - 0.5) * 0.10;
+
+  // Combine all factors
+  const baseConfidence = 0.40 + cohesionScore + competitorScore + roadScore + densityScore;
+  const finalConfidence = Math.min(0.95, Math.max(0.40, baseConfidence + randomVariance));
+
+  return Number(finalConfidence.toFixed(2));
+}
+
+// -----------------------------------------------------------------------------
+// NEW: MULTI-CANDIDATE GENERATION & SELECTION
+// -----------------------------------------------------------------------------
+
+interface ScoredCandidate {
+  point: GeoPoint;
+  score: number;
+  source: string;
+}
+
+/**
+ * Generate multiple candidate points for the recommended location
+ */
+function generateCandidates(
+  centroid: GeoPoint,
+  clusterPoints: ClusterPoint[],
+  businesses: Business[],
+  majorRoads: string[],
+  count: number = 6
+): GeoPoint[] {
+  const candidates: GeoPoint[] = [];
+
+  // Candidate 1: Centroid with small jitter
+  candidates.push(addJitter(centroid, 20));
+
+  // Candidate 2: Centroid with medium jitter
+  candidates.push(addJitter(centroid, 40));
+
+  // Candidate 3-4: Top-scoring cluster points with jitter
+  const shuffledPoints = shuffleArray(clusterPoints).slice(0, 2);
+  for (const p of shuffledPoints) {
+    candidates.push(addJitter({ latitude: p.latitude, longitude: p.longitude }, 15));
+  }
+
+  // Candidate 5-6: Nearest businesses on major roads
+  const roadBusinesses = businesses
+    .filter(b => majorRoads.includes(b.street?.toLowerCase() || ""))
+    .filter(b =>
+      b.latitude >= BRGY_BOUNDS.minLat && b.latitude <= BRGY_BOUNDS.maxLat &&
+      b.longitude >= BRGY_BOUNDS.minLng && b.longitude <= BRGY_BOUNDS.maxLng
+    )
+    .map(b => ({
+      business: b,
+      distance: haversineDistance(centroid, { latitude: b.latitude, longitude: b.longitude })
+    }))
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, 3);
+
+  // Pick random 2 from top 3 road businesses
+  const shuffledRoadBiz = shuffleArray(roadBusinesses).slice(0, 2);
+  for (const rb of shuffledRoadBiz) {
+    candidates.push(addJitter({
+      latitude: rb.business.latitude,
+      longitude: rb.business.longitude
+    }, 10));
+  }
+
+  // Ensure all candidates are clamped to barangay
+  return candidates.map(c => clampToBarangay(c.latitude, c.longitude));
+}
+
+/**
+ * Select the best candidate from generated points
+ * Adds randomization to avoid always picking the same one
+ */
+function selectBestCandidate(
+  candidates: GeoPoint[],
+  businesses: Business[],
+  competitors: Business[],
+  streetStats: Record<string, number>,
+  majorRoads: string[]
+): GeoPoint {
+  // Score all candidates
+  const scored: ScoredCandidate[] = candidates.map((point, idx) => {
+    // Filter out invalid locations
+    if (!isValidLocation(point, businesses, 0.2)) {
+      return { point, score: -1000, source: `candidate_${idx}` };
+    }
+
+    const locationScore = computeLocationScore(
+      point, businesses, competitors, streetStats, majorRoads
+    );
+
+    // Add small random factor to break ties and add variance
+    const randomBonus = Math.random() * 5;
+
+    return {
+      point,
+      score: locationScore.total + randomBonus,
+      source: `candidate_${idx}`
+    };
+  });
+
+  // Sort by score descending
+  scored.sort((a, b) => b.score - a.score);
+
+  // Pick from top 3 candidates with weighted probability
+  const top3 = scored.filter(s => s.score > -500).slice(0, 3);
+
+  if (top3.length === 0) {
+    // Fallback to first candidate (clamped centroid)
+    return candidates[0];
+  }
+
+  if (top3.length === 1) {
+    return top3[0].point;
+  }
+
+  // Weighted selection: 60% chance best, 30% second, 10% third
+  const weights = [0.60, 0.30, 0.10].slice(0, top3.length);
+  return weightedRandomSelect(top3.map(t => t.point), weights);
 }
 
 // -----------------------------------------------------------------------------
@@ -367,14 +752,15 @@ export function findOptimalLocation(
   }
 
   // ------------------------------------------------------
-  // SAFE SNAPPING LOGIC
+  // NEW: MULTI-CANDIDATE GENERATION & SELECTION
+  // (Replaces old single-point snapping logic)
   // ------------------------------------------------------
 
   const threshold = Math.max(
     3,
     Math.floor(
       Object.values(streetStats).reduce((a, b) => a + b, 0) /
-        Object.keys(streetStats).length
+      Object.keys(streetStats).length
     )
   );
 
@@ -384,37 +770,50 @@ export function findOptimalLocation(
 
   const centroid = best.centroid;
 
-  // Base recommended point = centroid
-  let recommended = { ...centroid };
+  // Competitors for this category
+  const competitors = businesses.filter(
+    (b) => b.general_category.trim().toLowerCase() === normalized
+  );
 
-  // Snapping (only inside barangay + radius <300m)
-  const candidateRoadBiz = businesses
-    .filter((b) => majorRoads.includes(b.street.toLowerCase()))
-    .filter(
-      (b) =>
-        b.latitude >= BRGY_BOUNDS.minLat &&
-        b.latitude <= BRGY_BOUNDS.maxLat &&
-        b.longitude >= BRGY_BOUNDS.minLng &&
-        b.longitude <= BRGY_BOUNDS.maxLng
-    )
-    .map((b) => ({
-      business: b,
-      distance: haversineDistance(centroid, {
-        latitude: b.latitude,
-        longitude: b.longitude,
-      }),
-    }))
-    .sort((a, b) => a.distance - b.distance)[0];
+  // Generate multiple candidate locations
+  const candidates = generateCandidates(
+    centroid,
+    best.points,
+    businesses,
+    majorRoads,
+    6
+  );
 
-  if (candidateRoadBiz && candidateRoadBiz.distance < 0.3) {
-    recommended = {
-      latitude: candidateRoadBiz.business.latitude,
-      longitude: candidateRoadBiz.business.longitude,
-    };
-  }
+  // Select best candidate with randomization
+  let recommended = selectBestCandidate(
+    candidates,
+    businesses,
+    competitors,
+    streetStats,
+    majorRoads
+  );
 
-  // Clamp inside barangay
+  // Ensure final result is clamped inside barangay
   recommended = clampToBarangay(recommended.latitude, recommended.longitude);
+
+  // Validate the location - if invalid, fall back to nearest valid business
+  if (!isValidLocation(recommended, businesses, 0.2)) {
+    const nearestValid = businesses
+      .filter(b =>
+        b.latitude >= BRGY_BOUNDS.minLat && b.latitude <= BRGY_BOUNDS.maxLat &&
+        b.longitude >= BRGY_BOUNDS.minLng && b.longitude <= BRGY_BOUNDS.maxLng
+      )
+      .map(b => ({
+        point: { latitude: b.latitude, longitude: b.longitude },
+        distance: haversineDistance(centroid, { latitude: b.latitude, longitude: b.longitude })
+      }))
+      .sort((a, b) => a.distance - b.distance)[0];
+
+    if (nearestValid) {
+      recommended = addJitter(nearestValid.point, 15);
+      recommended = clampToBarangay(recommended.latitude, recommended.longitude);
+    }
+  }
 
   // Determine zone type based on nearest business to recommended point
   const closestBizForZone = businesses
@@ -446,11 +845,6 @@ export function findOptimalLocation(
   // --------------------------------------
   // COMPETITOR ANALYSIS (same category only)
   // --------------------------------------
-
-  // Competitors = same general_category as category input
-  const competitors = businesses.filter(
-    (b) => b.general_category.trim().toLowerCase() === normalized
-  );
 
   // Pre-compute competitor distances from the recommended point
   const competitorDistances = competitors.map((b) => ({
@@ -504,20 +898,26 @@ export function findOptimalLocation(
   const marketSaturation =
     businessesWithin1km > 0 ? competitorsWithin1km / businessesWithin1km : 0;
 
-  // Confidence scoring (unchanged)
-  const confidence =
-    best.points.length / points.length >= 0.45
-      ? 0.82
-      : best.points.length / points.length >= 0.25
-      ? 0.68
-      : 0.55;
+  // --------------------------------------
+  // NEW: DYNAMIC CONFIDENCE SCORING
+  // (Replaces old static 0.82/0.68/0.55 values)
+  // --------------------------------------
+  const confidence = computeDynamicConfidence(
+    recommended,
+    best.points,
+    businesses,
+    competitors,
+    streetStats,
+    majorRoads
+  );
 
+  // Generate opportunity message based on confidence
   const opportunity =
-    confidence >= 0.8
+    confidence >= 0.75
       ? "EXCELLENT OPPORTUNITY — High foot-traffic indicators and healthy market space."
-      : confidence >= 0.6
-      ? "GOOD OPPORTUNITY — Balanced customer reach with moderate competition."
-      : "CAUTION — Competition density is high relative to surroundings.";
+      : confidence >= 0.55
+        ? "GOOD OPPORTUNITY — Balanced customer reach with moderate competition."
+        : "CAUTION — Competition density is high relative to surroundings.";
 
   return {
     clusters,
