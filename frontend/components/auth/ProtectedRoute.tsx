@@ -15,6 +15,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { Button } from "../ui/button";
+import { useKMeansStore } from "../../lib/stores/kmeansStore";
 
 type ApprovalStatus = "pending" | "approved" | "declined" | "flagged" | null;
 
@@ -46,6 +47,8 @@ function StatusPage({
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
+    // Clear K-Means session data before logout
+    useKMeansStore.getState().reset();
     await supabase.auth.signOut();
   };
 
@@ -96,7 +99,7 @@ function StatusPage({
 
               {/* Status Badge */}
               <div className={`absolute -bottom-2 -right-2 w-8 h-8 ${status === "pending" ? "bg-amber-500" :
-                  status === "flagged" ? "bg-orange-500" : "bg-red-500"
+                status === "flagged" ? "bg-orange-500" : "bg-red-500"
                 } rounded-full flex items-center justify-center border-4 border-slate-900`}>
                 {status === "pending" ? (
                   <Clock className="w-4 h-4 text-white" />

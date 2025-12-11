@@ -15,6 +15,7 @@ import { Shield, ArrowLeft, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "../../lib/supabase";
 import { validateEmail } from "../../utils/validation";
+import { useKMeansStore } from "../../lib/stores/kmeansStore";
 
 // Field error display component
 function FieldError({ error }: { error?: string }) {
@@ -48,14 +49,14 @@ export function AdminLoginPage() {
   const [isLocked, setIsLocked] = useState(false);
   const [lockCountdown, setLockCountdown] = useState(0);
   const lockIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  
+
   // Field-level validation
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const handleBlur = useCallback((field: string) => {
     setTouched(prev => ({ ...prev, [field]: true }));
-    
+
     if (field === "email") {
       const result = validateEmail(email);
       setFieldErrors(prev => ({ ...prev, email: result.error || "" }));
@@ -167,6 +168,8 @@ export function AdminLoginPage() {
         clearInterval(interval);
         localStorage.removeItem("admin_session_expire");
         localStorage.removeItem("admin-session");
+        // Clear K-Means session data
+        useKMeansStore.getState().reset();
         supabase.auth.signOut();
         toast.error("Session expired. Please log in again.");
         navigate("/admin/login");
@@ -193,101 +196,103 @@ export function AdminLoginPage() {
   // -------------------------------
   // SUBMIT LOGIN
   // -------------------------------
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (isLocked) {
-    toast.error("Login temporarily locked.");
-    return;
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isLocked) {
+      toast.error("Login temporarily locked.");
+      return;
+    }
 
-  // Validate fields before submission
-  const errors: Record<string, string> = {};
-  const emailResult = validateEmail(email);
-  if (!emailResult.isValid) errors.email = emailResult.error || "";
-  if (!password) errors.password = "Password is required";
-  
-  if (Object.keys(errors).length > 0) {
-    setFieldErrors(errors);
-    setTouched({ email: true, password: true });
-    const firstError = Object.values(errors)[0];
-    toast.error(firstError);
-    return;
-  }
+    // Validate fields before submission
+    const errors: Record<string, string> = {};
+    const emailResult = validateEmail(email);
+    if (!emailResult.isValid) errors.email = emailResult.error || "";
+    if (!password) errors.password = "Password is required";
 
-  setLoading(true);
-  setError("");
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setTouched({ email: true, password: true });
+      const firstError = Object.values(errors)[0];
+      toast.error(firstError);
+      return;
+    }
 
-  // 1. Authenticate user
-  const { data, error: loginError } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+    setLoading(true);
+    setError("");
 
-  if (loginError) {
-    recordFailedAttempt();
-    setError("Invalid admin email or password");
-    toast.error("Invalid admin credentials");
+    // 1. Authenticate user
+    const { data, error: loginError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (loginError) {
+      recordFailedAttempt();
+      setError("Invalid admin email or password");
+      toast.error("Invalid admin credentials");
+      setLoading(false);
+      return;
+    }
+
+    clearFailedAttempts();
+
+    const user = data.user;
+    if (!user) {
+      setError("Login failed.");
+      setLoading(false);
+      return;
+    }
+
+    // 2. Fetch role from PROFILES table instead of metadata
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Profile Fetch Error:", profileError);
+      toast.error("Unable to load admin profile.");
+      setLoading(false);
+      return;
+    }
+
+    if (profile.role !== "admin") {
+      setError("Access denied. Admins only.");
+      toast.error("Unauthorized access.");
+      // Clear K-Means session data
+      useKMeansStore.getState().reset();
+      await supabase.auth.signOut();
+      setLoading(false);
+      return;
+    }
+
+    // 3. Update last_login
+    await supabase
+      .from("profiles")
+      .update({ last_login: new Date().toISOString() })
+      .eq("id", user.id);
+
+    // 4. Save Remember Me
+    if (rememberMe) {
+      localStorage.setItem("admin_email", email);
+      localStorage.setItem("admin_password", password);
+      localStorage.setItem("admin-session", "true");
+    } else {
+      localStorage.removeItem("admin_email");
+      localStorage.removeItem("admin_password");
+    }
+
+    // 5. Start session expiration timer
+    setupSessionExpiration();
+
+    toast.success("Admin login successful!");
+
+    // 6. Redirect to Admin Dashboard
+    navigate("/admin", { replace: true });
+
     setLoading(false);
-    return;
-  }
-
-  clearFailedAttempts();
-
-  const user = data.user;
-  if (!user) {
-    setError("Login failed.");
-    setLoading(false);
-    return;
-  }
-
-  // 2. Fetch role from PROFILES table instead of metadata
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profileError) {
-    console.error("Profile Fetch Error:", profileError);
-    toast.error("Unable to load admin profile.");
-    setLoading(false);
-    return;
-  }
-
-  if (profile.role !== "admin") {
-    setError("Access denied. Admins only.");
-    toast.error("Unauthorized access.");
-    await supabase.auth.signOut();
-    setLoading(false);
-    return;
-  }
-
-  // 3. Update last_login
-  await supabase
-    .from("profiles")
-    .update({ last_login: new Date().toISOString() })
-    .eq("id", user.id);
-
-  // 4. Save Remember Me
-  if (rememberMe) {
-    localStorage.setItem("admin_email", email);
-    localStorage.setItem("admin_password", password);
-    localStorage.setItem("admin-session", "true");
-  } else {
-    localStorage.removeItem("admin_email");
-    localStorage.removeItem("admin_password");
-  }
-
-  // 5. Start session expiration timer
-  setupSessionExpiration();
-
-  toast.success("Admin login successful!");
-
-  // 6. Redirect to Admin Dashboard
-  navigate("/admin", { replace: true });
-
-  setLoading(false);
-};
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-white via-[#f7f8ff] to-[#ece8ff] p-4">

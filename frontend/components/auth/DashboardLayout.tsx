@@ -18,6 +18,7 @@ import {
 
 import { Button } from "../ui/button";
 import { supabase } from "../../lib/supabase";
+import { useKMeansStore } from "../../lib/stores/kmeansStore";
 
 export function DashboardLayout() {
   const navigate = useNavigate();
@@ -53,6 +54,8 @@ export function DashboardLayout() {
   };
 
   const handleLogout = async () => {
+    // Clear K-Means session data before logout
+    useKMeansStore.getState().reset();
     await supabase.auth.signOut();
     navigate("/user/login");
   };
@@ -61,7 +64,7 @@ export function DashboardLayout() {
     <div className="min-h-screen w-full bg-linear-to-br from-gray-50 via-white to-gray-100/50 flex">
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
@@ -133,8 +136,8 @@ export function DashboardLayout() {
                 className={`
                   w-full flex items-center gap-3 px-4 py-3 rounded-xl
                   transition-all duration-200 group relative
-                  ${isActive 
-                    ? "bg-linear-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/25" 
+                  ${isActive
+                    ? "bg-linear-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/25"
                     : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }
                 `}

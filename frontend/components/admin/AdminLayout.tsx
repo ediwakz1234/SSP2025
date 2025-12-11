@@ -15,6 +15,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "../ui/button";
+import { useKMeansStore } from "../../lib/stores/kmeansStore";
 
 export function AdminLayout() {
   const navigate = useNavigate();
@@ -47,6 +48,8 @@ export function AdminLayout() {
   };
 
   const handleLogout = async () => {
+    // Clear K-Means session data before logout
+    useKMeansStore.getState().reset();
     await supabase.auth.signOut();
     navigate("/admin/login");
   };
@@ -60,7 +63,7 @@ export function AdminLayout() {
     <div className="min-h-screen flex bg-linear-to-br from-slate-100 via-white to-purple-50/30">
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
@@ -146,8 +149,8 @@ export function AdminLayout() {
                 className={`
                   w-full flex items-center gap-3 px-4 py-3 rounded-xl
                   transition-all duration-200 group relative
-                  ${active 
-                    ? "bg-linear-to-r from-purple-600 to-fuchsia-600 text-white shadow-lg shadow-purple-500/25" 
+                  ${active
+                    ? "bg-linear-to-r from-purple-600 to-fuchsia-600 text-white shadow-lg shadow-purple-500/25"
                     : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }
                 `}

@@ -58,6 +58,7 @@ import {
 } from "../ui/dialog";
 import * as XLSX from "xlsx";
 import { useNavigate } from "react-router-dom";
+import { useKMeansStore } from "../../lib/stores/kmeansStore";
 
 
 
@@ -153,6 +154,10 @@ interface AIBusinessRecommendations {
 // ---------------------------------------------------------------------------
 export function ClusteringPage() {
   useActivity();
+
+  // Zustand store for K-Means session persistence
+  const kmeansStore = useKMeansStore();
+
   // -----------------------
   // NEW: AI business idea + category states
   // -----------------------
@@ -381,7 +386,26 @@ export function ClusteringPage() {
     loadBusinesses();
   }, []); // ⭐ RUN ONCE, NOT PER CATEGORY
 
-
+  // ===== RESTORE FROM ZUSTAND STORE ON MOUNT =====
+  useEffect(() => {
+    // Only restore if store has results (user navigated back)
+    if (kmeansStore.hasResults) {
+      // Restore inputs
+      if (kmeansStore.businessIdea) {
+        setBusinessIdea(kmeansStore.businessIdea);
+      }
+      if (kmeansStore.detectedCategory) {
+        setSelectedCategory(kmeansStore.detectedCategory);
+        setAiCategory(kmeansStore.detectedCategory);
+        if (kmeansStore.categoryReason) {
+          setAiCategoryExplanation(kmeansStore.categoryReason);
+        }
+      }
+      // Note: Clustering results (map, clusters, etc.) would need to be re-rendered
+      // The full result object isn't stored, but the key inputs are preserved
+      toast.info("Previous session restored. Click 'Run Clustering' to see results again.");
+    }
+  }, []); // Run once on mount
 
   // Auto-switch between local dev and production
   const API_BASE = "";
@@ -1011,6 +1035,33 @@ export function ClusteringPage() {
 
 
       setResult(enhancedResult);
+
+      // ===== SAVE TO ZUSTAND STORE FOR CROSS-PAGE PERSISTENCE =====
+      kmeansStore.setBusinessIdea(businessIdea);
+      kmeansStore.setDetectedCategory(selectedCategory, aiCategoryExplanation || "");
+      kmeansStore.setClusteringResults({
+        recommendedLocation: enhancedResult.recommendedLocation,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        clusters: enhancedResult.clusters as any,
+        zoneType: enhancedResult.zoneType,
+        analysis: {
+          opportunity: enhancedResult.analysis.opportunity,
+          opportunity_score: enhancedResult.analysis.opportunity_score ?? 0,
+          confidence: enhancedResult.analysis.confidence,
+          competitorCount: enhancedResult.competitorAnalysis?.competitorsWithin500m || 0,
+        },
+        competitorAnalysis: enhancedResult.competitorAnalysis || {
+          competitorsWithin500m: 0,
+          competitorsWithin1km: 0,
+          competitorsWithin2km: 0,
+          nearestCompetitor: null,
+          distanceToNearest: 0,
+          marketSaturation: 0,
+          recommendedStrategy: "",
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        nearbyBusinesses: enhancedResult.nearbyBusinesses as any,
+      });
 
       // ===== NEW: COMPUTE LIVE ANALYTICS FROM RECOMMENDED LOCATION =====
       const analytics = computeLiveAnalytics(
