@@ -72,8 +72,11 @@ export function UserAnalyticsPage() {
   const [userName, setUserName] = useState<string>("User");
   const [userLocation, setUserLocation] = useState<string>("");
 
-  // Ref for capturing analytics content for PDF export
+  // Refs for capturing charts for PDF export
   const analyticsContentRef = useRef<HTMLDivElement>(null);
+  const barChartRef = useRef<HTMLDivElement>(null);
+  const pieChartRef = useRef<HTMLDivElement>(null);
+  const zoneChartRef = useRef<HTMLDivElement>(null);
 
   // Date filter states
   const [startDate, setStartDate] = useState("");
@@ -420,10 +423,10 @@ export function UserAnalyticsPage() {
     logActivity("Exported Analytics Excel", { sheets: 5, records: businesses.length });
   };
 
-  // Enhanced PDF Export - Pure jsPDF (no html2canvas to avoid oklch color issues)
+  // Enhanced PDF Export - Capture actual charts from UI
   const exportPDF = async () => {
     setIsExporting(true);
-    toast.message("Generating PDF report...");
+    toast.message("Generating PDF report with charts...");
 
     try {
       const pdf = new jsPDF("p", "mm", "a4");
@@ -451,7 +454,49 @@ export function UserAnalyticsPage() {
         }
       };
 
-      // Title
+      // Helper to capture chart as base64 image
+      const captureChart = async (ref: React.RefObject<HTMLDivElement | null>): Promise<string | null> => {
+        if (!ref.current) return null;
+        try {
+          const canvas = await html2canvas(ref.current, {
+            backgroundColor: "#ffffff",
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            onclone: (clonedDoc) => {
+              // Replace oklch colors with fallback hex colors
+              const allElements = clonedDoc.querySelectorAll("*");
+              allElements.forEach((el) => {
+                const computed = window.getComputedStyle(el);
+                const styles = el as HTMLElement;
+
+                // Replace background colors containing oklch
+                if (computed.backgroundColor && computed.backgroundColor.includes("oklch")) {
+                  styles.style.backgroundColor = "#ffffff";
+                }
+                // Replace text colors containing oklch
+                if (computed.color && computed.color.includes("oklch")) {
+                  styles.style.color = "#333333";
+                }
+                // Replace border colors containing oklch
+                if (computed.borderColor && computed.borderColor.includes("oklch")) {
+                  styles.style.borderColor = "#e5e7eb";
+                }
+              });
+              // Remove backdrop-blur which can cause issues
+              clonedDoc.querySelectorAll("[class*='backdrop']").forEach((el) => {
+                (el as HTMLElement).style.backdropFilter = "none";
+              });
+            },
+          });
+          return canvas.toDataURL("image/png");
+        } catch (err) {
+          console.warn("Chart capture failed:", err);
+          return null;
+        }
+      };
+
+      // ===== TITLE =====
       pdf.setFontSize(24);
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(59, 130, 246);
@@ -463,7 +508,7 @@ export function UserAnalyticsPage() {
       pdf.text("Strategic Store Placement System", pageWidth / 2, yPos, { align: "center" });
       yPos += 15;
 
-      // Header box
+      // ===== HEADER BOX =====
       pdf.setFillColor(240, 245, 250);
       pdf.roundedRect(margin, yPos, pageWidth - margin * 2, 30, 3, 3, "F");
       yPos += 8;
@@ -478,7 +523,7 @@ export function UserAnalyticsPage() {
       pdf.text(`Time Range: ${timeRange}`, pageWidth - margin - 5, yPos, { align: "right" });
       yPos += 20;
 
-      // Section 1: Overview
+      // ===== SECTION 1: Overview Metrics =====
       pdf.setFillColor(59, 130, 246);
       pdf.roundedRect(margin, yPos, pageWidth - margin * 2, 10, 2, 2, "F");
       pdf.setFontSize(12);
@@ -490,154 +535,124 @@ export function UserAnalyticsPage() {
       pdf.setFontSize(10);
       pdf.setTextColor(30, 30, 30);
       pdf.setFont("helvetica", "normal");
+      const avgPerStreet = streets.length ? (totalBusinesses / streets.length).toFixed(1) : "0";
+      const avgPerZone = zones.length ? (totalBusinesses / zones.length).toFixed(1) : "0";
       const metrics = [
         `Total Businesses: ${totalBusinesses}`,
+        `Avg. per Street: ${avgPerStreet}`,
+        `Avg. per Zone: ${avgPerZone}`,
         `Business Categories: ${categories.length}`,
-        `Zone Types: ${zones.length}`,
-        `Total Streets: ${streets.length}`,
-        `Average per Street: ${streets.length ? (totalBusinesses / streets.length).toFixed(1) : 0}`,
+        `Zone Types Count: ${zones.length}`,
       ];
       metrics.forEach(m => { pdf.text(`• ${m}`, margin + 5, yPos); yPos += 6; });
       yPos += 10;
 
-      // Section 2: Categories (Bar Chart)
-      checkNewPage(100);
+      // ===== SECTION 2: Business Categories (Captured Bar Chart) =====
+      checkNewPage(120);
       pdf.setFillColor(16, 185, 129);
       pdf.roundedRect(margin, yPos, pageWidth - margin * 2, 10, 2, 2, "F");
       pdf.setFontSize(12);
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(255, 255, 255);
-      pdf.text("SECTION 2: Business Categories", margin + 5, yPos + 7);
-      yPos += 18;
+      pdf.text("SECTION 2: Business Category Analytics", margin + 5, yPos + 7);
+      yPos += 15;
 
-      // Draw horizontal bar chart
-      const barColors = [[59, 130, 246], [139, 92, 246], [16, 185, 129], [245, 158, 11], [239, 68, 68], [6, 182, 212]];
-      const maxBarWidth = pageWidth - margin * 2 - 60;
-      const maxValue = Math.max(...categories.map(c => c.value), 1);
-      const barHeight = 8;
+      // Capture and embed bar chart from UI
+      const barChartImage = await captureChart(barChartRef);
+      if (barChartImage) {
+        const chartWidth = pageWidth - margin * 2;
+        const chartHeight = 55;
+        pdf.addImage(barChartImage, "PNG", margin, yPos, chartWidth, chartHeight);
+        yPos += chartHeight + 5;
+      }
 
-      categories.slice(0, 6).forEach((cat, idx) => {
-        checkNewPage(15);
-        const barWidth = (cat.value / maxValue) * maxBarWidth;
+      // Summary list
+      pdf.setFontSize(9);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(50, 50, 50);
+      categories.slice(0, 5).forEach(cat => {
         const pct = ((cat.value / totalBusinesses) * 100).toFixed(1);
-        const color = barColors[idx % barColors.length];
-
-        // Category label
-        pdf.setFontSize(8);
-        pdf.setTextColor(60, 60, 60);
-        pdf.text(cat.name.substring(0, 18), margin + 5, yPos + 5);
-
-        // Bar
-        pdf.setFillColor(color[0], color[1], color[2]);
-        pdf.roundedRect(margin + 55, yPos, barWidth, barHeight, 2, 2, "F");
-
-        // Value label
-        pdf.setTextColor(80, 80, 80);
-        pdf.text(`${cat.value} (${pct}%)`, margin + 60 + barWidth, yPos + 5);
-
-        yPos += 12;
+        pdf.text(`• ${cat.name}: ${cat.value} (${pct}%)`, margin + 5, yPos);
+        yPos += 5;
       });
       yPos += 10;
 
-      // Section 3: Zones (Pie Chart)
-      checkNewPage(90);
+      // ===== SECTION 3: Category Percentage (Captured Pie Chart) =====
+      checkNewPage(120);
       pdf.setFillColor(139, 92, 246);
       pdf.roundedRect(margin, yPos, pageWidth - margin * 2, 10, 2, 2, "F");
       pdf.setFontSize(12);
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(255, 255, 255);
-      pdf.text("SECTION 3: Zone Distribution", margin + 5, yPos + 7);
-      yPos += 18;
+      pdf.text("SECTION 3: Category Percentage Distribution", margin + 5, yPos + 7);
+      yPos += 15;
 
-      // Draw pie chart
-      const pieColors = [[59, 130, 246], [139, 92, 246], [16, 185, 129], [245, 158, 11]];
-      const pieX = pageWidth / 3;
-      const pieY = yPos + 25;
-      const pieRadius = 22;
-      let startAngle = 0;
+      // Capture and embed pie chart from UI
+      const pieChartImage = await captureChart(pieChartRef);
+      if (pieChartImage) {
+        const chartWidth = pageWidth - margin * 2;
+        const chartHeight = 55;
+        pdf.addImage(pieChartImage, "PNG", margin, yPos, chartWidth, chartHeight);
+        yPos += chartHeight + 10;
+      }
 
-      zones.forEach((zone, idx) => {
-        const sliceAngle = (zone.value / totalBusinesses) * 2 * Math.PI;
-        const endAngle = startAngle + sliceAngle;
-        const color = pieColors[idx % pieColors.length];
-
-        // Draw pie slice using polygon approximation
-        pdf.setFillColor(color[0], color[1], color[2]);
-
-        // Create arc path points
-        const points: number[][] = [[pieX, pieY]];
-        for (let a = startAngle; a <= endAngle; a += 0.1) {
-          points.push([pieX + pieRadius * Math.cos(a), pieY + pieRadius * Math.sin(a)]);
-        }
-        points.push([pieX + pieRadius * Math.cos(endAngle), pieY + pieRadius * Math.sin(endAngle)]);
-        points.push([pieX, pieY]);
-
-        // Draw filled polygon for pie slice
-        if (points.length > 2) {
-          const xPoints = points.map(p => p[0]);
-          const yPoints = points.map(p => p[1]);
-          // Use lines to approximate arc
-          pdf.setDrawColor(255, 255, 255);
-          pdf.setLineWidth(0.5);
-          for (let i = 0; i < points.length - 1; i++) {
-            if (i === 0) {
-              pdf.moveTo(points[i][0], points[i][1]);
-            }
-          }
-          // Fill the slice
-          pdf.triangle(pieX, pieY,
-            pieX + pieRadius * Math.cos(startAngle), pieY + pieRadius * Math.sin(startAngle),
-            pieX + pieRadius * Math.cos(endAngle), pieY + pieRadius * Math.sin(endAngle), "F");
-        }
-
-        startAngle = endAngle;
-      });
-
-      // Draw legend next to pie
-      const legendX = pageWidth / 2 + 10;
-      let legendY = yPos + 10;
-      pdf.setFontSize(9);
-      zones.forEach((zone, idx) => {
-        const color = pieColors[idx % pieColors.length];
-        const pct = ((zone.value / totalBusinesses) * 100).toFixed(1);
-
-        // Color box
-        pdf.setFillColor(color[0], color[1], color[2]);
-        pdf.rect(legendX, legendY - 3, 8, 6, "F");
-
-        // Label
-        pdf.setTextColor(60, 60, 60);
-        pdf.text(`${zone.name}: ${zone.value} (${pct}%)`, legendX + 12, legendY + 1);
-        legendY += 10;
-      });
-
-      yPos += 55;
-
-      // Section 4: Insights
-      checkNewPage(80);
+      // ===== SECTION 4: Zone Distribution (Captured) =====
+      checkNewPage(120);
       pdf.setFillColor(245, 158, 11);
       pdf.roundedRect(margin, yPos, pageWidth - margin * 2, 10, 2, 2, "F");
       pdf.setFontSize(12);
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(255, 255, 255);
-      pdf.text("SECTION 4: Key Insights", margin + 5, yPos + 7);
+      pdf.text("SECTION 4: Zone Distribution", margin + 5, yPos + 7);
+      yPos += 15;
+
+      // Capture zone chart if available
+      const zoneChartImage = await captureChart(zoneChartRef);
+      if (zoneChartImage) {
+        const chartWidth = pageWidth - margin * 2;
+        const chartHeight = 55;
+        pdf.addImage(zoneChartImage, "PNG", margin, yPos, chartWidth, chartHeight);
+        yPos += chartHeight + 5;
+      } else {
+        // Fallback: show zone data as text
+        pdf.setFontSize(9);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(50, 50, 50);
+        zones.forEach(zone => {
+          const pct = ((zone.value / totalBusinesses) * 100).toFixed(1);
+          pdf.text(`• ${zone.name}: ${zone.value} businesses (${pct}%)`, margin + 5, yPos);
+          yPos += 6;
+        });
+      }
+      yPos += 10;
+
+      // ===== SECTION 5: Key Insights =====
+      checkNewPage(60);
+      pdf.setFillColor(99, 102, 241);
+      pdf.roundedRect(margin, yPos, pageWidth - margin * 2, 10, 2, 2, "F");
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(255, 255, 255);
+      pdf.text("SECTION 5: Key Insights", margin + 5, yPos + 7);
       yPos += 18;
 
       pdf.setFontSize(9);
       pdf.setFont("helvetica", "normal");
       pdf.setTextColor(40, 40, 40);
+      const topCategory = categories[0];
       const insights = [
-        `Top category: ${categories[0]?.name || "N/A"} with ${categories[0]?.value || 0} businesses`,
-        `Business density: ${streets.length ? (totalBusinesses / streets.length).toFixed(1) : 0} per street`,
-        `Top 3 categories account for ${categories.slice(0, 3).reduce((a, c) => a + c.value, 0)} businesses`,
+        `Top category: ${topCategory?.name || "N/A"} with ${topCategory?.value || 0} businesses (${topCategory ? ((topCategory.value / totalBusinesses) * 100).toFixed(1) : 0}%)`,
+        `Distribution behavior: ${zones.length > 1 ? "Businesses spread across multiple zone types" : "Concentrated in single zone type"}`,
+        `Average business density: ${avgPerStreet} per street`,
+        `Total coverage: ${streets.length} streets across ${zones.length} zone types`,
       ];
       insights.forEach(i => { checkNewPage(10); pdf.text(`• ${i}`, margin + 5, yPos); yPos += 7; });
 
       addFooter();
       const fileName = `SSP_Analytics_Report_${new Date().toISOString().split("T")[0]}.pdf`;
       pdf.save(fileName);
-      toast.success("PDF exported successfully!");
-      logActivity("Exported Analytics PDF", { pages: pageNum });
+      toast.success("PDF exported with charts!");
+      logActivity("Exported Analytics PDF", { pages: pageNum, withCharts: true });
     } catch (error) {
       console.error("PDF Export Error:", error);
       toast.error("Failed to generate PDF.");
@@ -964,7 +979,7 @@ export function UserAnalyticsPage() {
           <div ref={analyticsContentRef}>
             <div className="grid md:grid-cols-2 gap-6">
               {/* BAR CHART */}
-              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+              <Card ref={barChartRef} className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
                 <CardHeader className="bg-linear-to-r from-blue-50 to-indigo-50 border-b">
                   <div className="flex items-center gap-3">
                     <div className="p-2.5 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl text-white shadow-lg shadow-blue-200">
@@ -1003,7 +1018,7 @@ export function UserAnalyticsPage() {
               </Card>
 
               {/* PIE CHART */}
-              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+              <Card ref={pieChartRef} className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
                 <CardHeader className="bg-linear-to-r from-purple-50 to-violet-50 border-b">
                   <div className="flex items-center gap-3">
                     <div className="p-2.5 bg-linear-to-br from-purple-500 to-violet-600 rounded-xl text-white shadow-lg shadow-purple-200">
@@ -1088,7 +1103,7 @@ export function UserAnalyticsPage() {
 
         {/* ZONE TAB */}
         <TabsContent value="zone" className="space-y-6">
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+          <Card ref={zoneChartRef} className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
             <CardHeader className="bg-linear-to-r from-amber-50 to-orange-50 border-b">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-linear-to-br from-amber-500 to-orange-600 rounded-xl text-white shadow-lg shadow-amber-200">
