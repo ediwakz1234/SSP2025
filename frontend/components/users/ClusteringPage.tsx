@@ -1625,108 +1625,144 @@ export function ClusteringPage() {
   };
 
   const exportExcel = async () => {
+    if (!result) {
+      toast.error("No clustering results to export");
+      return;
+    }
+
     const workbook = XLSX.utils.book_new();
 
-    // Sheet 1: Summary Report
-    const summaryData = [
-      ["STRATEGIC STORE PLACEMENT SYSTEM - Analysis Report"],
+    // Calculate density metrics from nearby businesses
+    const biz50m = result.nearbyBusinesses.filter(nb => nb.distance <= 0.05).length;
+    const biz100m = result.nearbyBusinesses.filter(nb => nb.distance <= 0.1).length;
+    const biz200m = result.nearbyBusinesses.filter(nb => nb.distance <= 0.2).length;
+
+    // Calculate competitor metrics
+    const comp50m = result.competitorAnalysis.competitorsWithin500m || 0;
+    const comp100m = result.competitorAnalysis.competitorsWithin1km || 0;
+    const comp200m = result.competitorAnalysis.competitorsWithin2km || 0;
+
+    // ===== SHEET 1: Report =====
+    const reportData = [
+      ["CLUSTERING REPORT"],
+      ["Strategic Store Placement System"],
       [""],
       ["Generated", new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })],
       ["Business Idea", businessIdea || "Not specified"],
       ["Category", selectedCategory || "Not specified"],
       [""],
-      ["RECOMMENDED LOCATION"],
-      ["Latitude", result?.recommendedLocation.latitude],
-      ["Longitude", result?.recommendedLocation.longitude],
-      ["Zone Type", result?.zoneType],
-      ["Confidence", ((result?.analysis.confidence ?? 0) * 100).toFixed(0) + "%"],
-      ["Opportunity", result?.analysis.opportunity],
+      ["LOCATION DATA"],
+      ["Latitude", result.recommendedLocation.latitude.toFixed(6)],
+      ["Longitude", result.recommendedLocation.longitude.toFixed(6)],
+      ["Zone Type", result.zoneType],
+      ["Confidence", ((result.analysis.confidence ?? 0) * 100).toFixed(0) + "%"],
+      ["Opportunity", result.analysis.opportunity],
       [""],
-      ["COMPETITOR ANALYSIS"],
-      ["Total Competitors", result?.analysis.competitorCount],
-      ["Within 500m", result?.competitorAnalysis.competitorsWithin500m],
-      ["Within 1km", result?.competitorAnalysis.competitorsWithin1km],
-      ["Within 2km", result?.competitorAnalysis.competitorsWithin2km],
-      ["Recommended Strategy", result?.competitorAnalysis.recommendedStrategy],
+      ["BUSINESS PRESENCE"],
+      ["Within 50m", `${biz50m} businesses`],
+      ["Within 100m", `${biz100m} businesses`],
+      ["Within 200m", `${biz200m} businesses`],
+      [""],
+      ["COMPETITOR PRESSURE"],
+      ["Within 500m", `${comp50m} competitors`],
+      ["Within 1km", `${comp100m} competitors`],
+      ["Within 2km", `${comp200m} competitors`],
+      [""],
+      ["STRATEGY"],
+      [result.competitorAnalysis.recommendedStrategy || "No strategy available"],
+    ];
+    const reportSheet = XLSX.utils.aoa_to_sheet(reportData);
+    reportSheet["!cols"] = [{ wch: 20 }, { wch: 50 }];
+    XLSX.utils.book_append_sheet(workbook, reportSheet, "Report");
+
+    // ===== SHEET 2: AI Business Recommendation =====
+    const aiRecData = [
+      ["AI BUSINESS RECOMMENDATION"],
+      [""],
+      ["Business Idea", businessIdea || "Not specified"],
+      ["Zone Type", result.zoneType],
+      [""],
     ];
 
-    // Add Best Cluster info if available
     if (aiBusinessRecommendations?.bestCluster) {
       const bc = aiBusinessRecommendations.bestCluster;
-      summaryData.push(
-        [""],
-        ["BEST RECOMMENDED CLUSTER"],
-        ["Cluster Name", bc.friendlyName],
-        ["Confidence", `${bc.confidence}% - ${bc.confidenceLabel}`],
-        ["Reason", bc.reason]
+      aiRecData.push(
+        ["BEST CLUSTER ANALYSIS"],
+        ["Zone", bc.friendlyName || "N/A"],
+        ["Confidence", `${bc.confidence}%`],
+        ["Rating", bc.confidenceLabel],
+        ["Reason", bc.reason],
+        [""]
       );
     }
 
-    // Add Final Suggestion if available
     if (aiBusinessRecommendations?.finalSuggestion) {
-      summaryData.push(
-        [""],
-        ["FINAL SUGGESTION"],
-        [aiBusinessRecommendations.finalSuggestion]
+      aiRecData.push(
+        ["FINAL RECOMMENDATION"],
+        [aiBusinessRecommendations.finalSuggestion],
+        [""]
       );
     }
 
-    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-    summarySheet["!cols"] = [{ wch: 25 }, { wch: 60 }];
-    XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
-
-    // Sheet 2: Top 3 Recommended Businesses
-    if (aiBusinessRecommendations?.topBusinesses?.length) {
-      const topBizData = aiBusinessRecommendations.topBusinesses.map((biz, idx) => ({
-        "Rank": idx + 1,
-        "Business Name": biz.name,
-        "Score": biz.score,
-        "Fit %": biz.fitPercentage,
-        "Opportunity Level": biz.opportunityLevel,
-        "Description": biz.shortDescription,
-        "Startup Budget": biz.startupBudget || "N/A",
-        "Preferred Location": biz.preferredLocation || "N/A",
-        "Competitor Presence": biz.competitorPresence || "N/A",
-        "Business Density Insight": biz.businessDensityInsight || "N/A",
-      }));
-      const topBizSheet = XLSX.utils.json_to_sheet(topBizData);
-      XLSX.utils.book_append_sheet(workbook, topBizSheet, "Top 3 Businesses");
-    }
-
-    // Sheet 3: Cluster Summary
+    // Add cluster summary
     if (aiBusinessRecommendations?.clusterSummary?.length) {
-      const clusterData = aiBusinessRecommendations.clusterSummary.map((cluster) => ({
-        "Zone Type": cluster.zoneType || cluster.friendlyName,
-        "Business Count": cluster.businessCount,
-        "Competition Level": cluster.competitionLevel,
-      }));
-      const clusterSheet = XLSX.utils.json_to_sheet(clusterData);
-      XLSX.utils.book_append_sheet(workbook, clusterSheet, "Cluster Summary");
-    }
-
-    // Sheet 4: All Clusters with Points
-    if (result?.clusters?.length) {
-      const allPointsData: { Cluster: number; Latitude: number; Longitude: number; Street: string; Category: string; Zone: string }[] = [];
-      result.clusters.forEach((cluster) => {
-        cluster.points.forEach((point) => {
-          allPointsData.push({
-            "Cluster": cluster.id + 1,
-            "Latitude": point.latitude,
-            "Longitude": point.longitude,
-            "Street": point.business?.street || "Unknown",
-            "Category": point.business?.general_category || "Unknown",
-            "Zone": point.business?.zone_type || "Unknown",
-          });
-        });
+      aiRecData.push(["ZONE DISTRIBUTION"]);
+      aiBusinessRecommendations.clusterSummary.forEach(cluster => {
+        aiRecData.push([
+          cluster.zoneType || `Cluster ${cluster.clusterId}`,
+          `${cluster.businessCount} businesses, ${cluster.competitionLevel} competition`
+        ]);
       });
-      if (allPointsData.length > 0) {
-        const allPointsSheet = XLSX.utils.json_to_sheet(allPointsData);
-        XLSX.utils.book_append_sheet(workbook, allPointsSheet, "All Cluster Points");
-      }
     }
 
-    XLSX.writeFile(workbook, `business-location-report-${selectedCategory?.replace(/\s+/g, "_") || "analysis"}.xlsx`);
-    toast.success("Excel report exported with multiple sheets!");
+    const aiRecSheet = XLSX.utils.aoa_to_sheet(aiRecData);
+    aiRecSheet["!cols"] = [{ wch: 25 }, { wch: 70 }];
+    XLSX.utils.book_append_sheet(workbook, aiRecSheet, "AI Business Recommendation");
+
+    // ===== SHEET 3: Top 3 Recommended Businesses =====
+    const top3Data = [
+      ["TOP 3 RECOMMENDED BUSINESSES"],
+      ["Based on clustering analysis and AI evaluation"],
+      [""],
+      ["Rank", "Business Type", "Reason", "Success Potential", "Score", "Startup Budget"],
+    ];
+
+    if (aiBusinessRecommendations?.topBusinesses?.length) {
+      aiBusinessRecommendations.topBusinesses.forEach((biz, idx) => {
+        // Map opportunity level to success potential
+        const successPotential = biz.opportunityLevel?.includes("Excellent") ? "High" :
+          biz.opportunityLevel?.includes("Strong") ? "High" :
+            biz.opportunityLevel?.includes("Moderate") ? "Medium" : "Low";
+
+        top3Data.push([
+          `Business #${idx + 1}`,
+          biz.name,
+          biz.shortDescription || biz.fullDetails || "N/A",
+          successPotential,
+          `${biz.score}/100`,
+          biz.startupBudget || "N/A"
+        ]);
+      });
+    } else {
+      top3Data.push(["", "No AI recommendations available", "Run clustering first", "", "", ""]);
+    }
+
+    top3Data.push(
+      [""],
+      ["KEY FACTORS SUMMARY"],
+      ["Demand", biz200m > 10 ? "High foot traffic area" : biz200m > 5 ? "Moderate activity" : "Low density area"],
+      ["Competition", comp50m === 0 ? "No direct competitors - excellent opportunity" : comp50m <= 3 ? "Manageable competition" : "High competition - differentiation needed"],
+      ["Foot Traffic", biz100m > 8 ? "High" : biz100m > 3 ? "Medium" : "Low"],
+      ["Zone Fit", result.zoneType]
+    );
+
+    const top3Sheet = XLSX.utils.aoa_to_sheet(top3Data);
+    top3Sheet["!cols"] = [{ wch: 12 }, { wch: 25 }, { wch: 50 }, { wch: 18 }, { wch: 10 }, { wch: 25 }];
+    XLSX.utils.book_append_sheet(workbook, top3Sheet, "Top 3 Businesses");
+
+    XLSX.writeFile(workbook, `Clustering_Report_${selectedCategory?.replace(/\s+/g, "_") || "analysis"}_${new Date().toISOString().split("T")[0]}.xlsx`);
+    toast.success("Excel report exported (3 sheets)!");
+    logActivity("Exported Clustering Excel", { sheets: 3 });
   };
 
 
