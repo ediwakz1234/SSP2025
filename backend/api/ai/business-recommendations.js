@@ -133,9 +133,7 @@ Return ONLY valid JSON in this exact format:
 }`;
 
 
-    const result = await model.generateContent([
-      { role: "user", parts: [{ text: systemPrompt + "\n\n" + userPrompt }] }
-    ]);
+    const result = await model.generateContent(systemPrompt + "\n\n" + userPrompt);
     const text = result.response.text();
 
     let data;
