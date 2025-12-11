@@ -21,7 +21,8 @@
     "jspdf": "^3.0.4",
     "jspdf-autotable": "^5.0.2",
     "node-fetch": "^3.3.2",
-    "papaparse": "^5.5.3"
+    "papaparse": "^5.5.3",
+    "pdfkit": "^0.17.2"
   },
   "devDependencies": {
     "@types/papaparse": "^5.5.0",
