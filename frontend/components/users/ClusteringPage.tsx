@@ -389,7 +389,7 @@ export function ClusteringPage() {
   // ===== RESTORE FROM ZUSTAND STORE ON MOUNT =====
   useEffect(() => {
     // Only restore if store has results (user navigated back)
-    if (kmeansStore.hasResults) {
+    if (kmeansStore.hasResults && kmeansStore.recommendedLocation && kmeansStore.clusters.length > 0) {
       // Restore inputs
       if (kmeansStore.businessIdea) {
         setBusinessIdea(kmeansStore.businessIdea);
@@ -401,13 +401,58 @@ export function ClusteringPage() {
           setAiCategoryExplanation(kmeansStore.categoryReason);
         }
       }
+
       // Restore AI recommendations if available
       if (kmeansStore.aiRecommendations) {
         setAiBusinessRecommendations(kmeansStore.aiRecommendations);
       }
-      toast.info("Previous session restored. Click 'Run Clustering' to see full results.");
+
+      // ===== RESTORE FULL CLUSTERING RESULTS =====
+      // Reconstruct the ExtendedResult object from store data
+      const restoredResult: ExtendedResult = {
+        recommendedLocation: kmeansStore.recommendedLocation,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        clusters: kmeansStore.clusters as any,
+        zoneType: kmeansStore.zoneType,
+        analysis: kmeansStore.analysis || {
+          confidence: 0,
+          opportunity: "Unknown",
+          opportunity_score: 0,
+          competitorCount: 0,
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        competitorAnalysis: (kmeansStore.competitorAnalysis || {
+          competitorCount: 0,
+          nearestCompetitor: null,
+          distanceToNearest: 0,
+          competitorsWithin500m: 0,
+          competitorsWithin1km: 0,
+          competitorsWithin2km: 0,
+          marketSaturation: 0,
+          recommendedStrategy: "",
+        }) as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        nearbyBusinesses: kmeansStore.nearbyBusinesses as any,
+        gridPoints: [], // Grid points are not stored, will be empty
+      };
+
+      setResult(restoredResult);
+
+      // Compute live analytics from restored result
+      if (kmeansStore.detectedCategory) {
+        const analytics = computeLiveAnalytics(
+          restoredResult.recommendedLocation,
+          businesses,
+          kmeansStore.detectedCategory
+        );
+        setLiveAnalytics(analytics);
+      }
+
+      toast.success("Previous K-Means results restored!", {
+        description: "Your clustering results are ready to view.",
+      });
     }
-  }, []); // Run once on mount
+  }, [businesses.length]); // Re-run when businesses are loaded
 
   // Auto-switch between local dev and production
   const API_BASE = "";
