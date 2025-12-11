@@ -72,27 +72,39 @@ Use ONLY the provided clustering data:
 - User's business idea and category
 - Cluster information: clusterId, centroid (lat/lng), number of businesses per cluster
 
+ZONE NAMING RULES:
+When naming or describing the recommended zone (best cluster), ONLY use one of these exact names:
+
+"Commercial Zone" - Use when the cluster has many retail shops, food places, or service businesses.
+  Indicators: high activity, many businesses, strong demand.
+
+"Residential Zone" - Use when the cluster contains mostly homes, small stores, or quiet streets.
+  Indicators: fewer businesses, more community-based activity.
+
+"Mixed Zone" - Use when the cluster contains a combination of residential areas and commercial activity.
+  Indicators: balanced number of shops and homes.
+
+Do NOT create new labels or variations. Always select ONE of these exact zone names.
+
 Your tasks:
-1. Identify the best cluster and give it a friendly name.
+1. Identify the best cluster and assign it a zone type (Commercial Zone, Residential Zone, or Mixed Zone).
 2. Recommend the Top 3 additional business ideas suitable for that cluster.
 3. For each recommended business, include:
    - name
-   - score (0–100)
-   - fitPercentage (0–100)
+   - score (0-100)
+   - fitPercentage (0-100)
    - opportunityLevel (High/Medium/Low)
-   - shortDescription (1–2 simple sentences)
+   - shortDescription (1-2 simple sentences)
    - fullDetails: a clear explanation using simple language
    - preferredLocation: suggest where inside the cluster the business fits best
-       (e.g., near main road, beside residential area, close to other services)
-   - startupBudget: give a suggested budget range in PHP
-       (e.g., "₱80,000–₱150,000")
+   - startupBudget: give a suggested budget range in PHP (e.g., "PHP 80,000 - PHP 150,000")
    - competitorPresence: short explanation of how many similar shops exist in the area
    - businessDensityInsight: brief description of how crowded or open the area is
 
 4. Confidence Level:
 Convert the confidence % into this label:
-1–25% = "Not Ideal"
-26–50% = "Could Work"
+1-25% = "Not Ideal"
+26-50% = "Could Work"
 51–75% = "Good Choice"
 76–100% = "Best Choice"
 
@@ -197,7 +209,8 @@ Return ONLY valid JSON in this exact format:
     } catch {
       // Fallback response if JSON parsing fails
       const competitionLevel = c50 >= 3 ? "High" : c100 >= 5 ? "Medium" : "Low";
-      const friendlyName = b50 + b100 >= 10 ? "Busy Area" : b50 + b100 >= 5 ? "Active Area" : "Growing Area";
+      // Zone type based on business count
+      const zoneTypeName = b50 + b100 >= 10 ? "Commercial Zone" : b50 + b100 >= 3 ? "Mixed Zone" : "Residential Zone";
       const score1 = Math.max(60, 90 - c50 * 5);
       const score2 = Math.max(55, score1 - 7);
       const score3 = Math.max(50, score2 - 6);
@@ -207,10 +220,10 @@ Return ONLY valid JSON in this exact format:
       data = {
         bestCluster: {
           clusterId: 1,
-          friendlyName: friendlyName,
+          friendlyName: zoneTypeName,
           reason: c50 === 0
-            ? "This area has no direct competitors nearby, making it a great place to start."
-            : `This is a ${zoneType.toLowerCase()} zone with ${competitionLevel.toLowerCase()} competition.`,
+            ? `This ${zoneTypeName} has no direct competitors nearby, making it a great place to start.`
+            : `This ${zoneTypeName} has ${competitionLevel.toLowerCase()} competition with good potential.`,
           confidence: confValue,
           confidenceLabel: confLabel,
           confidenceColor: getConfidenceColor(confLabel)
@@ -264,13 +277,13 @@ Return ONLY valid JSON in this exact format:
           }
         ],
         clusterSummary: [
-          { clusterId: 1, friendlyName: friendlyName, businessCount: b50, competitionLevel: c50 >= 3 ? "High" : c50 >= 1 ? "Medium" : "Low" },
-          { clusterId: 2, friendlyName: "Active Area", businessCount: Math.max(0, b100 - b50), competitionLevel: "Medium" },
-          { clusterId: 3, friendlyName: "Growing Area", businessCount: Math.max(0, b200 - b100), competitionLevel: "Low" }
+          { clusterId: 1, friendlyName: zoneTypeName, businessCount: b50, competitionLevel: c50 >= 3 ? "High" : c50 >= 1 ? "Medium" : "Low" },
+          { clusterId: 2, friendlyName: "Mixed Zone", businessCount: Math.max(0, b100 - b50), competitionLevel: "Medium" },
+          { clusterId: 3, friendlyName: "Residential Zone", businessCount: Math.max(0, b200 - b100), competitionLevel: "Low" }
         ],
         finalSuggestion: c50 === 0
-          ? "This looks like a good place for your business because there are not many similar shops yet. You could be one of the first here."
-          : "This area has some competition, but there is still room for a new business if you offer something unique or better service."
+          ? `This ${zoneTypeName} looks like a good place for your business because there are not many similar shops yet. You could be one of the first here.`
+          : `This ${zoneTypeName} has some competition, but there is still room for a new business if you offer something unique or better service.`
       };
     }
 
