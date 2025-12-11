@@ -500,8 +500,8 @@ export function UserAnalyticsPage() {
       metrics.forEach(m => { pdf.text(`• ${m}`, margin + 5, yPos); yPos += 6; });
       yPos += 10;
 
-      // Section 2: Categories
-      checkNewPage(60);
+      // Section 2: Categories (Bar Chart)
+      checkNewPage(100);
       pdf.setFillColor(16, 185, 129);
       pdf.roundedRect(margin, yPos, pageWidth - margin * 2, 10, 2, 2, "F");
       pdf.setFontSize(12);
@@ -510,19 +510,37 @@ export function UserAnalyticsPage() {
       pdf.text("SECTION 2: Business Categories", margin + 5, yPos + 7);
       yPos += 18;
 
-      pdf.setFontSize(9);
-      pdf.setFont("helvetica", "normal");
-      categories.forEach((cat, idx) => {
-        checkNewPage(10);
+      // Draw horizontal bar chart
+      const barColors = [[59, 130, 246], [139, 92, 246], [16, 185, 129], [245, 158, 11], [239, 68, 68], [6, 182, 212]];
+      const maxBarWidth = pageWidth - margin * 2 - 60;
+      const maxValue = Math.max(...categories.map(c => c.value), 1);
+      const barHeight = 8;
+
+      categories.slice(0, 6).forEach((cat, idx) => {
+        checkNewPage(15);
+        const barWidth = (cat.value / maxValue) * maxBarWidth;
         const pct = ((cat.value / totalBusinesses) * 100).toFixed(1);
+        const color = barColors[idx % barColors.length];
+
+        // Category label
+        pdf.setFontSize(8);
         pdf.setTextColor(60, 60, 60);
-        pdf.text(`${idx + 1}. ${cat.name}: ${cat.value} (${pct}%)`, margin + 5, yPos);
-        yPos += 6;
+        pdf.text(cat.name.substring(0, 18), margin + 5, yPos + 5);
+
+        // Bar
+        pdf.setFillColor(color[0], color[1], color[2]);
+        pdf.roundedRect(margin + 55, yPos, barWidth, barHeight, 2, 2, "F");
+
+        // Value label
+        pdf.setTextColor(80, 80, 80);
+        pdf.text(`${cat.value} (${pct}%)`, margin + 60 + barWidth, yPos + 5);
+
+        yPos += 12;
       });
       yPos += 10;
 
-      // Section 3: Zones
-      checkNewPage(50);
+      // Section 3: Zones (Pie Chart)
+      checkNewPage(90);
       pdf.setFillColor(139, 92, 246);
       pdf.roundedRect(margin, yPos, pageWidth - margin * 2, 10, 2, 2, "F");
       pdf.setFontSize(12);
@@ -531,16 +549,69 @@ export function UserAnalyticsPage() {
       pdf.text("SECTION 3: Zone Distribution", margin + 5, yPos + 7);
       yPos += 18;
 
-      pdf.setFontSize(9);
-      pdf.setFont("helvetica", "normal");
-      zones.forEach(zone => {
-        checkNewPage(10);
-        const pct = ((zone.value / totalBusinesses) * 100).toFixed(1);
-        pdf.setTextColor(60, 60, 60);
-        pdf.text(`• ${zone.name}: ${zone.value} businesses (${pct}%)`, margin + 5, yPos);
-        yPos += 6;
+      // Draw pie chart
+      const pieColors = [[59, 130, 246], [139, 92, 246], [16, 185, 129], [245, 158, 11]];
+      const pieX = pageWidth / 3;
+      const pieY = yPos + 25;
+      const pieRadius = 22;
+      let startAngle = 0;
+
+      zones.forEach((zone, idx) => {
+        const sliceAngle = (zone.value / totalBusinesses) * 2 * Math.PI;
+        const endAngle = startAngle + sliceAngle;
+        const color = pieColors[idx % pieColors.length];
+
+        // Draw pie slice using polygon approximation
+        pdf.setFillColor(color[0], color[1], color[2]);
+
+        // Create arc path points
+        const points: number[][] = [[pieX, pieY]];
+        for (let a = startAngle; a <= endAngle; a += 0.1) {
+          points.push([pieX + pieRadius * Math.cos(a), pieY + pieRadius * Math.sin(a)]);
+        }
+        points.push([pieX + pieRadius * Math.cos(endAngle), pieY + pieRadius * Math.sin(endAngle)]);
+        points.push([pieX, pieY]);
+
+        // Draw filled polygon for pie slice
+        if (points.length > 2) {
+          const xPoints = points.map(p => p[0]);
+          const yPoints = points.map(p => p[1]);
+          // Use lines to approximate arc
+          pdf.setDrawColor(255, 255, 255);
+          pdf.setLineWidth(0.5);
+          for (let i = 0; i < points.length - 1; i++) {
+            if (i === 0) {
+              pdf.moveTo(points[i][0], points[i][1]);
+            }
+          }
+          // Fill the slice
+          pdf.triangle(pieX, pieY,
+            pieX + pieRadius * Math.cos(startAngle), pieY + pieRadius * Math.sin(startAngle),
+            pieX + pieRadius * Math.cos(endAngle), pieY + pieRadius * Math.sin(endAngle), "F");
+        }
+
+        startAngle = endAngle;
       });
-      yPos += 10;
+
+      // Draw legend next to pie
+      const legendX = pageWidth / 2 + 10;
+      let legendY = yPos + 10;
+      pdf.setFontSize(9);
+      zones.forEach((zone, idx) => {
+        const color = pieColors[idx % pieColors.length];
+        const pct = ((zone.value / totalBusinesses) * 100).toFixed(1);
+
+        // Color box
+        pdf.setFillColor(color[0], color[1], color[2]);
+        pdf.rect(legendX, legendY - 3, 8, 6, "F");
+
+        // Label
+        pdf.setTextColor(60, 60, 60);
+        pdf.text(`${zone.name}: ${zone.value} (${pct}%)`, legendX + 12, legendY + 1);
+        legendY += 10;
+      });
+
+      yPos += 55;
 
       // Section 4: Insights
       checkNewPage(80);
