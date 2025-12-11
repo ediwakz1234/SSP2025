@@ -1,0 +1,234 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+export default async function handler(req, res) {
+    if (req.method !== "POST") {
+        return res.status(405).json({ error: "Method not allowed" });
+    }
+
+    try {
+        const {
+            userName,
+            businessIdea,
+            category,
+            bestCluster,
+            recommendedLocation,
+            clusterSummary,
+            topBusinesses,
+            confidence,
+            confidenceLabel,
+            finalSuggestion,
+        } = req.body;
+
+        if (!userName || !businessIdea) {
+            return res.status(400).json({ error: "Missing required data" });
+        }
+
+        // Format date
+        const reportDate = new Date().toLocaleDateString('en-PH', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Generate PDF content directly (no AI needed for formatting)
+        const pdfContent = generatePDFContent({
+            userName,
+            businessIdea,
+            category,
+            bestCluster,
+            recommendedLocation,
+            clusterSummary,
+            topBusinesses,
+            confidence,
+            confidenceLabel,
+            finalSuggestion,
+            reportDate,
+        });
+
+        // Generate Excel data structure
+        const excelContent = generateExcelContent({
+            userName,
+            businessIdea,
+            bestCluster,
+            recommendedLocation,
+            clusterSummary,
+            topBusinesses,
+            confidence,
+            confidenceLabel,
+            finalSuggestion,
+        });
+
+        return res.status(200).json({
+            success: true,
+            pdfContent,
+            excelContent,
+        });
+
+    } catch (err) {
+        console.error("Report Generation Error:", err.message);
+        return res.status(500).json({ error: "Report generation failed", message: err.message });
+    }
+}
+
+function generatePDFContent(data) {
+    const {
+        userName,
+        businessIdea,
+        category,
+        bestCluster,
+        recommendedLocation,
+        clusterSummary,
+        topBusinesses,
+        confidence,
+        confidenceLabel,
+        finalSuggestion,
+        reportDate,
+    } = data;
+
+    const sections = [];
+
+    // Header
+    sections.push(`
+BUSINESS LOCATION ANALYSIS REPORT
+==================================
+
+Prepared for: ${userName}
+Business Idea: ${businessIdea}
+Category: ${category || "Not specified"}
+Date: ${reportDate}
+`);
+
+    // Recommended Location Section
+    sections.push(`
+RECOMMENDED LOCATION
+--------------------
+
+Best Cluster: ${bestCluster?.friendlyName || "Cluster " + (bestCluster?.clusterId || 1)}
+
+Why This Location:
+${bestCluster?.reason || "This area shows strong potential for your business based on clustering analysis."}
+
+Confidence Level: ${confidence || 80}% - ${confidenceLabel || "Good Choice"}
+
+Coordinates: ${recommendedLocation?.latitude?.toFixed(6) || "N/A"}, ${recommendedLocation?.longitude?.toFixed(6) || "N/A"}
+
+This location was selected because it offers a good balance of opportunity and accessibility for your type of business.
+`);
+
+    // Map Section Placeholder
+    sections.push(`
+MAP VISUALIZATION
+-----------------
+
+[MAP VIEW - Insert map snapshot showing the recommended location]
+
+The recommended spot is marked on the map at coordinates:
+Latitude: ${recommendedLocation?.latitude?.toFixed(6) || "N/A"}
+Longitude: ${recommendedLocation?.longitude?.toFixed(6) || "N/A"}
+
+The marker indicates the optimal placement within ${bestCluster?.friendlyName || "the recommended cluster"}.
+`);
+
+    // Top 3 Business Recommendations
+    sections.push(`
+TOP 3 BUSINESS RECOMMENDATIONS
+------------------------------
+`);
+
+    (topBusinesses || []).forEach((biz, index) => {
+        sections.push(`
+${index + 1}. ${biz.name}
+   Score: ${biz.score}/100 | Fit: ${biz.fitPercentage}% | Opportunity: ${biz.opportunityLevel}
+   
+   ${biz.shortDescription}
+   
+   Full Details:
+   ${biz.fullDetails}
+   
+   Preferred Location: ${biz.preferredLocation || "Near main road for visibility"}
+   Startup Budget: ${biz.startupBudget || "₱50,000–₱150,000"}
+   Competitor Presence: ${biz.competitorPresence || "Low competition in area"}
+   Business Density: ${biz.businessDensityInsight || "Moderate activity area"}
+`);
+    });
+
+    // Cluster Summary
+    sections.push(`
+CLUSTER SUMMARY
+---------------
+`);
+
+    (clusterSummary || []).forEach((cluster) => {
+        sections.push(`• ${cluster.friendlyName || "Cluster " + cluster.clusterId}: ${cluster.businessCount} businesses (${cluster.competitionLevel} competition)`);
+    });
+
+    // Final Suggestion
+    sections.push(`
+
+FINAL SUGGESTION
+----------------
+
+${finalSuggestion || "Based on our analysis, this location shows good potential for your business. Consider starting with a soft launch to test the market."}
+
+---
+Generated by Strategic Store Placement System
+`);
+
+    return sections.join("\n");
+}
+
+function generateExcelContent(data) {
+    const {
+        userName,
+        businessIdea,
+        bestCluster,
+        recommendedLocation,
+        clusterSummary,
+        topBusinesses,
+        confidence,
+        confidenceLabel,
+        finalSuggestion,
+    } = data;
+
+    // Summary Sheet
+    const summary = [{
+        "User Name": userName,
+        "Business Idea": businessIdea,
+        "Best Cluster": bestCluster?.clusterId || 1,
+        "Friendly Name": bestCluster?.friendlyName || "Recommended Area",
+        "Latitude": recommendedLocation?.latitude?.toFixed(6) || "N/A",
+        "Longitude": recommendedLocation?.longitude?.toFixed(6) || "N/A",
+        "Confidence %": confidence || 80,
+        "Confidence Label": confidenceLabel || "Good Choice",
+        "Final Suggestion": finalSuggestion || "Good potential for your business.",
+    }];
+
+    // Top Businesses Sheet
+    const topBusinessesSheet = (topBusinesses || []).map((biz, index) => ({
+        "Rank": index + 1,
+        "Business Name": biz.name,
+        "Score": biz.score,
+        "Fit Percentage": biz.fitPercentage,
+        "Opportunity Level": biz.opportunityLevel,
+        "Short Description": biz.shortDescription,
+        "Full Details": biz.fullDetails,
+        "Preferred Location": biz.preferredLocation || "Near main road",
+        "Startup Budget": biz.startupBudget || "₱50,000–₱150,000",
+        "Competitor Presence": biz.competitorPresence || "Low",
+        "Business Density Insight": biz.businessDensityInsight || "Moderate",
+    }));
+
+    // Cluster Summary Sheet
+    const clusterSummarySheet = (clusterSummary || []).map((cluster) => ({
+        "Cluster ID": cluster.clusterId,
+        "Friendly Name": cluster.friendlyName || `Cluster ${cluster.clusterId}`,
+        "Business Count": cluster.businessCount,
+        "Competition Level": cluster.competitionLevel,
+    }));
+
+    return {
+        summary,
+        topBusinesses: topBusinessesSheet,
+        clusterSummary: clusterSummarySheet,
+    };
+}
