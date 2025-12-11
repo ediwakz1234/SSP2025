@@ -105,48 +105,31 @@ const CATEGORY_OPTIONS = [
 ];
 
 // ---------------------------------------------------------------------------
-// AI RECOMMENDATION TYPES
+// AI RECOMMENDATION TYPES (New Compact Format)
 // ---------------------------------------------------------------------------
-interface AIRecommendation {
-  business_name: string;
-  general_category: string;
-  fit_reason: string;
-  ecosystem_synergy: string;
-  competition_risk: string;
-  data_points_supporting: string[];
+interface Top3Business {
+  name: string;
+  score: number;
+  fit_percentage: number;
+  opportunity_level: string;
+  reason: string;
+}
+
+interface ClusterSummary {
+  cluster_id: number;
+  business_count: number;
+  competition: string;
 }
 
 interface AIBusinessRecommendations {
-  category_validation: {
-    user_input: string;
-    mapped_category: string;
+  best_cluster: {
+    cluster_id: string;
     reason: string;
   };
-  nearby_business_summary: {
-    total_businesses: number;
-    total_competitors: number;
-    top_categories: string[];
-    area_behavior: string;
-  };
-  competitor_analysis: {
-    competition_level: string;
-    dominant_competitors: string[];
-    saturation_notes: string;
-    opportunity_gaps: string[];
-  };
-  location_analysis: {
-    zone_type: string;
-    strengths: string[];
-    weaknesses: string[];
-    opportunity_level: string;
-    suitability_score: string;
-  };
-  recommendations: AIRecommendation[];
-  final_verdict: {
-    suitability: string;
-    best_recommendation: string;
-    actionable_advice: string;
-  };
+  top_3_businesses: Top3Business[];
+  cluster_summary: ClusterSummary[];
+  final_suggestion: string;
+  confidence: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -2292,247 +2275,121 @@ ${result?.competitorAnalysis.recommendedStrategy}
               ) : aiBusinessRecommendations ? (
                 <div className="space-y-6">
 
-                  {/* Final Verdict Banner */}
-                  <div className={`relative overflow-hidden rounded-2xl p-6 ${aiBusinessRecommendations.final_verdict.suitability.includes("Highly")
-                    ? "bg-gradient-to-r from-emerald-500 to-green-600"
-                    : aiBusinessRecommendations.final_verdict.suitability.includes("Suitable")
-                      ? "bg-gradient-to-r from-blue-500 to-indigo-600"
-                      : aiBusinessRecommendations.final_verdict.suitability.includes("Moderate")
-                        ? "bg-gradient-to-r from-amber-500 to-orange-600"
-                        : "bg-gradient-to-r from-red-500 to-rose-600"
-                    } text-white shadow-lg`}>
+                  {/* Best Cluster Banner */}
+                  <div className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg">
                     <div className="flex items-start gap-4">
                       <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                        <ThumbsUp className="w-6 h-6" />
+                        <Target className="w-6 h-6" />
                       </div>
                       <div className="flex-1">
                         <h3 className="text-xl font-bold mb-1">
-                          {aiBusinessRecommendations.final_verdict.suitability}
+                          Best Cluster: {aiBusinessRecommendations.best_cluster?.cluster_id || "Cluster 1"}
                         </h3>
-                        <p className="text-white/90 font-medium">
-                          Best Fit: {aiBusinessRecommendations.final_verdict.best_recommendation}
+                        <p className="text-white/90">
+                          {aiBusinessRecommendations.best_cluster?.reason || "Recommended based on analysis"}
                         </p>
-                        <p className="text-white/80 text-sm mt-2">
-                          {aiBusinessRecommendations.final_verdict.actionable_advice}
-                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold">{aiBusinessRecommendations.confidence || 80}%</div>
+                        <div className="text-white/80 text-sm">Confidence</div>
                       </div>
                     </div>
                     <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full blur-2xl" />
                   </div>
 
-                  {/* Category Validation */}
-                  {aiBusinessRecommendations.category_validation.user_input !== "Not specified" && (
-                    <div className="bg-gradient-to-br from-indigo-50 to-violet-50 p-5 rounded-xl border border-indigo-200">
-                      <h4 className="font-semibold text-indigo-900 flex items-center gap-2 mb-3">
-                        <Lightbulb className="w-5 h-5" />
-                        Your Business Idea Analysis
-                      </h4>
-                      <div className="bg-white/80 p-4 rounded-xl space-y-2">
-                        <p className="text-gray-600">
-                          <span className="font-medium text-gray-800">Input:</span> {aiBusinessRecommendations.category_validation.user_input}
-                        </p>
-                        <p className="text-gray-600">
-                          <span className="font-medium text-gray-800">Mapped to:</span>{" "}
-                          <Badge className="bg-indigo-500 text-white border-0">
-                            {aiBusinessRecommendations.category_validation.mapped_category}
-                          </Badge>
-                        </p>
-                        <p className="text-gray-500 text-sm italic">
-                          {aiBusinessRecommendations.category_validation.reason}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Grid: Location Analysis + Competitor Analysis */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                    {/* Location Analysis */}
-                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-5 rounded-xl border border-blue-200">
-                      <h4 className="font-semibold text-blue-900 flex items-center gap-2 mb-4">
-                        <MapPin className="w-5 h-5" />
-                        Location Analysis
-                      </h4>
-
-                      <div className="space-y-3">
-                        <div className="bg-white/80 p-3 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-1">Zone Type</p>
-                          <Badge variant="outline" className="font-semibold">
-                            {aiBusinessRecommendations.location_analysis.zone_type}
-                          </Badge>
-                        </div>
-
-                        <div className="bg-white/80 p-3 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-2">Strengths</p>
-                          <div className="flex flex-wrap gap-2">
-                            {aiBusinessRecommendations.location_analysis.strengths.map((s, i) => (
-                              <Badge key={i} className="bg-green-100 text-green-700 border-0 text-xs">
-                                {s}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="bg-white/80 p-3 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-2">Weaknesses</p>
-                          <div className="flex flex-wrap gap-2">
-                            {aiBusinessRecommendations.location_analysis.weaknesses.map((w, i) => (
-                              <Badge key={i} className="bg-amber-100 text-amber-700 border-0 text-xs">
-                                {w}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="bg-white/80 p-3 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-1">Suitability Score</p>
-                          <p className="font-semibold text-blue-800">
-                            {aiBusinessRecommendations.location_analysis.suitability_score}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Competitor Analysis */}
-                    <div className="bg-gradient-to-br from-rose-50 to-pink-50 p-5 rounded-xl border border-rose-200">
-                      <h4 className="font-semibold text-rose-900 flex items-center gap-2 mb-4">
-                        <Shield className="w-5 h-5" />
-                        Competitor Analysis
-                      </h4>
-
-                      <div className="space-y-3">
-                        <div className="bg-white/80 p-3 rounded-lg flex items-center justify-between">
-                          <span className="text-sm text-gray-600">Competition Level</span>
-                          <Badge className={`border-0 ${aiBusinessRecommendations.competitor_analysis.competition_level === "Low"
-                            ? "bg-green-500 text-white"
-                            : aiBusinessRecommendations.competitor_analysis.competition_level === "Medium"
-                              ? "bg-amber-500 text-white"
-                              : "bg-red-500 text-white"
-                            }`}>
-                            {aiBusinessRecommendations.competitor_analysis.competition_level}
-                          </Badge>
-                        </div>
-
-                        <div className="bg-white/80 p-3 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-2">Saturation Notes</p>
-                          <p className="text-sm text-gray-700">
-                            {aiBusinessRecommendations.competitor_analysis.saturation_notes}
-                          </p>
-                        </div>
-
-                        <div className="bg-white/80 p-3 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-2">Opportunity Gaps</p>
-                          <div className="flex flex-wrap gap-2">
-                            {aiBusinessRecommendations.competitor_analysis.opportunity_gaps.map((gap, i) => (
-                              <Badge key={i} className="bg-emerald-100 text-emerald-700 border-0 text-xs">
-                                <Zap className="w-3 h-3 mr-1" />
-                                {gap}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Area Summary */}
-                  <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-5 rounded-xl border border-teal-200">
-                    <h4 className="font-semibold text-teal-900 flex items-center gap-2 mb-3">
-                      <Store className="w-5 h-5" />
-                      Nearby Business Summary
-                    </h4>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                      <div className="bg-white/80 p-4 rounded-xl text-center">
-                        <p className="text-2xl font-bold text-teal-700">
-                          {aiBusinessRecommendations.nearby_business_summary.total_businesses}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">Total Nearby</p>
-                      </div>
-                      <div className="bg-white/80 p-4 rounded-xl text-center">
-                        <p className="text-2xl font-bold text-rose-600">
-                          {aiBusinessRecommendations.nearby_business_summary.total_competitors}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">Competitors</p>
-                      </div>
-                      <div className="bg-white/80 p-4 rounded-xl text-center col-span-2">
-                        <div className="flex flex-wrap gap-1 justify-center">
-                          {aiBusinessRecommendations.nearby_business_summary.top_categories.map((cat, i) => (
-                            <Badge key={i} variant="outline" className="text-xs">
-                              {cat}
-                            </Badge>
-                          ))}
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2">Top Categories</p>
-                      </div>
-                    </div>
-                    <div className="bg-white/80 p-4 rounded-xl">
-                      <p className="text-sm text-gray-700 italic">
-                        "{aiBusinessRecommendations.nearby_business_summary.area_behavior}"
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Business Recommendations */}
+                  {/* Top 3 Recommended Businesses */}
                   <div>
                     <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-4 text-lg">
                       <Sparkles className="w-5 h-5 text-amber-500" />
-                      Recommended Businesses
+                      Top 3 Recommended Businesses
                     </h4>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      {aiBusinessRecommendations.recommendations.map((rec, index) => (
+                    <div className="space-y-4">
+                      {(aiBusinessRecommendations.top_3_businesses || []).map((biz, index) => (
                         <div
                           key={index}
                           className="bg-white rounded-2xl border-2 border-gray-100 p-5 hover:border-amber-300 hover:shadow-lg transition-all group"
                         >
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold shadow-lg">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
                                 {index + 1}
                               </div>
                               <div>
-                                <h5 className="font-bold text-gray-900 group-hover:text-amber-700 transition-colors">
-                                  {rec.business_name}
+                                <h5 className="font-bold text-gray-900 text-lg group-hover:text-amber-700 transition-colors">
+                                  {biz.name}
                                 </h5>
-                                <Badge className="bg-amber-100 text-amber-700 border-0 text-xs mt-1">
-                                  {rec.general_category}
-                                </Badge>
+                                <p className="text-gray-500 text-sm">{biz.reason}</p>
                               </div>
                             </div>
-                            <Badge className={`border-0 ${rec.competition_risk === "Low"
-                              ? "bg-green-500 text-white"
-                              : rec.competition_risk === "Medium"
-                                ? "bg-amber-500 text-white"
-                                : "bg-red-500 text-white"
-                              }`}>
-                              {rec.competition_risk === "Low" && <TrendingUp className="w-3 h-3 mr-1" />}
-                              {rec.competition_risk === "High" && <TrendingDown className="w-3 h-3 mr-1" />}
-                              {rec.competition_risk === "Medium" && <AlertTriangle className="w-3 h-3 mr-1" />}
-                              {rec.competition_risk} Risk
-                            </Badge>
-                          </div>
 
-                          <div className="space-y-3 text-sm">
-                            <div className="bg-gray-50 p-3 rounded-lg">
-                              <p className="text-xs font-medium text-gray-500 mb-1">Why it fits:</p>
-                              <p className="text-gray-700">{rec.fit_reason}</p>
-                            </div>
-
-                            <div className="bg-blue-50 p-3 rounded-lg">
-                              <p className="text-xs font-medium text-blue-600 mb-1">Ecosystem Synergy:</p>
-                              <p className="text-gray-700">{rec.ecosystem_synergy}</p>
-                            </div>
-
-                            <div className="flex flex-wrap gap-1">
-                              {rec.data_points_supporting.slice(0, 3).map((point, i) => (
-                                <Badge key={i} variant="outline" className="text-xs bg-white">
-                                  {point}
-                                </Badge>
-                              ))}
+                            <div className="flex items-center gap-3">
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-amber-600">{biz.score}</div>
+                                <div className="text-xs text-gray-500">Score</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-blue-600">{biz.fit_percentage}%</div>
+                                <div className="text-xs text-gray-500">Fit</div>
+                              </div>
+                              <Badge className={`border-0 px-3 py-1 ${biz.opportunity_level?.includes("High")
+                                ? "bg-green-500 text-white"
+                                : biz.opportunity_level?.includes("Medium")
+                                  ? "bg-amber-500 text-white"
+                                  : "bg-gray-500 text-white"
+                                }`}>
+                                {biz.opportunity_level || "Medium"}
+                              </Badge>
                             </div>
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Cluster Summary */}
+                  <div className="bg-gradient-to-br from-slate-50 to-gray-50 p-5 rounded-xl border border-gray-200">
+                    <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-4">
+                      <Store className="w-5 h-5" />
+                      Cluster Summary
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {(aiBusinessRecommendations.cluster_summary || []).map((cluster, index) => (
+                        <div key={index} className="bg-white p-4 rounded-xl border">
+                          <div className="flex items-center justify-between">
+                            <span className="font-semibold text-gray-800">
+                              Cluster {cluster.cluster_id}
+                            </span>
+                            <Badge className={`border-0 ${cluster.competition === "Low"
+                              ? "bg-green-100 text-green-700"
+                              : cluster.competition === "Medium"
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-red-100 text-red-700"
+                              }`}>
+                              {cluster.competition}
+                            </Badge>
+                          </div>
+                          <p className="text-2xl font-bold text-gray-900 mt-2">
+                            {cluster.business_count}
+                            <span className="text-sm font-normal text-gray-500 ml-1">businesses</span>
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Final Suggestion */}
+                  <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-5 rounded-xl border border-indigo-200">
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-indigo-500 rounded-lg text-white">
+                        <Lightbulb className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-indigo-900 mb-1">Final Suggestion</h4>
+                        <p className="text-gray-700">
+                          {aiBusinessRecommendations.final_suggestion || "Proceed with your business plan."}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>

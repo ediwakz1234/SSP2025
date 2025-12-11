@@ -31,46 +31,29 @@ interface NearbyBusiness {
     distance: number;
 }
 
-interface AIRecommendation {
-    business_name: string;
-    general_category: string;
-    fit_reason: string;
-    ecosystem_synergy: string;
-    competition_risk: string;
-    data_points_supporting: string[];
+interface Top3Business {
+    name: string;
+    score: number;
+    fit_percentage: number;
+    opportunity_level: string;
+    reason: string;
+}
+
+interface ClusterSummaryItem {
+    cluster_id: number;
+    business_count: number;
+    competition: string;
 }
 
 interface AIBusinessRecommendations {
-    category_validation: {
-        user_input: string;
-        mapped_category: string;
+    best_cluster: {
+        cluster_id: string;
         reason: string;
     };
-    nearby_business_summary: {
-        total_businesses: number;
-        total_competitors: number;
-        top_categories: string[];
-        area_behavior: string;
-    };
-    competitor_analysis: {
-        competition_level: string;
-        dominant_competitors: string[];
-        saturation_notes: string;
-        opportunity_gaps: string[];
-    };
-    location_analysis: {
-        zone_type: string;
-        strengths: string[];
-        weaknesses: string[];
-        opportunity_level: string;
-        suitability_score: string;
-    };
-    recommendations: AIRecommendation[];
-    final_verdict: {
-        suitability: string;
-        best_recommendation: string;
-        actionable_advice: string;
-    };
+    top_3_businesses: Top3Business[];
+    cluster_summary: ClusterSummaryItem[];
+    final_suggestion: string;
+    confidence: number;
 }
 
 interface ClusteringAnalysis {
