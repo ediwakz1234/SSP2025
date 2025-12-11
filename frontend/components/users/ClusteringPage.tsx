@@ -401,9 +401,11 @@ export function ClusteringPage() {
           setAiCategoryExplanation(kmeansStore.categoryReason);
         }
       }
-      // Note: Clustering results (map, clusters, etc.) would need to be re-rendered
-      // The full result object isn't stored, but the key inputs are preserved
-      toast.info("Previous session restored. Click 'Run Clustering' to see results again.");
+      // Restore AI recommendations if available
+      if (kmeansStore.aiRecommendations) {
+        setAiBusinessRecommendations(kmeansStore.aiRecommendations);
+      }
+      toast.info("Previous session restored. Click 'Run Clustering' to see full results.");
     }
   }, []); // Run once on mount
 
@@ -1198,6 +1200,8 @@ export function ClusteringPage() {
           const aiData = await aiResponse.json();
           if (aiData.success && aiData.recommendations) {
             setAiBusinessRecommendations(aiData.recommendations);
+            // Save to Zustand store for cross-page persistence
+            kmeansStore.setAIRecommendations(aiData.recommendations);
           }
         }
       } catch (aiErr) {
