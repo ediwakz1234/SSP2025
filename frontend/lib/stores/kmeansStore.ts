@@ -165,13 +165,29 @@ const initialState: KMeansState = {
 export const useKMeansStore = create<KMeansStore>((set) => ({
     ...initialState,
 
-    setBusinessIdea: (value) => set({ businessIdea: value }),
+    // When business idea changes, reset all results to ensure fresh data
+    setBusinessIdea: (value) => set({
+        businessIdea: value,
+        // Clear all previous clustering results and AI recommendations
+        hasResults: false,
+        recommendedLocation: null,
+        clusters: [],
+        zoneType: '',
+        analysis: null,
+        competitorAnalysis: null,
+        nearbyBusinesses: [],
+        businessDensity: null,
+        competitorDensity: null,
+        aiRecommendations: null,
+        analysisTimestamp: null,
+    }),
 
     setDetectedCategory: (value, reason = '') => set({
         detectedCategory: value,
         categoryReason: reason,
     }),
 
+    // When new clustering results are set, clear previous AI recommendations
     setClusteringResults: (results) => set({
         hasResults: true,
         recommendedLocation: results.recommendedLocation,
@@ -182,6 +198,8 @@ export const useKMeansStore = create<KMeansStore>((set) => ({
         nearbyBusinesses: results.nearbyBusinesses,
         businessDensity: results.businessDensity || null,
         competitorDensity: results.competitorDensity || null,
+        // Clear old AI recommendations - they will be regenerated
+        aiRecommendations: null,
         analysisTimestamp: Date.now(),
     }),
 
