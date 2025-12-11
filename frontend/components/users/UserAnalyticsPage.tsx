@@ -312,115 +312,111 @@ export function UserAnalyticsPage() {
   // EXPORT FUNCTIONS
   // ========================
 
-  // Enhanced Excel Export with 5 sheets matching user requirements
-  const exportExcel = () => {
-    const workbook = XLSX.utils.book_new();
-    const totalBusinesses = stats?.total_businesses || 0;
-    const timestamp = new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" });
-    const timeRange = startDate && endDate ? `${startDate} to ${endDate}` : "All Time";
+  // Enhanced Excel Export - 4 sheets matching Analytics dashboard
+  const exportExcel = async () => {
+    setIsExporting(true);
+    toast.message("Generating Excel report...");
 
-    // Sheet 1: Overview
-    const overviewData = [
-      ["STRATEGIC STORE PLACEMENT SYSTEM - Analytics Report"],
-      [""],
-      ["Prepared for", userName],
-      ["Location", userLocation],
-      ["Date Generated", timestamp],
-      ["Time Range", timeRange],
-      [""],
-      ["OVERVIEW METRICS"],
-      ["Total Businesses", totalBusinesses],
-      ["Average per Street", streets.length ? (totalBusinesses / streets.length).toFixed(2) : "0"],
-      ["Business Categories Count", categories.length],
-      ["Zone Types Count", zones.length],
-      ["Total Streets Covered", streets.length],
-      [""],
-      ["ZONE DISTRIBUTION SUMMARY"],
-      ...zones.map(z => [z.name, `${z.value} businesses (${((z.value / totalBusinesses) * 100).toFixed(1)}%)`]),
-    ];
-    const overviewSheet = XLSX.utils.aoa_to_sheet(overviewData);
-    overviewSheet["!cols"] = [{ wch: 30 }, { wch: 50 }];
-    XLSX.utils.book_append_sheet(workbook, overviewSheet, "Overview");
+    try {
+      const workbook = XLSX.utils.book_new();
+      const totalBusinesses = stats?.total_businesses || 0;
+      const timestamp = new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" });
+      const timeRange = startDate && endDate ? `${startDate} to ${endDate}` : "All Time";
+      const avgPerStreet = streets.length ? (totalBusinesses / streets.length).toFixed(2) : "0";
+      const avgPerZone = zones.length ? (totalBusinesses / zones.length).toFixed(2) : "0";
 
-    // Sheet 2: Businesses by Category
-    const categoryData = categories.map((c, idx) => ({
-      "Rank": idx + 1,
-      "Category Name": c.name,
-      "Business Count": c.value,
-      "Percentage (%)": ((c.value / totalBusinesses) * 100).toFixed(2),
-    }));
-    const categorySheet = XLSX.utils.json_to_sheet(categoryData);
-    XLSX.utils.book_append_sheet(workbook, categorySheet, "Businesses by Category");
+      // ===== SHEET 1: Overview =====
+      const overviewData = [
+        ["ANALYTICS REPORT"],
+        ["Strategic Store Placement System"],
+        [""],
+        ["Prepared for", userName],
+        ["Location", userLocation],
+        ["Date Generated", timestamp],
+        ["Time Range", timeRange],
+        [""],
+        ["OVERVIEW METRICS"],
+        ["Metric", "Value"],
+        ["Total Businesses", totalBusinesses],
+        ["Avg. per Street", avgPerStreet],
+        ["Avg. per Zone", avgPerZone],
+        ["Business Categories", categories.length],
+        ["Zone Types Count", zones.length],
+      ];
+      const overviewSheet = XLSX.utils.aoa_to_sheet(overviewData);
+      overviewSheet["!cols"] = [{ wch: 25 }, { wch: 40 }];
+      // Apply bold to headers (A1, A9)
+      if (overviewSheet["A1"]) overviewSheet["A1"].s = { font: { bold: true, sz: 16 } };
+      if (overviewSheet["A9"]) overviewSheet["A9"].s = { font: { bold: true } };
+      XLSX.utils.book_append_sheet(workbook, overviewSheet, "Overview");
 
-    // Sheet 3: Businesses by Zone
-    const zoneData = zones.map((z, idx) => ({
-      "Rank": idx + 1,
-      "Zone Type": z.name,
-      "Count": z.value,
-      "Percentage (%)": ((z.value / totalBusinesses) * 100).toFixed(2),
-      "Relative Density": z.value >= totalBusinesses / zones.length ? "High" : z.value >= totalBusinesses / (zones.length * 2) ? "Medium" : "Low",
-    }));
-    const zoneSheet = XLSX.utils.json_to_sheet(zoneData);
-    XLSX.utils.book_append_sheet(workbook, zoneSheet, "Businesses by Zone");
+      // ===== SHEET 2: Business Categories =====
+      const categorySheetData = [
+        ["BUSINESS CATEGORIES"],
+        ["Bar Chart Data - Matches Analytics Dashboard"],
+        [""],
+        ["Rank", "Category", "Count", "Percentage (%)"],
+      ];
+      categories.forEach((cat, idx) => {
+        const pct = ((cat.value / totalBusinesses) * 100).toFixed(2);
+        categorySheetData.push([String(idx + 1), cat.name, String(cat.value), `${pct}%`]);
+      });
+      categorySheetData.push([""]);
+      categorySheetData.push(["Total", "", String(totalBusinesses), "100%"]);
 
-    // Sheet 4: Raw Business Records
-    const rawData = businesses.map((b, idx) => ({
-      "ID": idx + 1,
-      "Business Name": b.business_name || "N/A",
-      "Category": b.general_category || "N/A",
-      "Zone Type": b.zone_type || "N/A",
-      "Street": b.street || "N/A",
-      "Latitude": b.latitude || "N/A",
-      "Longitude": b.longitude || "N/A",
-      "Status": b.status || "N/A",
-      "Date Added": b.created_at ? new Date(b.created_at).toLocaleDateString() : "N/A",
-    }));
-    const rawSheet = XLSX.utils.json_to_sheet(rawData);
-    XLSX.utils.book_append_sheet(workbook, rawSheet, "Raw Business Records");
+      const categorySheet = XLSX.utils.aoa_to_sheet(categorySheetData);
+      categorySheet["!cols"] = [{ wch: 8 }, { wch: 30 }, { wch: 12 }, { wch: 15 }];
+      XLSX.utils.book_append_sheet(workbook, categorySheet, "Business Categories");
 
-    // Sheet 5: Analytical Insights (AI-generated commentary)
-    const topCategory = categories[0];
-    const leastCategory = categories[categories.length - 1];
-    const commercialZone = zones.find(z => z.name.toLowerCase().includes("commercial"));
-    const residentialZone = zones.find(z => z.name.toLowerCase().includes("residential"));
-    const avgPerStreet = streets.length ? (totalBusinesses / streets.length).toFixed(1) : "0";
+      // ===== SHEET 3: Category Percentage =====
+      const pieSheetData = [
+        ["CATEGORY PERCENTAGE DISTRIBUTION"],
+        ["Pie Chart Data - Matches Analytics Dashboard"],
+        [""],
+        ["Category", "Count", "Percentage", "Visual"],
+      ];
+      categories.forEach(cat => {
+        const pct = ((cat.value / totalBusinesses) * 100).toFixed(1);
+        const barLength = Math.round(parseFloat(pct) / 5);
+        const visualBar = "█".repeat(barLength) + "░".repeat(20 - barLength);
+        pieSheetData.push([cat.name, String(cat.value), `${pct}%`, visualBar]);
+      });
 
-    const insightsData = [
-      ["ANALYTICAL INSIGHTS - AI-Generated Analysis"],
-      [""],
-      ["DISTRIBUTION BEHAVIOR"],
-      [`The ${userLocation} area has ${totalBusinesses} registered businesses distributed across ${streets.length} streets and ${zones.length} zone types.`],
-      [`Average business density is ${avgPerStreet} businesses per street, indicating ${parseFloat(avgPerStreet) > 5 ? "high commercial activity" : parseFloat(avgPerStreet) > 2 ? "moderate commercial presence" : "low-density development"}.`],
-      [""],
-      ["TOP-PERFORMING CATEGORIES"],
-      [`${topCategory?.name || "N/A"} leads with ${topCategory?.value || 0} businesses (${topCategory ? ((topCategory.value / totalBusinesses) * 100).toFixed(1) : 0}% of total).`],
-      [`The top 3 categories represent ${categories.slice(0, 3).reduce((acc, c) => acc + c.value, 0)} businesses (${((categories.slice(0, 3).reduce((acc, c) => acc + c.value, 0) / totalBusinesses) * 100).toFixed(1)}% of market).`],
-      [""],
-      ["HIGH-DENSITY ZONES"],
-      [commercialZone ? `Commercial zones contain ${commercialZone.value} businesses, making up ${((commercialZone.value / totalBusinesses) * 100).toFixed(1)}% of the total.` : "No commercial zone data available."],
-      [residentialZone ? `Residential zones have ${residentialZone.value} businesses (${((residentialZone.value / totalBusinesses) * 100).toFixed(1)}%).` : "No residential zone data available."],
-      [""],
-      ["MARKET OPPORTUNITIES"],
-      [`${leastCategory?.name || "N/A"} has the lowest presence with only ${leastCategory?.value || 0} businesses - potential market gap.`],
-      [categories.length > 5 ? "Diverse business ecosystem suggests healthy competition and consumer choice." : "Limited category diversity may indicate untapped market segments."],
-      [""],
-      ["GROWTH TREND COMMENTARY"],
-      [startDate && endDate ? `Data filtered from ${startDate} to ${endDate} shows focused time-period analysis.` : "All-time data provides comprehensive historical view."],
-      [`With ${streets.length} streets covered, there is ${streets.length > 20 ? "extensive" : streets.length > 10 ? "moderate" : "limited"} geographic coverage.`],
-      [""],
-      ["RISKS & OPPORTUNITIES"],
-      [parseFloat(avgPerStreet) > 8 ? "⚠️ High density may indicate market saturation in some areas." : "✓ Density levels suggest room for new business entries."],
-      [categories.length >= 6 ? "✓ Well-diversified business ecosystem reduces single-category risk." : "⚠️ Category concentration may pose market vulnerability."],
-    ];
-    const insightsSheet = XLSX.utils.aoa_to_sheet(insightsData);
-    insightsSheet["!cols"] = [{ wch: 120 }];
-    XLSX.utils.book_append_sheet(workbook, insightsSheet, "Analytical Insights");
+      const pieSheet = XLSX.utils.aoa_to_sheet(pieSheetData);
+      pieSheet["!cols"] = [{ wch: 30 }, { wch: 10 }, { wch: 12 }, { wch: 25 }];
+      XLSX.utils.book_append_sheet(workbook, pieSheet, "Category Percentage");
 
-    // Save the workbook
-    const fileName = `SSP_Analytics_Report_${new Date().toISOString().split("T")[0]}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
-    toast.success(`Exported ${businesses.length} records to Excel (5 sheets)`);
-    logActivity("Exported Analytics Excel", { sheets: 5, records: businesses.length });
+      // ===== SHEET 4: Zone Distribution =====
+      const zoneSheetData = [
+        ["ZONE DISTRIBUTION"],
+        ["Zone Chart Data - Matches Analytics Dashboard"],
+        [""],
+        ["Zone Type", "Count", "Percentage", "Density Level"],
+      ];
+      zones.forEach(zone => {
+        const pct = ((zone.value / totalBusinesses) * 100).toFixed(2);
+        const density = zone.value >= totalBusinesses / zones.length ? "High" :
+          zone.value >= totalBusinesses / (zones.length * 2) ? "Medium" : "Low";
+        zoneSheetData.push([zone.name, String(zone.value), `${pct}%`, density]);
+      });
+      zoneSheetData.push([""]);
+      zoneSheetData.push(["Total", String(totalBusinesses), "100%", ""]);
+
+      const zoneSheet = XLSX.utils.aoa_to_sheet(zoneSheetData);
+      zoneSheet["!cols"] = [{ wch: 20 }, { wch: 10 }, { wch: 12 }, { wch: 15 }];
+      XLSX.utils.book_append_sheet(workbook, zoneSheet, "Zone Distribution");
+
+      // Save the workbook
+      const fileName = `SSP_Analytics_Report_${new Date().toISOString().split("T")[0]}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+      toast.success(`Exported to Excel (4 sheets)`);
+      logActivity("Exported Analytics Excel", { sheets: 4, records: totalBusinesses });
+    } catch (error) {
+      console.error("Excel Export Error:", error);
+      toast.error("Failed to generate Excel.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   // Enhanced PDF Export - Capture actual charts from UI
