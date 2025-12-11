@@ -68,47 +68,79 @@ export default async function handler(req, res) {
     // Build comprehensive system prompt
     const systemPrompt = `You are an AI Business Recommendation Engine.
 
-Use ONLY the provided clustering data:
+Use ONLY the provided clustering and business environment data:
 - User's business idea and category
-- Cluster information: clusterId, centroid (lat/lng), number of businesses per cluster
+- Cluster information (clusterId, centroid, business count)
+- Business density & competitor counts
+- Nearby business details
+- Opportunity level from analysis
 
-ZONE NAMING RULES:
-When naming or describing the recommended zone (best cluster), ONLY use one of these exact names:
+-----------------------------------
+ZONE NAMING RULES (STRICT):
+-----------------------------------
+Assign the best cluster EXACTLY ONE of these:
+1. "Commercial Zone"
+2. "Residential Zone"
+3. "Mixed Zone"
 
-"Commercial Zone" - Use when the cluster has many retail shops, food places, or service businesses.
-  Indicators: high activity, many businesses, strong demand.
+Do NOT generate new zone names.
 
-"Residential Zone" - Use when the cluster contains mostly homes, small stores, or quiet streets.
-  Indicators: fewer businesses, more community-based activity.
+-----------------------------------
+SCORING RULES (STRICT & DYNAMIC):
+-----------------------------------
+Each recommended business must receive a unique score based on:
+- How well the business matches the zone type
+- Density of businesses within 50m/100m/200m
+- Number of direct competitors nearby
+- Complementary services in the area
+- Gap in supply vs demand
 
-"Mixed Zone" - Use when the cluster contains a combination of residential areas and commercial activity.
-  Indicators: balanced number of shops and homes.
+Scoring Range:
+- All scores MUST be between 70 and 100
+- No two recommended businesses may have the same score
+- No reused scoring patterns (avoid 92/88/85 repetition)
 
-Do NOT create new labels or variations. Always select ONE of these exact zone names.
+Fit Percentage:
+- Must be between 70% and 100%
+- Cannot be identical to the score
+- Should logically correlate with the score
 
-Your tasks:
-1. Identify the best cluster and assign it a zone type (Commercial Zone, Residential Zone, or Mixed Zone).
-2. Recommend the Top 3 additional business ideas suitable for that cluster.
-3. For each recommended business, include:
-   - name
-   - score (0-100)
-   - fitPercentage (0-100)
-   - opportunityLevel (High/Medium/Low)
-   - shortDescription (1-2 simple sentences)
-   - fullDetails: a clear explanation using simple language
-   - preferredLocation: suggest where inside the cluster the business fits best
-   - startupBudget: give a suggested budget range in PHP (e.g., "PHP 80,000 - PHP 150,000")
-   - competitorPresence: short explanation of how many similar shops exist in the area
-   - businessDensityInsight: brief description of how crowded or open the area is
+-----------------------------------
+OPPORTUNITY LEVEL LABEL (BUSINESS-FRIENDLY):
+-----------------------------------
+Assign opportunityLevel based on SCORE:
 
-4. Confidence Level:
-Convert the confidence % into this label:
-1-25% = "Not Ideal"
-26-50% = "Could Work"
-51–75% = "Good Choice"
-76–100% = "Best Choice"
+Score 90-100  = "Excellent Potential"
+Score 80-89   = "Strong Potential"
+Score 70-79   = "Moderate Potential"
+Score below 70 = "Limited Potential"
 
-Output ONLY valid JSON.`;
+-----------------------------------
+CONFIDENCE LABEL:
+-----------------------------------
+Convert confidence % to a user-friendly label:
+
+1-25%   = "Not Ideal"
+26-50%  = "Could Work"
+51-75%  = "Good Choice"
+76-100% = "Best Choice"
+
+-----------------------------------
+TOP 3 BUSINESS RECOMMENDATIONS:
+-----------------------------------
+For EACH recommended business include:
+- name
+- score (unique, 70-100)
+- fitPercentage (unique, 70-100)
+- opportunityLevel (from scoring rules above)
+- shortDescription (1-2 simple sentences)
+- fullDetails (simple, friendly explanation)
+- preferredLocation (best spot inside cluster)
+- startupBudget ("PHP xx,xxx - PHP xx,xxx")
+- competitorPresence (simple explanation)
+- businessDensityInsight (how crowded or open the area is)
+
+Return ONLY valid JSON.`;
 
     const userPrompt = `Business Idea: "${businessIdea || "General " + (generalCategory || "Business")}"
 Detected Category: ${generalCategory || "Not specified"}
@@ -141,7 +173,7 @@ Return ONLY valid JSON in this exact format:
 {
   "bestCluster": {
     "clusterId": 1,
-    "friendlyName": "Service Area",
+    "zoneType": "Commercial Zone",
     "reason": "Simple reason why this cluster is best",
     "confidence": 85,
     "confidenceLabel": "Best Choice"
@@ -149,47 +181,47 @@ Return ONLY valid JSON in this exact format:
   "topBusinesses": [
     {
       "name": "Business Name",
-      "score": 92,
-      "fitPercentage": 88,
-      "opportunityLevel": "High",
+      "score": 94,
+      "fitPercentage": 91,
+      "opportunityLevel": "Excellent Potential",
       "shortDescription": "1-2 simple sentences about this business.",
-      "fullDetails": "Clear explanation using simple words about why this business fits, what is missing, benefits, and any small risks.",
-      "preferredLocation": "Near the main road or community entrance for easy access.",
-      "startupBudget": "₱80,000–₱150,000",
-      "competitorPresence": "Only 1 similar shop nearby, leaving strong room for demand.",
-      "businessDensityInsight": "Moderately busy area with service-focused businesses."
+      "fullDetails": "Clear explanation using simple words.",
+      "preferredLocation": "Near the main road or community entrance.",
+      "startupBudget": "PHP 80,000 - PHP 150,000",
+      "competitorPresence": "Only 1 similar shop nearby.",
+      "businessDensityInsight": "Moderately busy area."
     },
     {
       "name": "Business Name 2",
-      "score": 85,
-      "fitPercentage": 82,
-      "opportunityLevel": "Medium",
+      "score": 87,
+      "fitPercentage": 84,
+      "opportunityLevel": "Strong Potential",
       "shortDescription": "Short description.",
       "fullDetails": "Full explanation in simple words.",
       "preferredLocation": "Suggested location.",
-      "startupBudget": "₱50,000–₱100,000",
+      "startupBudget": "PHP 50,000 - PHP 100,000",
       "competitorPresence": "Competition info.",
       "businessDensityInsight": "Density insight."
     },
     {
       "name": "Business Name 3",
-      "score": 79,
-      "fitPercentage": 77,
-      "opportunityLevel": "Medium",
+      "score": 76,
+      "fitPercentage": 79,
+      "opportunityLevel": "Moderate Potential",
       "shortDescription": "Short description.",
       "fullDetails": "Full explanation in simple words.",
       "preferredLocation": "Suggested location.",
-      "startupBudget": "₱30,000–₱80,000",
+      "startupBudget": "PHP 30,000 - PHP 80,000",
       "competitorPresence": "Competition info.",
       "businessDensityInsight": "Density insight."
     }
   ],
   "clusterSummary": [
-    { "clusterId": 1, "friendlyName": "Busy Area", "businessCount": ${b50 + b100}, "competitionLevel": "High" },
-    { "clusterId": 2, "friendlyName": "Active Area", "businessCount": ${b100}, "competitionLevel": "Medium" },
-    { "clusterId": 3, "friendlyName": "Growing Area", "businessCount": ${Math.max(0, b200 - b100)}, "competitionLevel": "Low" }
+    { "clusterId": 1, "zoneType": "Commercial Zone", "businessCount": ${b50 + b100}, "competitionLevel": "High" },
+    { "clusterId": 2, "zoneType": "Mixed Zone", "businessCount": ${b100}, "competitionLevel": "Medium" },
+    { "clusterId": 3, "zoneType": "Residential Zone", "businessCount": ${Math.max(0, b200 - b100)}, "competitionLevel": "Low" }
   ],
-  "finalSuggestion": "This cluster looks like a good place for your business because people in the area need these kinds of services, and there are still not many shops offering them."
+  "finalSuggestion": "This cluster looks like a good place for your business because people in the area need these kinds of services."
 }`;
 
 
@@ -217,10 +249,18 @@ Return ONLY valid JSON in this exact format:
       const confValue = Math.min(95, Math.max(60, 85 - c50 * 5 + b100 * 2));
       const confLabel = getConfidenceLabel(confValue);
 
+      // Helper to get opportunity level from score
+      const getOpportunityLevel = (score) => {
+        if (score >= 90) return "Excellent Potential";
+        if (score >= 80) return "Strong Potential";
+        if (score >= 70) return "Moderate Potential";
+        return "Limited Potential";
+      };
+
       data = {
         bestCluster: {
           clusterId: 1,
-          friendlyName: zoneTypeName,
+          zoneType: zoneTypeName,
           reason: c50 === 0
             ? `This ${zoneTypeName} has no direct competitors nearby, making it a great place to start.`
             : `This ${zoneTypeName} has ${competitionLevel.toLowerCase()} competition with good potential.`,
@@ -231,17 +271,17 @@ Return ONLY valid JSON in this exact format:
         topBusinesses: [
           {
             name: businessIdea || `${generalCategory || "General"} Business`,
-            score: score1,
-            fitPercentage: score1 - 4,
-            opportunityLevel: score1 >= 80 ? "High" : score1 >= 65 ? "Medium" : "Low",
+            score: Math.min(100, Math.max(70, score1 + 10)),
+            fitPercentage: Math.min(100, Math.max(70, score1 + 6)),
+            opportunityLevel: getOpportunityLevel(Math.max(70, score1 + 10)),
             shortDescription: c50 === 0
               ? "No similar shops nearby. Good chance to be the first."
               : "Some competition exists, but you can stand out with good service.",
             fullDetails: c50 === 0
               ? "This business fits well here because there are no direct competitors within 50 meters. People in this area may need this service but currently have to go elsewhere. Being the first gives you an advantage."
               : `There are ${c50} similar businesses nearby. To succeed, focus on what makes your business different - better quality, price, or service.`,
-            preferredLocation: `Near the main road or central area of this ${zoneType.toLowerCase()} zone for maximum visibility.`,
-            startupBudget: "₱80,000–₱150,000",
+            preferredLocation: `Near the main road or central area of this ${zoneTypeName} for maximum visibility.`,
+            startupBudget: "PHP 80,000 - PHP 150,000",
             competitorPresence: c50 === 0
               ? "No direct competitors found within 50 meters. Excellent opportunity."
               : `${c50} similar businesses within 50 meters. Moderate competition.`,
@@ -253,33 +293,33 @@ Return ONLY valid JSON in this exact format:
           },
           {
             name: `${generalCategory || "Retail"} Services`,
-            score: score2,
-            fitPercentage: score2 - 3,
-            opportunityLevel: score2 >= 80 ? "High" : score2 >= 65 ? "Medium" : "Low",
+            score: Math.min(100, Math.max(70, score2 + 8)),
+            fitPercentage: Math.min(100, Math.max(70, score2 + 5)),
+            opportunityLevel: getOpportunityLevel(Math.max(70, score2 + 8)),
             shortDescription: `Works well with the ${b100} businesses already here.`,
             fullDetails: `This area already has ${b100} businesses within 100 meters. Adding a service business can complement them and benefit from the foot traffic they bring.`,
             preferredLocation: "Close to existing service businesses for customer convenience.",
-            startupBudget: "₱50,000–₱120,000",
+            startupBudget: "PHP 50,000 - PHP 120,000",
             competitorPresence: `Complementary to ${b100} nearby businesses. Low direct competition.`,
             businessDensityInsight: `${b100} businesses nearby provide a steady stream of potential customers.`
           },
           {
             name: "Convenience Store",
-            score: score3,
-            fitPercentage: score3 - 2,
-            opportunityLevel: score3 >= 80 ? "High" : score3 >= 65 ? "Medium" : "Low",
+            score: Math.min(100, Math.max(70, score3 + 15)),
+            fitPercentage: Math.min(100, Math.max(70, score3 + 12)),
+            opportunityLevel: getOpportunityLevel(Math.max(70, score3 + 15)),
             shortDescription: "Basic needs store that most areas can benefit from.",
-            fullDetails: `A convenience store provides daily essentials that people need. In a ${zoneType.toLowerCase()} zone like this, there is usually steady demand for quick purchases.`,
+            fullDetails: `A convenience store provides daily essentials that people need. In this ${zoneTypeName}, there is usually steady demand for quick purchases.`,
             preferredLocation: "Near residential areas or along main walkways for easy access.",
-            startupBudget: "₱100,000–₱250,000",
+            startupBudget: "PHP 100,000 - PHP 250,000",
             competitorPresence: "Essential services are always needed. Some competition acceptable.",
-            businessDensityInsight: `${zoneType} area with ${b200} businesses within 200m. Consistent demand expected.`
+            businessDensityInsight: `${zoneTypeName} with ${b200} businesses within 200m. Consistent demand expected.`
           }
         ],
         clusterSummary: [
-          { clusterId: 1, friendlyName: zoneTypeName, businessCount: b50, competitionLevel: c50 >= 3 ? "High" : c50 >= 1 ? "Medium" : "Low" },
-          { clusterId: 2, friendlyName: "Mixed Zone", businessCount: Math.max(0, b100 - b50), competitionLevel: "Medium" },
-          { clusterId: 3, friendlyName: "Residential Zone", businessCount: Math.max(0, b200 - b100), competitionLevel: "Low" }
+          { clusterId: 1, zoneType: zoneTypeName, businessCount: b50, competitionLevel: c50 >= 3 ? "High" : c50 >= 1 ? "Medium" : "Low" },
+          { clusterId: 2, zoneType: "Mixed Zone", businessCount: Math.max(0, b100 - b50), competitionLevel: "Medium" },
+          { clusterId: 3, zoneType: "Residential Zone", businessCount: Math.max(0, b200 - b100), competitionLevel: "Low" }
         ],
         finalSuggestion: c50 === 0
           ? `This ${zoneTypeName} looks like a good place for your business because there are not many similar shops yet. You could be one of the first here.`
