@@ -1024,6 +1024,28 @@ export function OpportunitiesPage() {
     // Determine competition level
     const competitionLevel = getCompetitionLevel(avgComp);
 
+    // Determine opportunity focus based on operating time and setup speed
+    let opportunityFocus = "Best for quick setup";
+    if (operatingTime === "Evening" && competitionLevel === "Low") {
+      opportunityFocus = "Best for evening sales";
+    } else if (operatingTime === "Day" && competitionLevel === "Low") {
+      opportunityFocus = "Best for daytime services";
+    } else if (setupSpeed === "Fast" && competitionLevel === "Low") {
+      opportunityFocus = "Best for quick setup";
+    } else if (avgDensity > 15) {
+      opportunityFocus = "Best for high-traffic areas";
+    } else if (competitionLevel === "Low") {
+      opportunityFocus = "Best for first movers";
+    }
+
+    // Determine area readiness level
+    let areaReadiness: "High" | "Medium" | "Low" = "Medium";
+    if (avgScore >= 70 && commercialRatio > 0.4) {
+      areaReadiness = "High";
+    } else if (avgScore < 50 || commercialRatio < 0.2) {
+      areaReadiness = "Low";
+    }
+
     return {
       category: businessType || "General Business",
       overallScore: avgScore,
@@ -1031,6 +1053,8 @@ export function OpportunitiesPage() {
       setupSpeed,
       competitionLevel,
       status: getStatusFromScore(avgScore),
+      opportunityFocus,
+      areaReadiness,
     };
   }, [opportunities, clusterKPIs, businessType]);
 
@@ -1589,7 +1613,7 @@ export function OpportunitiesPage() {
           </Card>
 
           {/* Summary Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {/* Overall Score */}
             <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all hover:scale-[1.02]">
               <CardContent className="p-5">
@@ -1662,133 +1686,38 @@ export function OpportunitiesPage() {
               </CardContent>
             </Card>
 
-            {/* Business Category */}
+            {/* Opportunity Focus */}
             <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all hover:scale-[1.02]">
               <CardContent className="p-5">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 bg-linear-to-br from-blue-500 to-indigo-600 rounded-lg text-white">
-                    <Store className="w-5 h-5" />
+                  <div className="p-2 bg-linear-to-br from-cyan-500 to-blue-600 rounded-lg text-white">
+                    <Target className="w-5 h-5" />
                   </div>
-                  <span className="text-sm font-medium text-gray-600">Category</span>
+                  <span className="text-sm font-medium text-gray-600">Opportunity Focus</span>
                 </div>
-                <div className="text-lg font-bold text-gray-800 truncate">{overviewSummary.category || "General"}</div>
-                <p className="text-xs text-gray-500 mt-1">{clusterKPIs.totalOpportunities} locations found</p>
+                <div className="text-lg font-bold text-gray-800">{overviewSummary.opportunityFocus}</div>
+                <p className="text-xs text-gray-500 mt-1">Based on local conditions</p>
+              </CardContent>
+            </Card>
+
+            {/* Area Readiness */}
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all hover:scale-[1.02]">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 bg-linear-to-br from-violet-500 to-purple-600 rounded-lg text-white">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">Area Readiness</span>
+                </div>
+                <div className="text-2xl font-bold text-gray-800">{overviewSummary.areaReadiness}</div>
+                <Badge className={`mt-1 ${overviewSummary.areaReadiness === "High" ? "bg-emerald-100 text-emerald-700" : overviewSummary.areaReadiness === "Medium" ? "bg-amber-100 text-amber-700" : "bg-rose-100 text-rose-700"}`}>
+                  {overviewSummary.areaReadiness === "High" ? "Ready for business" : overviewSummary.areaReadiness === "Medium" ? "Some preparation needed" : "Requires development"}
+                </Badge>
               </CardContent>
             </Card>
           </div>
-
-          {/* Category distribution */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-linear-to-r from-blue-50 to-indigo-50 border-b">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl text-white shadow-lg shadow-blue-200">
-                  <Store className="w-5 h-5" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl">Business Category Distribution</CardTitle>
-                  <p className="text-sm text-gray-500">
-                    Current businesses in your study area (Active only)
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              {categoryStats.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {categoryStats.map((cat, index) => {
-                    const colors = [
-                      'from-blue-500 to-indigo-600',
-                      'from-emerald-500 to-green-600',
-                      'from-amber-500 to-orange-600',
-                      'from-purple-500 to-violet-600',
-                      'from-rose-500 to-pink-600',
-                    ];
-                    const colorClass = colors[index % colors.length];
-                    return (
-                      <div
-                        key={cat.category}
-                        className="border rounded-xl p-5 flex flex-col gap-2 bg-linear-to-br from-gray-50 to-white hover:shadow-lg transition-all hover:scale-[1.02] group"
-                      >
-                        <p className="text-sm font-semibold text-gray-700">{cat.category}</p>
-                        <p className={`text-3xl font-bold bg-linear-to-r ${colorClass} bg-clip-text text-transparent`}>{cat.count}</p>
-                        <div className="space-y-1 mt-2">
-                          <p className="text-xs text-gray-500 flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-blue-400" />
-                            Avg. density: {cat.avgBusinessDensity}
-                          </p>
-                          <p className="text-xs text-gray-500 flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-amber-400" />
-                            Avg. competitors: {cat.avgCompetitors}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                    <Store className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <h4 className="text-lg font-semibold text-gray-700">No data available</h4>
-                  <p className="text-sm text-gray-500 mt-1 max-w-sm">
-                    There are no active businesses in this category yet. Try adjusting your filters or running a clustering analysis.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Zone Distribution - Full Width */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-linear-to-r from-emerald-50 to-teal-50 border-b">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-linear-to-br from-emerald-500 to-teal-600 rounded-xl text-white shadow-lg shadow-emerald-200">
-                  <MapPin className="w-5 h-5" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Zone Distribution</CardTitle>
-                  <p className="text-sm text-gray-500">
-                    Where most active businesses are located
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              {zoneStats.length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {zoneStats.map((zone) => {
-                    const percent =
-                      totalBusinesses > 0
-                        ? Math.round((zone.count / totalBusinesses) * 100)
-                        : 0;
-                    return (
-                      <div key={zone.zone} className="space-y-2 p-4 bg-gray-50 rounded-xl">
-                        <div className="flex justify-between text-sm">
-                          <span className="font-medium text-gray-700">{zone.zone}</span>
-                          <span className="font-semibold text-emerald-600">
-                            {zone.count} ({percent}%)
-                          </span>
-                        </div>
-                        <Progress value={percent} className="h-2" />
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                    <MapPin className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <h4 className="text-lg font-semibold text-gray-700">No data available</h4>
-                  <p className="text-sm text-gray-500 mt-1 max-w-sm">
-                    There are no zone distribution records to display. Try adjusting your filters or running a clustering analysis.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </TabsContent>
+
 
         {/* OPPORTUNITIES TAB */}
         <TabsContent value="opportunities" className="space-y-6">
