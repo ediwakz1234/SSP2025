@@ -1012,8 +1012,10 @@ export function OpportunitiesPage() {
     // Determine best operating time from zone and category analysis
     let operatingTime: "Day" | "Evening" | "Both" = "Both";
     const commercialRatio = clusterKPIs.commercialZoneCount / Math.max(1, clusterKPIs.totalOpportunities);
+    const residentialRatio = clusterKPIs.residentialZoneCount / Math.max(1, clusterKPIs.totalOpportunities);
     if (commercialRatio > 0.7) operatingTime = "Both";
-    else if (clusterKPIs.residentialZoneCount > clusterKPIs.commercialZoneCount) operatingTime = "Day";
+    else if (residentialRatio > 0.6) operatingTime = "Day";
+    else if (commercialRatio > 0.4 && residentialRatio < 0.3) operatingTime = "Evening";
     
     // Determine setup speed based on category
     const setupSpeed = determineSetupSpeed(businessType);
@@ -1097,6 +1099,7 @@ export function OpportunitiesPage() {
     let activityTime: "Daytime" | "Evening" | "Balanced" = "Balanced";
     if (commercialRatio > 0.6) activityTime = "Balanced";
     else if (residentialRatio > 0.6) activityTime = "Daytime";
+    else if (commercialRatio > 0.3 && residentialRatio < 0.3) activityTime = "Evening";
     
     // Ease of opening
     let easeOfOpening: "Easy" | "Moderate" | "Challenging" = "Moderate";
