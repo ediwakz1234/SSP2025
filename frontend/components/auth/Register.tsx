@@ -253,9 +253,9 @@ export function Register() {
 
             {/* Logo */}
             <div className="flex flex-col items-center gap-4">
-              <div className="relative w-16 h-16 bg-linear-to-br from-primary to-purple-600 rounded-2xl shadow-lg shadow-primary/30 flex items-center justify-center">
+              <div className="relative w-16 h-16 bg-[#1e3a5f] rounded-2xl shadow-lg shadow-slate-900/25 flex items-center justify-center">
                 <MapPin className="w-8 h-8 text-white" />
-                <div className="absolute -inset-1 bg-linear-to-br from-primary to-purple-600 rounded-2xl blur opacity-30 -z-10" />
+                <div className="absolute -inset-1 bg-[#1e3a5f] rounded-2xl blur opacity-30 -z-10" />
               </div>
 
               <div className="text-center">

@@ -63,7 +63,7 @@ export function ActivityLogDetailsModal({ log, open, onClose }: ActivityLogDetai
             {/* Modal */}
             <div className="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl animate-fadeInUp overflow-hidden">
                 {/* Header */}
-                <div className="relative bg-gradient-to-br from-purple-600 via-violet-600 to-indigo-700 p-6 text-white">
+                <div className="relative bg-slate-700 p-6 text-white">
                     <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-white/10 blur-2xl -translate-y-1/2 translate-x-1/2" />
 
                     <div className="relative z-10 flex items-start justify-between">

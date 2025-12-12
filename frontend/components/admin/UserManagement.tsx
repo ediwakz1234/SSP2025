@@ -251,7 +251,7 @@ function EditUserModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-slideUp">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-fuchsia-600 p-6">
+        <div className="bg-slate-700 p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
@@ -713,7 +713,7 @@ export function UserManagement() {
       />
 
       {/* Hero Header */}
-      <div className="page-content relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 via-fuchsia-500 to-pink-500 p-6 text-white">
+      <div className="page-content relative overflow-hidden rounded-2xl bg-slate-700 p-6 text-white">
         <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
 
@@ -734,8 +734,7 @@ export function UserManagement() {
               fetchUsers();
               fetchAnalysesCount();
             }}
-            className="bg-white text-purple-600 hover:bg-white/90 border-0"
-          >
+            className="bg-white text-slate-700 hover:bg-white/90 border-0">
             <RefreshCcw className="mr-2 h-4 w-4" />
             Refresh
           </Button>
@@ -801,7 +800,7 @@ export function UserManagement() {
       <Card className="border-0 shadow-card overflow-hidden animate-fadeInUp delay-100">
         <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center">
               <Users className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -875,7 +874,7 @@ export function UserManagement() {
                       <Avatar className="h-14 w-14 border-2 border-white shadow-md">
                         <AvatarFallback className={`font-semibold ${isFlagged
                           ? "bg-gradient-to-br from-orange-400 to-red-500 text-white"
-                          : "bg-gradient-to-br from-indigo-500 to-purple-500 text-white"
+                          : "bg-slate-700 text-white"
                           }`}>
                           {getInitials(u.full_name)}
                         </AvatarFallback>

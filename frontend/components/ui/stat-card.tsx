@@ -29,42 +29,42 @@ function StatCard({
 }: StatCardProps) {
   const colorConfig = {
     purple: {
-      bg: "bg-linear-to-br from-purple-500/10 to-fuchsia-500/10",
-      text: "text-purple-600",
-      glow: "shadow-purple-500/10",
+      bg: "bg-gradient-to-br from-slate-500/10 to-gray-500/10",
+      text: "text-slate-600",
+      glow: "shadow-slate-500/10",
     },
     blue: {
-      bg: "bg-linear-to-br from-blue-500/10 to-cyan-500/10",
-      text: "text-blue-600",
-      glow: "shadow-blue-500/10",
+      bg: "bg-gradient-to-br from-[#1e3a5f]/10 to-slate-500/10",
+      text: "text-[#1e3a5f]",
+      glow: "shadow-slate-500/10",
     },
     green: {
-      bg: "bg-linear-to-br from-emerald-500/10 to-teal-500/10",
+      bg: "bg-gradient-to-br from-emerald-500/10 to-teal-500/10",
       text: "text-emerald-600",
       glow: "shadow-emerald-500/10",
     },
     orange: {
-      bg: "bg-linear-to-br from-orange-500/10 to-amber-500/10",
+      bg: "bg-gradient-to-br from-orange-500/10 to-amber-500/10",
       text: "text-orange-600",
       glow: "shadow-orange-500/10",
     },
     red: {
-      bg: "bg-linear-to-br from-red-500/10 to-rose-500/10",
+      bg: "bg-gradient-to-br from-red-500/10 to-rose-500/10",
       text: "text-red-600",
       glow: "shadow-red-500/10",
     },
     indigo: {
-      bg: "bg-linear-to-br from-indigo-500/10 to-violet-500/10",
-      text: "text-indigo-600",
-      glow: "shadow-indigo-500/10",
+      bg: "bg-gradient-to-br from-[#1e3a5f]/10 to-slate-500/10",
+      text: "text-[#1e3a5f]",
+      glow: "shadow-slate-500/10",
     },
     cyan: {
-      bg: "bg-linear-to-br from-cyan-500/10 to-sky-500/10",
+      bg: "bg-gradient-to-br from-cyan-500/10 to-sky-500/10",
       text: "text-cyan-600",
       glow: "shadow-cyan-500/10",
     },
     pink: {
-      bg: "bg-linear-to-br from-pink-500/10 to-rose-500/10",
+      bg: "bg-gradient-to-br from-pink-500/10 to-rose-500/10",
       text: "text-pink-600",
       glow: "shadow-pink-500/10",
     },

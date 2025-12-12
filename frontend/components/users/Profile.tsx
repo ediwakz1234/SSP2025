@@ -234,10 +234,10 @@ export function Profile() {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] animate-fadeIn">
         <div className="relative">
-          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 animate-pulse flex items-center justify-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#1e3a5f] animate-pulse flex items-center justify-center">
             <Loader2 className="w-8 h-8 text-white animate-spin" />
           </div>
-          <div className="absolute -inset-4 bg-linear-to-br from-indigo-500/20 to-purple-600/20 rounded-3xl blur-xl animate-pulse" />
+          <div className="absolute -inset-4 bg-slate-500/20 rounded-3xl blur-xl animate-pulse" />
         </div>
         <p className="mt-6 text-gray-600 font-medium">Loading profile...</p>
         <p className="text-sm text-gray-400 mt-1">Getting your information</p>
@@ -251,7 +251,7 @@ export function Profile() {
   return (
     <div className="page-wrapper w-full max-w-5xl mx-auto p-6 space-y-8">
       {/* HEADER CARD */}
-      <div className="page-content relative overflow-hidden rounded-3xl bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 p-8">
+      <div className="page-content relative overflow-hidden rounded-3xl bg-[#1e3a5f] p-8">
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
@@ -261,7 +261,7 @@ export function Profile() {
           <div className="relative">
             <div className="absolute -inset-1 bg-linear-to-br from-white/40 to-white/10 rounded-full blur" />
             <Avatar className="relative w-28 h-28 border-4 border-white/30 shadow-xl">
-              <AvatarFallback className="text-3xl font-bold bg-linear-to-br from-indigo-600 to-purple-600 text-white">
+              <AvatarFallback className="text-3xl font-bold bg-slate-600 text-white">
                 {profile?.firstName?.[0]}
                 {profile?.lastName?.[0]}
               </AvatarFallback>
@@ -346,8 +346,8 @@ export function Profile() {
             <Progress value={completionPercentage} className="h-3 bg-gray-100" />
             <div
               className={`absolute top-0 left-0 h-3 rounded-full transition-all duration-500 ${completionPercentage === 100
-                  ? "bg-linear-to-r from-emerald-400 to-teal-400"
-                  : "bg-linear-to-r from-indigo-500 to-purple-500"
+                  ? "bg-gradient-to-r from-emerald-400 to-teal-400"
+                  : "bg-[#1e3a5f]"
                 }`}
               style={{ width: `${completionPercentage}%` }}
             />
@@ -359,7 +359,7 @@ export function Profile() {
       <Card className="border-0 shadow-card overflow-hidden animate-fadeInUp delay-100">
         <CardHeader className="bg-linear-to-r from-gray-50 to-white border-b border-gray-100 px-8 py-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#1e3a5f] flex items-center justify-center">
               <User className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -507,8 +507,7 @@ export function Profile() {
               <Button
                 onClick={handleSave}
                 disabled={saving}
-                className="px-8 bg-linear-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30 transition-all"
-              >
+                className="px-8 bg-[#1e3a5f] hover:bg-[#2d4a6f] shadow-lg shadow-slate-500/25 hover:shadow-xl hover:shadow-slate-500/30 transition-all">
                 {saving ? (
                   <>
                     <Loader2 className="mr-2 w-4 h-4 animate-spin" />

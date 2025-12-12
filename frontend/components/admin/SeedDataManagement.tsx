@@ -1549,12 +1549,12 @@ export default function SeedDataManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-slate-50 animate-fadeIn">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-slate-50 animate-fadeIn">
       {/* Hero Header */}
-      <div className="relative overflow-hidden bg-linear-to-br from-purple-600 via-violet-600 to-indigo-700 shadow-xl">
+      <div className="relative overflow-hidden bg-slate-700 shadow-xl">
         <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-white/10 blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-purple-400/20 blur-2xl translate-y-1/2 -translate-x-1/2"></div>
-        <div className="absolute top-1/2 left-1/2 h-32 w-32 rounded-full bg-violet-300/30 blur-xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-slate-400/20 blur-2xl translate-y-1/2 -translate-x-1/2"></div>
+        <div className="absolute top-1/2 left-1/2 h-32 w-32 rounded-full bg-slate-300/30 blur-xl -translate-x-1/2 -translate-y-1/2"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
           <div className="flex items-center justify-between">
@@ -1564,7 +1564,7 @@ export default function SeedDataManagement() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-white mb-1">Seed Data Management</h1>
-                <p className="text-purple-100">Manage your K-Means clustering dataset and trigger ML training</p>
+                <p className="text-slate-200">Manage your K-Means clustering dataset and trigger ML training</p>
               </div>
             </div>
             <button

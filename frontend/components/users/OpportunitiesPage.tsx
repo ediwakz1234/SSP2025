@@ -952,10 +952,10 @@ export function OpportunitiesPage() {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] animate-fadeIn">
         <div className="relative">
-          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 animate-pulse flex items-center justify-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#1e3a5f] animate-pulse flex items-center justify-center">
             <Zap className="w-8 h-8 text-white animate-pulse" />
           </div>
-          <div className="absolute -inset-4 bg-linear-to-br from-indigo-500/20 to-purple-600/20 rounded-3xl blur-xl animate-pulse" />
+          <div className="absolute -inset-4 bg-slate-500/20 rounded-3xl blur-xl animate-pulse" />
         </div>
         <p className="mt-6 text-gray-600 font-medium">Loading opportunities...</p>
         <p className="text-sm text-gray-400 mt-1">Analyzing business data for insights</p>
@@ -1254,7 +1254,7 @@ export function OpportunitiesPage() {
   return (
     <div className="page-wrapper space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-600 via-indigo-600 to-purple-700 p-8 text-white shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl bg-[#1e3a5f] p-8 text-white shadow-xl">
         <div className="absolute inset-0 bg-white/5 mask-[radial-gradient(ellipse_at_center,black_50%,transparent_100%)]" />
         <div className="relative z-10">
           <div className="flex items-center justify-between flex-wrap gap-4">
@@ -1700,7 +1700,7 @@ export function OpportunitiesPage() {
                   </div>
 
                   <Button
-                    className="bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl shadow-lg shadow-indigo-200 transition-all hover:scale-[1.02]"
+                    className="bg-[#1e3a5f] hover:bg-[#2d4a6f] text-white rounded-xl shadow-lg shadow-slate-200 transition-all hover:scale-[1.02]"
                     onClick={() =>
                       navigate("/user/dashboard/map", {
                         state: {

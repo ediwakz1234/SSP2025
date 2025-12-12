@@ -298,8 +298,8 @@ export function AdminLoginPage() {
     <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-slate-50 via-white to-purple-50/30 p-4">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-fuchsia-500/5 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-slate-500/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-400/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative w-full max-w-md animate-fadeInUp">
@@ -316,9 +316,9 @@ export function AdminLoginPage() {
 
           {/* Logo */}
           <div className="flex flex-col items-center gap-4">
-            <div className="relative w-20 h-20 bg-linear-to-br from-purple-600 to-fuchsia-600 rounded-2xl shadow-lg shadow-purple-500/30 flex items-center justify-center">
+            <div className="relative w-20 h-20 bg-slate-700 rounded-2xl shadow-lg shadow-slate-700/30 flex items-center justify-center">
               <Shield className="w-10 h-10 text-white" />
-              <div className="absolute -inset-1 bg-linear-to-br from-purple-600 to-fuchsia-600 rounded-2xl blur opacity-30 -z-10" />
+              <div className="absolute -inset-1 bg-slate-700 rounded-2xl blur opacity-30 -z-10" />
             </div>
 
             <div className="text-center">

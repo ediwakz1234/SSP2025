@@ -16,10 +16,10 @@ function PageWrapper({
   ...props
 }: PageWrapperProps) {
   const variants = {
-    default: "min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50/30",
-    auth: "min-h-screen w-full flex items-center justify-center bg-linear-to-br from-slate-50 via-white to-indigo-50/30 p-4",
+    default: "min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50/30",
+    auth: "min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-gray-50/30 p-4",
     centered: "min-h-screen flex items-center justify-center p-4 bg-background",
-    dashboard: "min-h-screen w-full bg-linear-to-br from-gray-50 via-white to-gray-100/50",
+    dashboard: "min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-gray-100/50",
   };
 
   return (

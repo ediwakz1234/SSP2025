@@ -253,7 +253,7 @@ export function BusinessOpportunityCard({
 
                 {/* Action Button */}
                 <Button
-                    className="w-full bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl shadow-lg shadow-indigo-200 transition-all hover:scale-[1.02]"
+                    className="w-full bg-[#1e3a5f] hover:bg-[#2d4a6f] text-white rounded-xl shadow-lg shadow-slate-200 transition-all hover:scale-[1.02]"
                     onClick={() => onViewOnMap?.(
                         opportunity.coordinates.lat,
                         opportunity.coordinates.lng,

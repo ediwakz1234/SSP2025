@@ -240,9 +240,9 @@ export function ActivityLogsPage() {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-purple-600 via-violet-600 to-indigo-700 p-8 text-white shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl bg-slate-700 p-8 text-white shadow-xl">
         <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-white/10 blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-purple-400/20 blur-2xl translate-y-1/2 -translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-slate-400/20 blur-2xl translate-y-1/2 -translate-x-1/2"></div>
 
         <div className="relative z-10 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -251,7 +251,7 @@ export function ActivityLogsPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold">Activity Logs</h1>
-              <p className="text-purple-100 mt-1">Monitor all system activities in real-time</p>
+              <p className="text-slate-200 mt-1">Monitor all system activities in real-time</p>
             </div>
           </div>
           <Button

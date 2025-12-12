@@ -278,9 +278,9 @@ export function AdminPortal() {
   return (
     <div className="page-wrapper space-y-6">
       {/* HEADER ------------------------------------------------------------ */}
-      <div className="page-content relative overflow-hidden rounded-2xl bg-linear-to-br from-purple-600 via-fuchsia-500 to-pink-500 p-6 text-white">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+      <div className="page-content relative overflow-hidden rounded-2xl bg-slate-700 p-6 text-white">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">

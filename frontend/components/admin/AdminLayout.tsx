@@ -85,7 +85,7 @@ export function AdminLayout() {
         <div className="p-5 border-b border-gray-100 flex items-center gap-3">
           {isSidebarOpen ? (
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-linear-to-br from-purple-600 to-fuchsia-600 shadow-lg shadow-purple-500/25 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-slate-700 shadow-lg shadow-slate-900/20 flex items-center justify-center shrink-0">
                 <Shield className="w-5 h-5 text-white" />
               </div>
               <div className="min-w-0">
@@ -94,7 +94,7 @@ export function AdminLayout() {
               </div>
             </div>
           ) : (
-            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-purple-600 to-fuchsia-600 shadow-lg shadow-purple-500/25 flex items-center justify-center mx-auto">
+            <div className="w-10 h-10 rounded-xl bg-slate-700 shadow-lg shadow-slate-900/20 flex items-center justify-center mx-auto">
               <Shield className="w-5 h-5 text-white" />
             </div>
           )}
@@ -122,14 +122,14 @@ export function AdminLayout() {
 
         {/* Admin Profile */}
         <div className="p-4 flex items-center gap-3 border-b border-gray-100">
-          <div className="w-11 h-11 rounded-xl bg-linear-to-br from-purple-500 to-fuchsia-500 text-white flex items-center justify-center text-lg font-bold shadow-md shadow-purple-500/20 shrink-0">
+          <div className="w-11 h-11 rounded-xl bg-slate-600 text-white flex items-center justify-center text-lg font-bold shadow-md shadow-slate-500/20 shrink-0">
             {adminEmail?.charAt(0).toUpperCase()}
           </div>
 
           {isSidebarOpen && (
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-sm text-gray-900 truncate">{adminEmail}</p>
-              <span className="inline-flex items-center text-xs bg-purple-100 text-purple-700 px-2.5 py-0.5 rounded-full font-medium mt-1">
+              <span className="inline-flex items-center text-xs bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full font-medium mt-1">
                 Administrator
               </span>
             </div>
@@ -150,7 +150,7 @@ export function AdminLayout() {
                   w-full flex items-center gap-3 px-4 py-3 rounded-xl
                   transition-all duration-200 group relative
                   ${active
-                    ? "bg-linear-to-r from-purple-600 to-fuchsia-600 text-white shadow-lg shadow-purple-500/25"
+                    ? "bg-slate-700 text-white shadow-lg shadow-slate-700/25"
                     : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }
                 `}

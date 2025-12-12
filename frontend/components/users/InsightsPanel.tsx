@@ -133,13 +133,13 @@ export function InsightsPanel({ insights, className = "", defaultExpanded = true
 
     return (
         <Card className={`border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden ${className}`}>
-            <CardHeader className="bg-linear-to-r from-slate-50 to-gray-50 border-b">
+            <CardHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b">
                 <button
                     onClick={() => setIsExpanded(!isExpanded)}
                     className="w-full flex items-center justify-between"
                 >
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl text-white shadow-lg shadow-indigo-200">
+                        <div className="p-2.5 bg-[#1e3a5f] rounded-xl text-white shadow-lg shadow-slate-200">
                             <Lightbulb className="w-5 h-5" />
                         </div>
                         <div className="text-left">

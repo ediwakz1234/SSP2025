@@ -159,9 +159,9 @@ export function UserLogin() {
 
           {/* Logo & Header */}
           <div className="text-center space-y-4">
-            <div className="relative mx-auto w-20 h-20 bg-linear-to-br from-primary to-purple-600 rounded-2xl shadow-lg shadow-primary/30 flex items-center justify-center">
+            <div className="relative mx-auto w-20 h-20 bg-[#1e3a5f] rounded-2xl shadow-lg shadow-slate-900/25 flex items-center justify-center">
               <MapPin className="w-10 h-10 text-white" />
-              <div className="absolute -inset-1 bg-linear-to-br from-primary to-purple-600 rounded-2xl blur opacity-30 -z-10" />
+              <div className="absolute -inset-1 bg-[#1e3a5f] rounded-2xl blur opacity-30 -z-10" />
             </div>
 
             <div>
@@ -247,7 +247,7 @@ export function UserLogin() {
               </label>
               <button
                 type="button"
-                className="text-primary hover:text-primary/80 font-medium transition-colors"
+                className="text-[#1e3a5f] hover:text-slate-700 font-medium transition-colors"
                 onClick={() => navigate("/forgot-password")}
               >
                 Forgot password?
@@ -272,7 +272,7 @@ export function UserLogin() {
               Don't have an account?{" "}
               <button
                 onClick={() => navigate("/register")}
-                className="text-primary font-semibold hover:text-primary/80 transition-colors"
+                className="text-[#1e3a5f] font-semibold hover:text-slate-700 transition-colors"
               >
                 Create Account
               </button>

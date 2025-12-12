@@ -28,7 +28,7 @@ function PageHeader({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
           {icon && (
-            <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary to-purple-600 shadow-lg shadow-primary/25 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-[#1e3a5f] shadow-lg shadow-slate-500/25 flex items-center justify-center shrink-0">
               {icon}
             </div>
           )}

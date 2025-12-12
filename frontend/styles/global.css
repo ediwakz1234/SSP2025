@@ -504,46 +504,46 @@
   --text-3xl: 1.875rem;
   --text-4xl: 2.25rem;
 
-  /* Premium Light Theme */
-  --background: #f8f9fc;
-  --foreground: #1a1b26;
+  /* Clean Light Theme - Matching Landing Page */
+  --background: #f8fafc;
+  --foreground: #1e293b;
   
   --card: #ffffff;
-  --card-foreground: #1a1b26;
+  --card-foreground: #1e293b;
   
   --popover: #ffffff;
-  --popover-foreground: #1a1b26;
+  --popover-foreground: #1e293b;
   
-  --primary: #6366f1; /* Indigo 500 */
+  --primary: #1e3a5f; /* Dark Navy Blue - Matching Landing Page */
   --primary-foreground: #ffffff;
   
-  --secondary: #f3f4f6;
-  --secondary-foreground: #1f2937;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #334155;
   
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
   
-  --accent: #e0e7ff;
-  --accent-foreground: #4338ca;
+  --accent: #e2e8f0;
+  --accent-foreground: #1e293b;
   
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   
   --border: #e2e8f0;
   --input: #e2e8f0;
-  --ring: #6366f1;
+  --ring: #1e3a5f;
   
   --radius: 0.75rem; /* More rounded */
 
-  /* Sidebar */
+  /* Sidebar - Clean style */
   --sidebar: #ffffff;
   --sidebar-foreground: #1e293b;
-  --sidebar-primary: #6366f1;
+  --sidebar-primary: #1e3a5f;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f8fafc;
-  --sidebar-accent-foreground: #0f172a;
+  --sidebar-accent-foreground: #1e293b;
   --sidebar-border: #e2e8f0;
-  --sidebar-ring: #6366f1;
+  --sidebar-ring: #1e3a5f;
 }
 
 .dark {

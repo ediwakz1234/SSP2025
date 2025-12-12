@@ -30,9 +30,9 @@ export default function AdminStatCard({
   return (
     <div className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg shadow-gray-900/5 border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5">
       {/* Background Decoration */}
-      <div className={`absolute -top-6 -right-6 w-24 h-24 rounded-full bg-linear-to-br ${
-        color === "purple" ? "from-purple-500/10 to-fuchsia-500/10" :
-        color === "blue" ? "from-blue-500/10 to-cyan-500/10" :
+      <div className={`absolute -top-6 -right-6 w-24 h-24 rounded-full bg-gradient-to-br ${
+        color === "purple" ? "from-slate-500/10 to-gray-500/10" :
+        color === "blue" ? "from-[#1e3a5f]/10 to-slate-500/10" :
         color === "green" ? "from-emerald-500/10 to-teal-500/10" :
         color === "orange" ? "from-orange-500/10 to-amber-500/10" :
         "from-red-500/10 to-rose-500/10"
@@ -42,11 +42,11 @@ export default function AdminStatCard({
         <div className="flex items-center gap-4">
           {/* Icon */}
           <div className={`p-3.5 rounded-xl shadow-md ${
-            color === "purple" ? "bg-linear-to-br from-purple-500/10 to-fuchsia-500/10 text-purple-600 shadow-purple-500/10" :
-            color === "blue" ? "bg-linear-to-br from-blue-500/10 to-cyan-500/10 text-blue-600 shadow-blue-500/10" :
-            color === "green" ? "bg-linear-to-br from-emerald-500/10 to-teal-500/10 text-emerald-600 shadow-emerald-500/10" :
-            color === "orange" ? "bg-linear-to-br from-orange-500/10 to-amber-500/10 text-orange-600 shadow-orange-500/10" :
-            "bg-linear-to-br from-red-500/10 to-rose-500/10 text-red-600 shadow-red-500/10"
+            color === "purple" ? "bg-gradient-to-br from-slate-500/10 to-gray-500/10 text-slate-600 shadow-slate-500/10" :
+            color === "blue" ? "bg-gradient-to-br from-[#1e3a5f]/10 to-slate-500/10 text-[#1e3a5f] shadow-slate-500/10" :
+            color === "green" ? "bg-gradient-to-br from-emerald-500/10 to-teal-500/10 text-emerald-600 shadow-emerald-500/10" :
+            color === "orange" ? "bg-gradient-to-br from-orange-500/10 to-amber-500/10 text-orange-600 shadow-orange-500/10" :
+            "bg-gradient-to-br from-red-500/10 to-rose-500/10 text-red-600 shadow-red-500/10"
           }`}>
             {icon}
           </div>

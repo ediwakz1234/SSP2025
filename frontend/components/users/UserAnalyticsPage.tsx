@@ -281,10 +281,10 @@ export function UserAnalyticsPage() {
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto animate-pulse">
+            <div className="w-16 h-16 rounded-full bg-[#1e3a5f] flex items-center justify-center mx-auto animate-pulse">
               <Activity className="w-8 h-8 text-white" />
             </div>
-            <div className="absolute inset-0 w-16 h-16 mx-auto rounded-full border-4 border-blue-200 border-t-blue-500 animate-spin" />
+            <div className="absolute inset-0 w-16 h-16 mx-auto rounded-full border-4 border-slate-200 border-t-[#1e3a5f] animate-spin" />
           </div>
           <div>
             <p className="text-lg font-semibold text-gray-900">Loading Analytics</p>
@@ -665,7 +665,7 @@ export function UserAnalyticsPage() {
   return (
     <div className="page-wrapper space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-600 via-indigo-600 to-violet-700 p-8 text-white shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl bg-[#1e3a5f] p-8 text-white shadow-xl">
         <div className="absolute inset-0 bg-white/5 mask-[radial-gradient(ellipse_at_center,black_50%,transparent_100%)]" />
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-4">
@@ -745,14 +745,14 @@ export function UserAnalyticsPage() {
 
             <button
               onClick={() => applyQuickFilter(7)}
-              className="px-4 py-2.5 bg-linear-to-r from-blue-100 to-indigo-100 text-blue-700 rounded-xl font-medium hover:from-blue-200 hover:to-indigo-200 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               Last 7 Days
             </button>
 
             <button
               onClick={() => applyQuickFilter(30)}
-              className="px-4 py-2.5 bg-linear-to-r from-purple-100 to-violet-100 text-purple-700 rounded-xl font-medium hover:from-purple-200 hover:to-violet-200 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="px-4 py-2.5 bg-[#1e3a5f] text-white rounded-xl font-medium hover:bg-[#2d4a6f] transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               Last 30 Days
             </button>
@@ -795,13 +795,13 @@ export function UserAnalyticsPage() {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-gray-500">Total Businesses</CardTitle>
-              <div className="p-2 bg-linear-to-br from-blue-500 to-indigo-600 rounded-lg text-white shadow-lg shadow-blue-200">
+              <div className="p-2 bg-[#1e3a5f] rounded-lg text-white shadow-lg shadow-slate-200">
                 <Building2 className="w-4 h-4" />
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{stats.total_businesses}</div>
+            <div className="text-4xl font-bold text-[#1e3a5f]">{stats.total_businesses}</div>
             <p className="text-xs text-gray-500 mt-1">Active locations</p>
           </CardContent>
         </Card>
@@ -848,13 +848,13 @@ export function UserAnalyticsPage() {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-gray-500">Categories</CardTitle>
-              <div className="p-2 bg-linear-to-br from-purple-500 to-violet-600 rounded-lg text-white shadow-lg shadow-purple-200">
+              <div className="p-2 bg-slate-600 rounded-lg text-white shadow-lg shadow-slate-200">
                 <Target className="w-4 h-4" />
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold bg-linear-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">{categoryData.length}</div>
+            <div className="text-4xl font-bold text-slate-700">{categoryData.length}</div>
             <p className="text-xs text-gray-500 mt-1">Business types</p>
           </CardContent>
         </Card>
@@ -865,7 +865,7 @@ export function UserAnalyticsPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl w-full max-w-md p-8 shadow-2xl space-y-6 animate-fadeIn">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl text-white shadow-lg">
+              <div className="p-3 bg-[#1e3a5f] rounded-xl text-white shadow-lg">
                 <FileDown className="w-6 h-6" />
               </div>
               <div>
@@ -948,13 +948,13 @@ export function UserAnalyticsPage() {
       >
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <TabsList className="h-14 bg-white/80 backdrop-blur-sm shadow-lg rounded-xl p-1.5">
-            <TabsTrigger value="category" className="rounded-lg px-6 data-[state=active]:bg-linear-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium transition-all">
+            <TabsTrigger value="category" className="rounded-lg px-6 data-[state=active]:bg-[#1e3a5f] data-[state=active]:text-white data-[state=active]:shadow-lg font-medium transition-all">
               By Category
             </TabsTrigger>
-            <TabsTrigger value="zone" className="rounded-lg px-6 data-[state=active]:bg-linear-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium transition-all">
+            <TabsTrigger value="zone" className="rounded-lg px-6 data-[state=active]:bg-[#1e3a5f] data-[state=active]:text-white data-[state=active]:shadow-lg font-medium transition-all">
               By Zone
             </TabsTrigger>
-            <TabsTrigger value="distribution" className="rounded-lg px-6 data-[state=active]:bg-linear-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium transition-all">
+            <TabsTrigger value="distribution" className="rounded-lg px-6 data-[state=active]:bg-[#1e3a5f] data-[state=active]:text-white data-[state=active]:shadow-lg font-medium transition-all">
               Distribution
             </TabsTrigger>
           </TabsList>
@@ -962,8 +962,7 @@ export function UserAnalyticsPage() {
           {/* Export Button */}
           <button
             onClick={() => setShowExportModal(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl shadow-lg shadow-blue-200 transition-all hover:scale-[1.02]"
-          >
+            className="flex items-center gap-2 px-6 py-3 bg-[#1e3a5f] hover:bg-[#2d4a6f] text-white rounded-xl shadow-lg shadow-slate-200 transition-all hover:scale-[1.02]">
             <FileDown className="w-5 h-5" />
             Export Report
           </button>
@@ -976,9 +975,9 @@ export function UserAnalyticsPage() {
             <div className="grid md:grid-cols-2 gap-6">
               {/* BAR CHART */}
               <Card ref={barChartRef} className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-                <CardHeader className="bg-linear-to-r from-blue-50 to-indigo-50 border-b">
+                <CardHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl text-white shadow-lg shadow-blue-200">
+                    <div className="p-2.5 bg-[#1e3a5f] rounded-xl text-white shadow-lg shadow-slate-200">
                       <Activity className="w-5 h-5" />
                     </div>
                     <div>
@@ -1015,9 +1014,9 @@ export function UserAnalyticsPage() {
 
               {/* PIE CHART */}
               <Card ref={pieChartRef} className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-                <CardHeader className="bg-linear-to-r from-purple-50 to-violet-50 border-b">
+                <CardHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-linear-to-br from-purple-500 to-violet-600 rounded-xl text-white shadow-lg shadow-purple-200">
+                    <div className="p-2.5 bg-slate-600 rounded-xl text-white shadow-lg shadow-slate-200">
                       <Target className="w-5 h-5" />
                     </div>
                     <div>
@@ -1088,7 +1087,7 @@ export function UserAnalyticsPage() {
                         />
                         <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">{cat.name}</span>
                       </div>
-                      <Badge className="bg-linear-to-r from-blue-500 to-indigo-600 text-white border-0 shadow-md">{cat.value}</Badge>
+                      <Badge className="bg-[#1e3a5f] text-white border-0 shadow-md">{cat.value}</Badge>
                     </div>
                   ))}
                 </div>
@@ -1100,9 +1099,9 @@ export function UserAnalyticsPage() {
         {/* ZONE TAB */}
         <TabsContent value="zone" className="space-y-6">
           <Card ref={zoneChartRef} className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-linear-to-r from-amber-50 to-orange-50 border-b">
+            <CardHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-linear-to-br from-amber-500 to-orange-600 rounded-xl text-white shadow-lg shadow-amber-200">
+                <div className="p-2.5 bg-amber-600 rounded-xl text-white shadow-lg shadow-amber-200">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
@@ -1215,11 +1214,11 @@ export function UserAnalyticsPage() {
                       .map((cat, index) => (
                         <div
                           key={cat.name}
-                          className="flex items-center gap-3 p-3 bg-linear-to-r from-gray-50 to-slate-50 rounded-xl border hover:shadow-md transition-all"
+                          className="flex items-center gap-3 p-3 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl border hover:shadow-md transition-all"
                         >
-                          <Badge className="bg-linear-to-r from-purple-500 to-violet-600 text-white border-0 w-8 h-8 flex items-center justify-center rounded-lg">{index + 1}</Badge>
+                          <Badge className="bg-[#1e3a5f] text-white border-0 w-8 h-8 flex items-center justify-center rounded-lg">{index + 1}</Badge>
                           <span className="flex-1 text-sm font-medium text-gray-700">{cat.name}</span>
-                          <span className="text-lg font-bold text-purple-600">{cat.value}</span>
+                          <span className="text-lg font-bold text-[#1e3a5f]">{cat.value}</span>
                         </div>
                       ))}
                   </div>
@@ -1266,12 +1265,12 @@ export function UserAnalyticsPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 p-4 bg-linear-to-r from-purple-50 to-violet-50 rounded-xl border border-purple-100">
-                      <div className="p-2 bg-purple-500 rounded-lg text-white">
+                    <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-100">
+                      <div className="p-2 bg-slate-600 rounded-lg text-white">
                         <Activity className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-purple-900">
+                        <p className="text-sm font-semibold text-slate-900">
                           Avg. per Street: {streets.length ? (businesses.length / streets.length).toFixed(1) : 0}
                         </p>
                         <p className="text-xs text-gray-600 mt-1">

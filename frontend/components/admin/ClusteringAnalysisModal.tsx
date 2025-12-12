@@ -85,7 +85,7 @@ export function ClusteringAnalysisModal({
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="max-w-2xl bg-white rounded-2xl shadow-2xl border-0 p-0 overflow-hidden">
                 {/* Header */}
-                <DialogHeader className="bg-linear-to-r from-indigo-600 via-purple-600 to-violet-600 text-white p-6">
+                <DialogHeader className="bg-slate-700 text-white p-6">
                     <div className="flex items-center gap-4">
                         {rank && rank <= 3 && (
                             <div
@@ -154,9 +154,9 @@ export function ClusteringAnalysisModal({
                     </div>
 
                     {/* Business Analysis */}
-                    <div className="p-4 rounded-xl bg-linear-to-r from-purple-50 to-violet-50 border border-purple-100">
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200">
                         <div className="flex items-center gap-2 mb-3">
-                            <Building2 className="h-4 w-4 text-purple-600" />
+                            <Building2 className="h-4 w-4 text-slate-600" />
                             <h3 className="font-semibold text-gray-800">Business Analysis</h3>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -164,7 +164,7 @@ export function ClusteringAnalysisModal({
                                 <p className="text-xs text-gray-500 uppercase tracking-wide">
                                     Category
                                 </p>
-                                <Badge className="mt-1 bg-purple-100 text-purple-800 border-purple-200 font-medium">
+                                <Badge className="mt-1 bg-slate-100 text-slate-800 border-slate-200 font-medium">
                                     {analysis.business_category}
                                 </Badge>
                             </div>

@@ -2366,9 +2366,9 @@ export function ClusteringPage() {
           {/* COMPETITOR ANALYSIS */}
           {/* ---------------------------------------------- */}
           <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-linear-to-r from-indigo-50 to-purple-50 border-b">
+            <CardHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl text-white shadow-lg shadow-indigo-200">
+                <div className="p-2.5 bg-[#1e3a5f] rounded-xl text-white shadow-lg shadow-slate-200">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
                 </div>
                 <div>

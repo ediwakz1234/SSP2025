@@ -17,7 +17,7 @@ type PortalMode = 'user' | 'admin' | 'both';
 function FeatureItem({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-3 group">
-      <div className="w-2 h-2 rounded-full bg-primary group-hover:scale-125 transition-transform" />
+      <div className="w-2 h-2 rounded-full bg-[#1e3a5f] group-hover:scale-125 transition-transform" />
       <span className="text-gray-600 group-hover:text-gray-800 transition-colors">{text}</span>
     </div>
   );
@@ -26,7 +26,7 @@ function FeatureItem({ text }: { text: string }) {
 function FeatureItemAdmin({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-3 group">
-      <div className="w-2 h-2 rounded-full bg-purple-500 group-hover:scale-125 transition-transform" />
+      <div className="w-2 h-2 rounded-full bg-slate-500 group-hover:scale-125 transition-transform" />
       <span className="text-gray-600 group-hover:text-gray-800 transition-colors">{text}</span>
     </div>
   );
@@ -51,8 +51,8 @@ function FeatureCard({
       style={{ animationDelay: delay }}
     >
       <CardHeader className="pb-3">
-        <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/10 to-purple-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-          <Icon className="w-7 h-7 text-primary" />
+        <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+          <Icon className="w-7 h-7 text-[#1e3a5f]" />
         </div>
         <CardTitle className="text-xl text-gray-900">{title}</CardTitle>
         <CardDescription className="text-gray-600 leading-relaxed">
@@ -139,21 +139,21 @@ export function LandingPage() {
             onClick={handleLogoClick}
             className="relative inline-flex items-center justify-center w-24 h-24 mb-8 cursor-pointer select-none group"
           >
-            <div className="absolute inset-0 bg-linear-to-br from-primary to-purple-600 rounded-3xl shadow-2xl shadow-primary/30 group-hover:shadow-primary/40 transition-shadow" />
-            <div className="absolute inset-0 bg-linear-to-br from-primary to-purple-600 rounded-3xl blur-xl opacity-40 group-hover:opacity-60 transition-opacity" />
+            <div className="absolute inset-0 bg-[#1e3a5f] rounded-3xl shadow-2xl shadow-slate-900/30 group-hover:shadow-slate-900/40 transition-shadow" />
+            <div className="absolute inset-0 bg-[#1e3a5f] rounded-3xl blur-xl opacity-40 group-hover:opacity-60 transition-opacity" />
             <MapPin className="relative w-12 h-12 text-white group-hover:scale-110 transition-transform" />
           </div>
 
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6 animate-fadeIn delay-100">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">AI-Powered Location Analytics</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 border border-slate-200 mb-6 animate-fadeIn delay-100">
+            <Sparkles className="w-4 h-4 text-emerald-500" />
+            <span className="text-sm font-medium text-slate-700">AI-Powered Analytics</span>
           </div>
 
           {/* Title */}
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight animate-fadeIn delay-150">
             Strategic Store
-            <span className="block text-transparent bg-clip-text bg-linear-to-r from-primary to-purple-600">
+            <span className="block text-slate-600">
               Placement System
             </span>
           </h1>
@@ -222,8 +222,8 @@ export function LandingPage() {
               style={{ animationDelay: '300ms' }}
             >
               <CardHeader className="text-center pb-4">
-                <div className="mx-auto w-18 h-18 rounded-2xl bg-linear-to-br from-blue-500/10 to-primary/10 flex items-center justify-center mb-4 shadow-lg shadow-blue-500/10">
-                  <Users className="w-9 h-9 text-blue-600" />
+                <div className="mx-auto w-18 h-18 rounded-2xl bg-slate-100 flex items-center justify-center mb-4 shadow-lg shadow-slate-200">
+                  <Users className="w-9 h-9 text-[#1e3a5f]" />
                 </div>
 
                 <CardTitle className="text-2xl text-gray-900">User Portal</CardTitle>
@@ -262,8 +262,8 @@ export function LandingPage() {
               style={{ animationDelay: '400ms' }}
             >
               <CardHeader className="text-center pb-4">
-                <div className="mx-auto w-18 h-18 rounded-2xl bg-linear-to-br from-purple-500/10 to-fuchsia-500/10 flex items-center justify-center mb-4 shadow-lg shadow-purple-500/10">
-                  <Shield className="w-9 h-9 text-purple-600" />
+                <div className="mx-auto w-18 h-18 rounded-2xl bg-slate-100 flex items-center justify-center mb-4 shadow-lg shadow-slate-200">
+                  <Shield className="w-9 h-9 text-slate-600" />
                 </div>
 
                 <CardTitle className="text-2xl text-gray-900">Admin Portal</CardTitle>
@@ -282,7 +282,7 @@ export function LandingPage() {
                 </div>
 
                 <Button
-                  className="w-full mt-4 bg-linear-to-r from-purple-600 to-fuchsia-600 shadow-purple-500/25 hover:shadow-purple-500/35"
+                  className="w-full mt-4 bg-slate-600 hover:bg-slate-700 shadow-slate-500/25"
                   size="lg"
                   onClick={() => navigate("/admin/login")}
                 >

@@ -11,18 +11,18 @@ const buttonVariants = cva(
         variants: {
             variant: {
                 default:
-                    "bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 active:shadow-md",
+                    "bg-[#1e3a5f] text-white shadow-lg shadow-slate-900/20 hover:bg-[#2d4a6f] hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:shadow-md",
                 destructive:
                     "bg-destructive text-white shadow-lg shadow-destructive/25 hover:shadow-xl hover:shadow-destructive/30 hover:-translate-y-0.5 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
                 outline:
-                    "border border-input bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground hover:border-primary/30 hover:-translate-y-0.5 dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+                    "border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 hover:-translate-y-0.5",
                 secondary:
-                    "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:-translate-y-0.5",
+                    "bg-gray-100 text-gray-700 shadow-sm hover:bg-gray-200 hover:-translate-y-0.5",
                 ghost:
-                    "text-foreground hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-                link: "text-primary underline-offset-4 hover:underline",
+                    "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                link: "text-[#1e3a5f] underline-offset-4 hover:underline",
                 gradient:
-                    "bg-gradient-to-r from-primary to-purple-600 text-white shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0",
+                    "bg-[#1e3a5f] text-white shadow-lg shadow-slate-900/20 hover:bg-[#2d4a6f] hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0",
                 success:
                     "bg-emerald-600 text-white shadow-lg shadow-emerald-600/25 hover:bg-emerald-700 hover:shadow-xl hover:shadow-emerald-600/30 hover:-translate-y-0.5",
                 warning:

@@ -246,10 +246,10 @@ export function DashboardPage() {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] animate-fadeIn">
         <div className="relative">
-          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 animate-pulse flex items-center justify-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#1e3a5f] animate-pulse flex items-center justify-center">
             <Loader2 className="w-8 h-8 text-white animate-spin" />
           </div>
-          <div className="absolute -inset-4 bg-linear-to-br from-indigo-500/20 to-purple-600/20 rounded-3xl blur-xl animate-pulse" />
+          <div className="absolute -inset-4 bg-slate-500/20 rounded-3xl blur-xl animate-pulse" />
         </div>
         <p className="mt-6 text-gray-600 font-medium">Loading dashboard...</p>
         <p className="text-sm text-gray-400 mt-1">Preparing your insights</p>
@@ -264,10 +264,10 @@ export function DashboardPage() {
     <div className="page-wrapper space-y-8">
 
       {/* Hero Greeting Section */}
-      <div className="page-content relative overflow-hidden rounded-2xl bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 p-8 text-white">
+      <div className="page-content relative overflow-hidden rounded-2xl bg-[#1e3a5f] p-8 text-white">
         {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
         
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2">
