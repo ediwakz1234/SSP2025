@@ -66,82 +66,91 @@ export default async function handler(req, res) {
     const totalBusinesses = clusterAnalytics?.totalBusinesses ?? nearbyBusinesses?.length ?? 0;
 
     // Build comprehensive system prompt
-    const systemPrompt = `You are an AI Business Recommendation Engine.
+    const systemPrompt = `You are an AI Business Opportunity and Recommendation Engine for a Strategic Store Placement System.
 
-Your task is to recommend the TOP 3 most viable business types across ALL categories, even if the user provides a specific business idea or category.
+Your responsibility is to generate two balanced perspectives:
+1. Overall Market Overview (category-neutral)
+2. User Business Idea Fit (idea-specific but not category-locked)
 
-🔑 CATEGORY OVERRIDE RULE (CRITICAL)
+Both views must be generated every time.
 
-The user's business idea and category are context only.
+🔁 DUAL-VIEW OUTPUT RULE (NON-NEGOTIABLE)
 
-DO NOT limit recommendations to the detected category.
+You MUST generate TWO SEPARATE SECTIONS:
 
-At least ONE (1) recommended business MUST belong to a DIFFERENT category than the user's detected category.
+1️⃣ Overall Market Overview
+- Represents the general business potential of the area
+- Uses ALL businesses across ALL categories
+- Must NOT focus on the user's selected business idea
 
-If stronger opportunities exist outside the user's category, prioritize those instead.
+2️⃣ Your Business Idea Fit
+- Evaluates how well the user's specific business idea fits
+- Uses the idea as context only
+- Must NOT restrict recommendations to the same category
+- May suggest better alternatives from other categories
 
-📌 Example:
-User inputs Milk Tea (Food / Beverages)
-AI may recommend:
-- Convenience Store (Retail)
-- Pharmacy (Services)
-- Coffee Shop (Food / Beverages)
+🔑 CATEGORY HANDLING RULE (STRICT)
 
-📊 DATA USAGE RULES (STRICT)
+The user's selected business idea and category are PREFERENCE CONTEXT ONLY.
+DO NOT FILTER data by the detected category.
+Recommendations may come from ANY category.
+At least ONE recommendation must be from a DIFFERENT category than the user's detected category.
 
-Use ONLY the provided data:
-- User's business idea & category (context only)
-- Cluster information (clusterId, centroid, business count)
-- Business density & competitor counts
-- Nearby business details
-- Opportunity level from analysis
-
-❌ Do NOT assume missing data
-❌ Do NOT invent demand, locations, or competitors
-
-🧭 CATEGORY SCOPE (MANDATORY)
-
-Recommendations may come from ANY of the following:
+Allowed categories:
 - Retail
 - Services
 - Food / Beverages
 - Merchandise / Trading
 - Entertainment / Leisure
 
-🚫 The detected category must NEVER restrict output.
+📊 DATA USAGE RULES (STRICT)
+
+Use ONLY the provided data:
+- Cluster information
+- Business density and competitor counts
+- Nearby business list
+- Direct competitors
+- Zone type
+- Opportunity level
+
+❌ Do NOT assume foot traffic
+❌ Do NOT assume population
+❌ Do NOT invent demand, locations, or competitors
 
 🏙️ ZONE NAMING RULES (STRICT)
 
-Assign ONLY ONE zone type:
+Assign ONLY ONE of the following:
 - "Commercial Zone"
 - "Residential Zone"
 - "Mixed Zone"
 
-❌ Do NOT generate new zone names.
+❌ Do NOT generate new zone names
 
-🧮 SCORING RULES (STRICT & DYNAMIC)
+🧮 SCORING RULES (STRICT)
 
-Each recommended business MUST have:
-- A UNIQUE score (70–100 only)
-- A UNIQUE fitPercentage (70–100 only, different from score)
+Score Rules:
+- Range: 70–100 ONLY
+- Each business must have a UNIQUE score
+- No repeated score patterns
 
-Score must be based on:
+Fit Percentage Rules:
+- Range: 70–100
+- Must be different from score
+- Must logically correlate with score
+
+Scoring must consider:
 - Zone compatibility
 - Business density (50m / 100m / 200m)
-- Number of direct competitors
+- Direct competitor count
 - Complementary businesses nearby
-- Supply vs demand gap (derived ONLY from provided data)
+- Market saturation balance
 
-❌ No duplicate scores
-❌ No repeated scoring patterns
+🏷️ OPPORTUNITY LEVEL LABELS
 
-🏷️ OPPORTUNITY LEVEL LABEL
-
-Assign automatically from score:
+Automatically assign from score:
 - 90–100 → "Excellent Potential"
 - 80–89 → "Strong Potential"
 - 70–79 → "Moderate Potential"
-- Below 70 → "Limited Potential" (avoid unless extreme competition)
 
 🎯 CLUSTER CONFIDENCE LABEL
 
@@ -153,7 +162,7 @@ Convert confidence % into:
 
 ⚠️ RISK LEVEL RULE (MANDATORY)
 
-Each business MUST include ONE risk level:
+Each recommended business MUST include:
 - "Low Risk"
 - "Medium Risk"
 - "High Risk"
@@ -162,39 +171,17 @@ Risk must logically match:
 - Competition density
 - Market saturation
 - Operational complexity
-- Sensitivity to timing or capital
-
-📌 Logic:
-- High score + low competition → Low Risk
-- Moderate competition → Medium Risk
-- High competition / narrow demand → High Risk
+- Capital sensitivity
 
 ❌ Do NOT invent new risk labels
 
-🥇 TOP 3 BUSINESS RECOMMENDATIONS (REQUIRED)
+🧩 MARKET SATURATION INTERPRETATION
 
-Each recommendation MUST include:
-{
-  "name": "",
-  "category": "",
-  "score": 0,
-  "fitPercentage": 0,
-  "opportunityLevel": "",
-  "riskLevel": "",
-  "shortDescription": "",
-  "fullDetails": "",
-  "preferredLocation": "",
-  "startupBudget": "PHP xx,xxx - PHP xx,xxx",
-  "competitorPresence": "",
-  "businessDensityInsight": ""
-}
+- 0–30% → "Good Opportunity"
+- 31–60% → "Needs Strategic Planning"
+- 61–100% → "Highly Saturated"
 
-📌 Businesses may belong to different categories.
-
-✅ EXPECTED BEHAVIOR (NON-NEGOTIABLE)
-- Recommendations must reflect the overall business ecosystem
-- The AI must break out of the user's category when better opportunities exist
-- Results must be simple, realistic, and business-friendly
+Explain saturation using competition and density only.
 
 -----------------------------------
 JSON OUTPUT FORMAT (REQUIRED):
@@ -202,6 +189,24 @@ JSON OUTPUT FORMAT (REQUIRED):
 Return ONLY valid JSON:
 
 {
+  "marketOverview": {
+    "overallScore": number,
+    "opportunityLevel": "Excellent Potential" | "Strong Potential" | "Moderate Potential",
+    "competitionLevel": "Low" | "Medium" | "High",
+    "marketSaturationPercent": number,
+    "marketSaturationStatus": "Good Opportunity" | "Needs Strategic Planning" | "Highly Saturated",
+    "areaReadiness": "Low" | "Medium" | "High",
+    "zoneType": "Commercial Zone" | "Residential Zone" | "Mixed Zone",
+    "summary": "string"
+  },
+  "ideaFit": {
+    "ideaFitScore": number,
+    "fitLabel": "Highly Recommended" | "Good Choice" | "Fair Option",
+    "competitionForIdea": "Low" | "Medium" | "High",
+    "riskLevel": "Low Risk" | "Medium Risk" | "High Risk",
+    "setupDifficulty": "Easy" | "Moderate" | "Complex",
+    "suggestedAdjustments": "string"
+  },
   "bestCluster": {
     "clusterId": number,
     "zoneType": "Commercial Zone" | "Residential Zone" | "Mixed Zone",
@@ -215,7 +220,7 @@ Return ONLY valid JSON:
       "category": "string",
       "score": number,
       "fitPercentage": number,
-      "opportunityLevel": "Excellent Potential" | "Strong Potential" | "Moderate Potential" | "Limited Potential",
+      "opportunityLevel": "Excellent Potential" | "Strong Potential" | "Moderate Potential",
       "riskLevel": "Low Risk" | "Medium Risk" | "High Risk",
       "shortDescription": "string",
       "fullDetails": "string",
@@ -265,6 +270,24 @@ OPPORTUNITY LEVEL: ${opportunity || "Moderate"}
 
 Return ONLY valid JSON in this exact format:
 {
+  "marketOverview": {
+    "overallScore": 82,
+    "opportunityLevel": "Strong Potential",
+    "competitionLevel": "Medium",
+    "marketSaturationPercent": 35,
+    "marketSaturationStatus": "Needs Strategic Planning",
+    "areaReadiness": "Medium",
+    "zoneType": "Commercial Zone",
+    "summary": "This area has moderate business activity with room for new businesses that offer differentiation."
+  },
+  "ideaFit": {
+    "ideaFitScore": 78,
+    "fitLabel": "Good Choice",
+    "competitionForIdea": "Medium",
+    "riskLevel": "Medium Risk",
+    "setupDifficulty": "Moderate",
+    "suggestedAdjustments": "Consider adding unique menu items or services to stand out from existing competition."
+  },
   "bestCluster": {
     "clusterId": 1,
     "zoneType": "Commercial Zone",
@@ -364,7 +387,40 @@ Return ONLY valid JSON in this exact format:
         return "Medium Risk";
       };
 
+      // Calculate market saturation
+      const totalNearby = b50 + b100 + b200;
+      const totalCompetitors = c50 + c100 + c200;
+      const saturationPercent = totalNearby > 0 ? Math.round((totalCompetitors / totalNearby) * 100) : 0;
+      const saturationStatus = saturationPercent <= 30 ? "Good Opportunity" : saturationPercent <= 60 ? "Needs Strategic Planning" : "Highly Saturated";
+
+      // Determine idea fit
+      const ideaFitScore = Math.min(100, Math.max(70, 90 - c50 * 8 + b100 * 2));
+      const fitLabel = ideaFitScore >= 85 ? "Highly Recommended" : ideaFitScore >= 75 ? "Good Choice" : "Fair Option";
+      const setupDifficulty = c50 >= 3 ? "Complex" : c50 >= 1 ? "Moderate" : "Easy";
+
       data = {
+        marketOverview: {
+          overallScore: Math.min(100, Math.max(70, 85 - c100 * 3 + b100 * 2)),
+          opportunityLevel: getOpportunityLevel(Math.min(100, Math.max(70, 85 - c100 * 3 + b100 * 2))),
+          competitionLevel,
+          marketSaturationPercent: saturationPercent,
+          marketSaturationStatus: saturationStatus,
+          areaReadiness: b100 >= 8 ? "High" : b100 >= 4 ? "Medium" : "Low",
+          zoneType: zoneTypeName,
+          summary: c50 === 0
+            ? `This ${zoneTypeName} has low competition and good potential for new businesses.`
+            : `This ${zoneTypeName} has ${competitionLevel.toLowerCase()} competition. New businesses can succeed with proper differentiation.`
+        },
+        ideaFit: {
+          ideaFitScore,
+          fitLabel,
+          competitionForIdea: competitionLevel,
+          riskLevel: getRiskLevel(ideaFitScore, c50),
+          setupDifficulty,
+          suggestedAdjustments: c50 >= 2
+            ? "Consider offering unique features or better service to stand out from existing competition."
+            : "Good opportunity - focus on quality and building customer relationships."
+        },
         bestCluster: {
           clusterId: 1,
           zoneType: zoneTypeName,
