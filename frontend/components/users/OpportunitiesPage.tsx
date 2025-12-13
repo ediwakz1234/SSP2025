@@ -2879,9 +2879,9 @@ export function OpportunitiesPage() {
           {/* Recommended for You - Personalized Insights */}
           <RecommendedForYou
             businessType={businessType}
-            competitionLevel={overviewSummary.competitionLevel}
+            competitionLevel={overviewSummary.competitionLevel === "N/A" ? "Medium" : overviewSummary.competitionLevel}
             zoneType={zoneAnalysisData.zoneType}
-            activityTime={overviewSummary.operatingTime}
+            activityTime={overviewSummary.operatingTime === "N/A" ? "Both" : overviewSummary.operatingTime}
             avgDensity={clusterKPIs.avgBusinessDensity}
             avgCompetitors={clusterKPIs.avgCompetition}
             clusterCount={clusterKPIs.numClusters}
