@@ -1032,7 +1032,7 @@ export function findOptimalLocation(
       recommendedStrategy:
         confidence >= 0.8
           ? "Ideal location for business entry."
-          : "Proceed with clear differentiation.",
+          : "There is some competition in this area, but new businesses can still succeed with a unique offering.",
     },
     zoneType: inferredZoneType,
     analysis: {
