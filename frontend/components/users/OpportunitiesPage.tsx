@@ -1181,7 +1181,12 @@ export function OpportunitiesPage() {
   const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
   const [appliedPreferences, setAppliedPreferences] = useState<UserPreferences | null>(null);
 
-  // Load clustering result and active businesses
+  // Get kmeans store data early - needed for conditional data loading
+  const kmeansStore = useKMeansStore();
+  const aiRecommendations = kmeansStore.aiRecommendations;
+  const hasClusteringResultsFromStore = kmeansStore.hasResults;
+
+  // Load data from Supabase
   const loadData = async () => {
     setLoading(true);
     setError(null);
@@ -1234,10 +1239,17 @@ export function OpportunitiesPage() {
   // ALL MEMOIZED VALUES - MUST BE BEFORE EARLY RETURNS
   // ============================================================================
 
-  // Extract safe values from clustering results
-  const businessType = clusteringResults?.business_category || "";
-  const numClusters = clusteringResults?.num_clusters ?? 0;
-  const locations = clusteringResults?.locations || [];
+  // Extract safe values from clustering results - ONLY if clustering was run in session
+  // Use kmeansStore as the source of truth for whether to show data
+  const businessType = kmeansStore.hasResults
+    ? (kmeansStore.detectedCategory || clusteringResults?.business_category || "")
+    : "";
+  const numClusters = kmeansStore.hasResults
+    ? (clusteringResults?.num_clusters ?? 0)
+    : 0;
+  const locations = kmeansStore.hasResults
+    ? (clusteringResults?.locations || [])
+    : [];
 
   // Build opportunities array with predictive scoring
   const opportunities: Opportunity[] = useMemo(() => {
@@ -1349,12 +1361,8 @@ export function OpportunitiesPage() {
   const totalBusinesses = businesses.length;
   const marketGaps = useMemo(() => buildMarketGaps(businesses, opportunities), [businesses, opportunities]);
 
-  // Get kmeans store data for AI recommendations
-  const kmeansStore = useKMeansStore();
-  const aiRecommendations = kmeansStore.aiRecommendations;
-
   // Check if clustering has been run in the current session
-  const hasClusteringResults = kmeansStore.hasResults;
+  const hasClusteringResults = hasClusteringResultsFromStore;
 
   // Effective KPIs - show zeros if clustering hasn't been run
   const effectiveKPIs = useMemo(() => {
