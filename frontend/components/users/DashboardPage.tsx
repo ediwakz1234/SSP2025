@@ -119,7 +119,7 @@ function getActionIcon(action: string) {
 // ------------------------------------------------
 export function DashboardPage() {
   useActivity(); // Auto-page logging
-  
+
 
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
@@ -268,7 +268,7 @@ export function DashboardPage() {
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
-        
+
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-5 h-5 text-yellow-300" />
@@ -295,10 +295,10 @@ export function DashboardPage() {
             { bg: "from-amber-500 to-amber-600", light: "bg-amber-50", text: "text-amber-600" },
           ];
           const color = colors[index % colors.length];
-          
+
           return (
-            <div 
-              key={stat.title} 
+            <div
+              key={stat.title}
               className="stat-card-modern group"
               style={{ "--stat-color": index === 0 ? "#6366f1" : index === 1 ? "#a855f7" : index === 2 ? "#3b82f6" : index === 3 ? "#10b981" : "#f59e0b" } as React.CSSProperties}
             >
@@ -393,12 +393,11 @@ export function DashboardPage() {
                     className="flex items-center justify-between p-4 rounded-xl bg-linear-to-r from-gray-50 to-white border border-gray-100 hover:border-emerald-200 hover:shadow-sm transition-all duration-200"
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white ${
-                        index === 0 ? "bg-linear-to-br from-yellow-400 to-orange-500" :
-                        index === 1 ? "bg-linear-to-br from-gray-400 to-gray-500" :
-                        index === 2 ? "bg-linear-to-br from-amber-600 to-amber-700" :
-                        "bg-linear-to-br from-gray-300 to-gray-400"
-                      }`}>
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white ${index === 0 ? "bg-linear-to-br from-yellow-400 to-orange-500" :
+                          index === 1 ? "bg-linear-to-br from-gray-400 to-gray-500" :
+                            index === 2 ? "bg-linear-to-br from-amber-600 to-amber-700" :
+                              "bg-linear-to-br from-gray-300 to-gray-400"
+                        }`}>
                         {index + 1}
                       </div>
                       <span className="font-medium text-gray-800">{lc.category}</span>
@@ -430,7 +429,7 @@ export function DashboardPage() {
               <div className="grid gap-4 md:grid-cols-3">
                 <LightAction
                   icon={GitBranch}
-                  title="Run K-Means Analysis"
+                  title="Find Business Ideas"
                   desc="Analyze optimal business locations"
                   action="clustering"
                 />
@@ -527,71 +526,71 @@ export function DashboardPage() {
 
             <CardContent className="p-0 max-h-80 overflow-y-auto scrollbar-thin">
               <div className="p-4 space-y-2">
-              {(() => {
-                let logs = activityLogs.filter((log) => {
-                  const diff = daysDiff(log.created_at);
+                {(() => {
+                  let logs = activityLogs.filter((log) => {
+                    const diff = daysDiff(log.created_at);
 
-                  if (filterType === "yesterday") return diff <= 2 && diff > 1;
-                  if (filterType === "3days") return diff <= 3;
-                  if (filterType === "week") return diff <= 7;
-                  return true;
-                });
+                    if (filterType === "yesterday") return diff <= 2 && diff > 1;
+                    if (filterType === "3days") return diff <= 3;
+                    if (filterType === "week") return diff <= 7;
+                    return true;
+                  });
 
-                if (searchQuery.trim() !== "") {
-                  const q = searchQuery.toLowerCase();
-                  logs = logs.filter((log) =>
-                    log.action.toLowerCase().includes(q) ||
-                    (log.metadata?.page || "").toLowerCase().includes(q)
-                  );
-                }
+                  if (searchQuery.trim() !== "") {
+                    const q = searchQuery.toLowerCase();
+                    logs = logs.filter((log) =>
+                      log.action.toLowerCase().includes(q) ||
+                      (log.metadata?.page || "").toLowerCase().includes(q)
+                    );
+                  }
 
-                if (logs.length === 0)
-                  return (
-                    <div className="text-center py-12">
-                      <ActivityIcon className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                      <p className="text-sm text-gray-500">No activity found.</p>
-                    </div>
-                  );
+                  if (logs.length === 0)
+                    return (
+                      <div className="text-center py-12">
+                        <ActivityIcon className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                        <p className="text-sm text-gray-500">No activity found.</p>
+                      </div>
+                    );
 
-                  
 
-                return logs.map((log) => {
-  const Icon = getActionIcon(log.action);
 
-  return (
-    <div
-      key={log.id}
-      className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors group"
-    >
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
-          <Icon className="w-4 h-4 text-gray-500 group-hover:text-indigo-500 transition-colors" />
-        </div>
+                  return logs.map((log) => {
+                    const Icon = getActionIcon(log.action);
 
-        <div className="flex flex-col">
-          <p className="font-medium text-sm text-gray-800">{cleanAction(log.action)}</p>
+                    return (
+                      <div
+                        key={log.id}
+                        className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
+                            <Icon className="w-4 h-4 text-gray-500 group-hover:text-indigo-500 transition-colors" />
+                          </div>
 
-          {log.metadata?.timeSpentSeconds != null && (
-            <p className="text-xs text-gray-400 flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {log.metadata.timeSpentSeconds}s spent
-            </p>
-          )}
-        </div>
-      </div>
+                          <div className="flex flex-col">
+                            <p className="font-medium text-sm text-gray-800">{cleanAction(log.action)}</p>
 
-      <span className="text-xs text-gray-400 font-medium">
-        {new Date(log.created_at!).toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        })}
-      </span>
-    </div>
-  );
-});
+                            {log.metadata?.timeSpentSeconds != null && (
+                              <p className="text-xs text-gray-400 flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {log.metadata.timeSpentSeconds}s spent
+                              </p>
+                            )}
+                          </div>
+                        </div>
 
-              })()}
+                        <span className="text-xs text-gray-400 font-medium">
+                          {new Date(log.created_at!).toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          })}
+                        </span>
+                      </div>
+                    );
+                  });
+
+                })()}
               </div>
             </CardContent>
           </Card>
@@ -634,7 +633,7 @@ function CategoryBar({
     "from-pink-500 to-rose-500",
     "from-violet-500 to-purple-500",
   ];
-  
+
   return (
     <div className="group">
       <div className="flex items-center gap-4">
@@ -668,7 +667,7 @@ function Summary({ icon: Icon, text, color = "gray" }: { icon: LucideIcon; text:
     emerald: "bg-emerald-50 text-emerald-600",
     gray: "bg-gray-100 text-gray-600",
   };
-  
+
   return (
     <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
       <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${colorClasses[color]}`}>
@@ -699,14 +698,14 @@ export function LightAction({
       className="group relative p-5 rounded-2xl bg-white border border-gray-100 hover:border-indigo-200 transition-all duration-300 text-left hover:shadow-lg hover:-translate-y-1"
     >
       <div className="absolute inset-0 bg-linear-to-br from-indigo-500/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-      
+
       <div className="relative">
         <div className="w-12 h-12 rounded-xl bg-linear-to-br from-indigo-500 to-purple-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
           <Icon className="w-6 h-6 text-white" />
         </div>
         <p className="font-semibold text-gray-800 mb-1 group-hover:text-indigo-600 transition-colors">{title}</p>
         <p className="text-sm text-gray-500">{desc}</p>
-        
+
         <div className="mt-3 flex items-center text-indigo-500 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
           <span>Get started</span>
           <ArrowUpRight className="w-4 h-4 ml-1" />

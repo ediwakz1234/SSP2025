@@ -36,7 +36,7 @@ export function DashboardLayout() {
 
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/user/dashboard" },
-    { id: "clustering", label: "K-Means Clustering", icon: GitBranch, path: "/user/clustering" },
+    { id: "clustering", label: "Business Recommendation", icon: GitBranch, path: "/user/clustering" },
     { id: "analytics", label: "Analytics", icon: BarChart3, path: "/user/analytics" },
     { id: "map", label: "Map View", icon: Map, path: "/user/map" },
     {

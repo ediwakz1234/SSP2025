@@ -447,7 +447,7 @@ export function ClusteringPage() {
         setLiveAnalytics(analytics);
       }
 
-      toast.success("Previous K-Means results restored!", {
+      toast.success("Your previous recommendations are ready!", {
         description: "Your clustering results are ready to view.",
       });
     }
@@ -1799,8 +1799,8 @@ export function ClusteringPage() {
               <Target className="w-8 h-8" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">K-Means Clustering</h1>
-              <p className="text-emerald-100">AI-powered location analysis for optimal business placement</p>
+              <h1 className="text-3xl font-bold tracking-tight">Business Recommendation</h1>
+              <p className="text-emerald-100">Find the best business idea and location based on your input</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-3 mt-6">
@@ -1810,7 +1810,7 @@ export function ClusteringPage() {
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-lg backdrop-blur-sm">
               <CheckCircle2 className="w-4 h-4" />
-              <span className="text-sm font-medium">Auto-Optimized Clusters</span>
+              <span className="text-sm font-medium">Smart Location Analysis</span>
             </div>
           </div>
         </div>
@@ -1830,9 +1830,9 @@ export function ClusteringPage() {
               <Target className="w-5 h-5" />
             </div>
             <div>
-              <CardTitle className="text-xl">Clustering Configuration</CardTitle>
+              <CardTitle className="text-xl">Your Business Idea</CardTitle>
               <CardDescription className="text-gray-600">
-                Enter your business idea - choose a category or ask AI to suggest one
+                Tell us the business you want, or let us suggest one for you
               </CardDescription>
             </div>
           </div>
@@ -1907,11 +1907,11 @@ export function ClusteringPage() {
             <div className="space-y-3">
               <Label className="flex items-center gap-2 font-semibold text-gray-800">
                 <span className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 text-xs font-bold">2</span>
-                AI Business Category (Auto-Detected)
+                Suggested Business Type
               </Label>
 
               <p className="text-xs text-gray-500 mb-2">
-                The system automatically classifies your business idea into: Retail, Services, Restaurant, Food & Beverages, Merchandise / Trading, or Entertainment / Leisure.
+                Based on your idea, we identify the most suitable business type for you.
               </p>
 
               {/* Show loading state while validating/detecting */}
@@ -1920,7 +1920,7 @@ export function ClusteringPage() {
                   <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
                     <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
                   </div>
-                  <span className="text-sm font-medium text-emerald-700">AI is analyzing your business idea...</span>
+                  <span className="text-sm font-medium text-emerald-700">Finding the best business type for you...</span>
                 </div>
               ) : aiCategory && selectedCategory ? (
                 /* Show detected category */
@@ -2007,11 +2007,11 @@ export function ClusteringPage() {
               >
                 {isProcessing ? (
                   <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing Analysis...
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Finding the best business options for you...
                   </>
                 ) : isValidating ? (
                   <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Validating Business Idea...
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Checking your business idea...
                   </>
                 ) : isInvalid ? (
                   <>
@@ -2019,7 +2019,7 @@ export function ClusteringPage() {
                   </>
                 ) : (
                   <>
-                    <Target className="w-5 h-5 mr-2" /> Run K-Means Clustering Analysis
+                    <Target className="w-5 h-5 mr-2" /> Find the Best Business for Your Idea
                   </>
                 )}
               </Button>
@@ -2030,11 +2030,11 @@ export function ClusteringPage() {
           {isProcessing && (
             <div className="space-y-3 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
               <div className="flex items-center justify-between text-sm">
-                <span className="font-medium text-emerald-700">Analyzing location data...</span>
+                <span className="font-medium text-emerald-700">Finding the best business options for you...</span>
                 <span className="font-bold text-emerald-600">{progress}%</span>
               </div>
               <Progress value={progress} className="h-3 bg-emerald-100" />
-              <p className="text-xs text-gray-500">Calculating optimal clusters and recommended locations</p>
+              <p className="text-xs text-gray-500">Analyzing locations and opportunities for your business</p>
             </div>
           )}
         </CardContent>
