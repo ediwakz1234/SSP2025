@@ -2760,28 +2760,30 @@ export function ClusteringPage() {
                       <Store className="w-5 h-5" />
                       Cluster Summary
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      {(aiBusinessRecommendations.clusterSummary || []).map((cluster: ClusterSummaryItem, index: number) => (
-                        <div key={index} className="bg-white p-4 rounded-xl border">
-                          <div className="flex items-center justify-between">
-                            <span className="font-semibold text-gray-800">
-                              {cluster.zoneType || cluster.friendlyName || `Cluster ${cluster.clusterId}`}
-                            </span>
-                            <Badge className={`border-0 ${cluster.competitionLevel === "Low"
-                              ? "bg-green-100 text-green-700"
-                              : cluster.competitionLevel === "Medium"
-                                ? "bg-amber-100 text-amber-700"
-                                : "bg-red-100 text-red-700"
-                              }`}>
-                              {cluster.competitionLevel}
-                            </Badge>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {(aiBusinessRecommendations.clusterSummary || [])
+                        .filter((cluster: ClusterSummaryItem) => cluster.zoneType !== "Mixed Zone")
+                        .map((cluster: ClusterSummaryItem, index: number) => (
+                          <div key={index} className="bg-white p-4 rounded-xl border">
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-gray-800">
+                                {cluster.zoneType || cluster.friendlyName || `Cluster ${cluster.clusterId}`}
+                              </span>
+                              <Badge className={`border-0 ${cluster.competitionLevel === "Low"
+                                ? "bg-green-100 text-green-700"
+                                : cluster.competitionLevel === "Medium"
+                                  ? "bg-amber-100 text-amber-700"
+                                  : "bg-red-100 text-red-700"
+                                }`}>
+                                {cluster.competitionLevel}
+                              </Badge>
+                            </div>
+                            <p className="text-2xl font-bold text-gray-900 mt-2">
+                              {cluster.businessCount}
+                              <span className="text-sm font-normal text-gray-500 ml-1">businesses</span>
+                            </p>
                           </div>
-                          <p className="text-2xl font-bold text-gray-900 mt-2">
-                            {cluster.businessCount}
-                            <span className="text-sm font-normal text-gray-500 ml-1">businesses</span>
-                          </p>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </div>
 

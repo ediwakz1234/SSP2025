@@ -1972,7 +1972,6 @@ export function OpportunitiesPage() {
       "Location Count": cluster.locationCount,
       "High-Access Locations": cluster.commercialCount,
       "Residential Zones": cluster.residentialCount,
-      "Mixed Zones": cluster.mixedCount,
       "Center Latitude": cluster.centerLat.toFixed(6),
       "Center Longitude": cluster.centerLng.toFixed(6),
     }));
