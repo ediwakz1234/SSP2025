@@ -3675,8 +3675,10 @@ export function OpportunitiesPage() {
                   <div className="grid md:grid-cols-2 gap-4">
                     {/* Morning Gap */}
                     <div className={`p-5 rounded-xl border-2 bg-white hover:shadow-md transition-all ${timeBasedGapsData.morning.status === "Gap Identified"
-                      ? "border-rose-200"
-                      : "border-emerald-200"
+                        ? "border-rose-200"
+                        : timeBasedGapsData.morning.status === "No Data Available"
+                          ? "border-gray-200"
+                          : "border-emerald-200"
                       }`}>
                       <div className="flex items-center gap-3 mb-3">
                         <div className="p-2 bg-amber-100 rounded-lg">
@@ -3685,8 +3687,10 @@ export function OpportunitiesPage() {
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-800">Morning Hours ({timeBasedGapsData.morning.period})</h4>
                           <Badge className={`mt-1 ${timeBasedGapsData.morning.status === "Gap Identified"
-                            ? "bg-rose-100 text-rose-700"
-                            : "bg-emerald-100 text-emerald-700"
+                              ? "bg-rose-100 text-rose-700"
+                              : timeBasedGapsData.morning.status === "No Data Available"
+                                ? "bg-gray-100 text-gray-600"
+                                : "bg-emerald-100 text-emerald-700"
                             }`}>
                             {timeBasedGapsData.morning.status}
                           </Badge>
@@ -3720,8 +3724,10 @@ export function OpportunitiesPage() {
 
                     {/* Evening Gap */}
                     <div className={`p-5 rounded-xl border-2 bg-white hover:shadow-md transition-all ${timeBasedGapsData.evening.status === "Gap Identified"
-                      ? "border-rose-200"
-                      : "border-emerald-200"
+                        ? "border-rose-200"
+                        : timeBasedGapsData.evening.status === "No Data Available"
+                          ? "border-gray-200"
+                          : "border-emerald-200"
                       }`}>
                       <div className="flex items-center gap-3 mb-3">
                         <div className="p-2 bg-indigo-100 rounded-lg">
@@ -3730,8 +3736,10 @@ export function OpportunitiesPage() {
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-800">Evening Hours ({timeBasedGapsData.evening.period})</h4>
                           <Badge className={`mt-1 ${timeBasedGapsData.evening.status === "Gap Identified"
-                            ? "bg-rose-100 text-rose-700"
-                            : "bg-emerald-100 text-emerald-700"
+                              ? "bg-rose-100 text-rose-700"
+                              : timeBasedGapsData.evening.status === "No Data Available"
+                                ? "bg-gray-100 text-gray-600"
+                                : "bg-emerald-100 text-emerald-700"
                             }`}>
                             {timeBasedGapsData.evening.status}
                           </Badge>

@@ -18,8 +18,8 @@ export interface TimePeriodMetrics {
 
 export interface TimePeriodGap {
     period: string;
-    status: "Well Covered" | "Gap Identified";
-    statusColor: "green" | "red";
+    status: "Well Covered" | "Gap Identified" | "No Data Available";
+    statusColor: "green" | "red" | "gray";
     summary: string;
     details: TimePeriodMetrics;
     insight: string;
@@ -158,36 +158,36 @@ export function getDefaultTimeBasedGaps(location: string = "Selected Area"): Tim
         location,
         morning: {
             period: "6AM – 11AM",
-            status: "Well Covered",
-            statusColor: "green",
-            summary: "Morning coverage data will appear after clustering analysis.",
+            status: "No Data Available",
+            statusColor: "gray",
+            summary: "Clustering data is required to analyze business coverage during this time period.",
             details: {
                 businessCount: 0,
                 mainCategories: [],
                 averageDemandScore: 0,
                 typicalHours: "—",
             },
-            insight: "Run a clustering analysis to generate morning coverage insights.",
+            insight: "Run clustering to identify time-based opportunities.",
             reason: "No clustering data available yet.",
         },
         evening: {
             period: "6PM – 10PM",
-            status: "Well Covered",
-            statusColor: "green",
-            summary: "Evening coverage data will appear after clustering analysis.",
+            status: "No Data Available",
+            statusColor: "gray",
+            summary: "Clustering data is required to analyze business coverage during this time period.",
             details: {
                 businessCount: 0,
                 mainCategories: [],
                 averageDemandScore: 0,
                 typicalHours: "—",
             },
-            insight: "Run a clustering analysis to generate evening coverage insights.",
+            insight: "Run clustering to identify time-based opportunities.",
             reason: "No clustering data available yet.",
         },
         overallAssessment: {
             gapsFound: false,
             summary: "Time-based gap analysis requires clustering data.",
-            recommendation: "Navigate to the Clustering page and run an analysis to see time-based opportunities.",
+            recommendation: "Run clustering to identify time-based opportunities.",
         },
     };
 }
