@@ -53,9 +53,28 @@ interface ClusterSummaryItem {
 }
 
 interface AIBusinessRecommendations {
+    marketOverview?: {
+        overallScore: number;
+        opportunityLevel: string;
+        competitionLevel: string;
+        marketSaturationPercent: number;
+        marketSaturationStatus: string;
+        areaReadiness: string;
+        zoneType: string;
+        summary: string;
+    };
+    ideaFit?: {
+        ideaFitScore: number;
+        fitLabel: string;
+        competitionForIdea: string;
+        riskLevel: string;
+        setupDifficulty: string;
+        suggestedAdjustments: string;
+    };
     bestCluster: {
         clusterId: number;
         friendlyName: string;
+        zoneType?: string;
         reason: string;
         confidence: number;
         confidenceLabel: string;
