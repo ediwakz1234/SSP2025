@@ -2477,8 +2477,8 @@ export function OpportunitiesPage() {
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3 mb-3">
                       <div className={`p-2 rounded-lg text-white ${overviewSummary.marketSaturationStatus === "Good Opportunity" ? "bg-gradient-to-br from-emerald-500 to-green-600" :
-                          overviewSummary.marketSaturationStatus === "Needs Strategic Planning" ? "bg-gradient-to-br from-amber-500 to-yellow-600" :
-                            "bg-gradient-to-br from-rose-500 to-red-600"
+                        overviewSummary.marketSaturationStatus === "Needs Strategic Planning" ? "bg-gradient-to-br from-amber-500 to-yellow-600" :
+                          "bg-gradient-to-br from-rose-500 to-red-600"
                         }`}>
                         <Activity className="w-5 h-5" />
                       </div>
@@ -2488,8 +2488,8 @@ export function OpportunitiesPage() {
                       {overviewSummary.marketSaturationPercent}%
                     </div>
                     <Badge className={`mt-1 ${overviewSummary.marketSaturationStatus === "Good Opportunity" ? "bg-emerald-100 text-emerald-700" :
-                        overviewSummary.marketSaturationStatus === "Needs Strategic Planning" ? "bg-amber-100 text-amber-700" :
-                          "bg-rose-100 text-rose-700"
+                      overviewSummary.marketSaturationStatus === "Needs Strategic Planning" ? "bg-amber-100 text-amber-700" :
+                        "bg-rose-100 text-rose-700"
                       }`}>
                       {overviewSummary.marketSaturationStatus !== "N/A" ? overviewSummary.marketSaturationStatus : "—"}
                     </Badge>
@@ -2508,8 +2508,8 @@ export function OpportunitiesPage() {
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3 mb-3">
                       <div className={`p-2 rounded-lg text-white ${overviewSummary.ideaFitLabel === "Highly Recommended" ? "bg-gradient-to-br from-emerald-500 to-green-600" :
-                          overviewSummary.ideaFitLabel === "Good Choice" ? "bg-gradient-to-br from-blue-500 to-indigo-600" :
-                            "bg-gradient-to-br from-amber-500 to-orange-600"
+                        overviewSummary.ideaFitLabel === "Good Choice" ? "bg-gradient-to-br from-blue-500 to-indigo-600" :
+                          "bg-gradient-to-br from-amber-500 to-orange-600"
                         }`}>
                         <Lightbulb className="w-5 h-5" />
                       </div>
@@ -2520,8 +2520,8 @@ export function OpportunitiesPage() {
                     </div>
                     {overviewSummary.ideaFitLabel !== "N/A" && (
                       <Badge className={`mt-1 ${overviewSummary.ideaFitLabel === "Highly Recommended" ? "bg-emerald-100 text-emerald-700" :
-                          overviewSummary.ideaFitLabel === "Good Choice" ? "bg-blue-100 text-blue-700" :
-                            "bg-amber-100 text-amber-700"
+                        overviewSummary.ideaFitLabel === "Good Choice" ? "bg-blue-100 text-blue-700" :
+                          "bg-amber-100 text-amber-700"
                         }`}>
                         {overviewSummary.ideaFitLabel}
                       </Badge>
@@ -2535,8 +2535,8 @@ export function OpportunitiesPage() {
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3 mb-3">
                       <div className={`p-2 rounded-lg text-white ${overviewSummary.riskLevel === "Low Risk" ? "bg-gradient-to-br from-emerald-500 to-green-600" :
-                          overviewSummary.riskLevel === "Medium Risk" ? "bg-gradient-to-br from-amber-500 to-yellow-600" :
-                            "bg-gradient-to-br from-rose-500 to-red-600"
+                        overviewSummary.riskLevel === "Medium Risk" ? "bg-gradient-to-br from-amber-500 to-yellow-600" :
+                          "bg-gradient-to-br from-rose-500 to-red-600"
                         }`}>
                         <AlertTriangle className="w-5 h-5" />
                       </div>
@@ -2547,8 +2547,8 @@ export function OpportunitiesPage() {
                     </div>
                     {overviewSummary.riskLevel !== "N/A" && (
                       <Badge className={`mt-1 ${overviewSummary.riskLevel === "Low Risk" ? "bg-emerald-100 text-emerald-700" :
-                          overviewSummary.riskLevel === "Medium Risk" ? "bg-amber-100 text-amber-700" :
-                            "bg-rose-100 text-rose-700"
+                        overviewSummary.riskLevel === "Medium Risk" ? "bg-amber-100 text-amber-700" :
+                          "bg-rose-100 text-rose-700"
                         }`}>
                         {overviewSummary.riskLevel === "Low Risk" ? "Safe investment" :
                           overviewSummary.riskLevel === "Medium Risk" ? "Manageable risk" : "Proceed with caution"}
@@ -3588,349 +3588,364 @@ export function OpportunitiesPage() {
 
         {/* MARKET GAPS TAB */}
         <TabsContent value="market-gaps" className="space-y-6">
-          {/* First Mover Opportunities */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-linear-to-r from-purple-50 to-pink-50 border-b">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-linear-to-br from-purple-500 to-pink-600 rounded-xl text-white shadow-lg shadow-purple-200">
-                  <Sparkles className="w-5 h-5" />
+          {/* Empty State - No Clustering */}
+          {!hasClusteringResults ? (
+            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+              <CardContent className="p-12 text-center">
+                <div className="p-4 bg-amber-100 rounded-full w-fit mx-auto mb-4">
+                  <AlertCircle className="w-8 h-8 text-amber-600" />
                 </div>
-                <div>
-                  <CardTitle className="text-xl">First-Mover Opportunities</CardTitle>
-                  <p className="text-sm text-gray-500">
-                    Categories with little to no competition — ideal for new entrants
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              {marketGaps.filter(g => g.gapLevel === "High").length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {marketGaps.filter(g => g.gapLevel === "High").slice(0, 6).map((gap, index) => (
-                    <div
-                      key={gap.category}
-                      className="p-5 rounded-xl border-2 border-purple-100 bg-linear-to-br from-purple-50 to-pink-50 hover:shadow-lg transition-all"
-                    >
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-8 h-8 rounded-full bg-linear-to-br from-purple-500 to-pink-600 text-white flex items-center justify-center font-bold text-sm">
-                          {index + 1}
-                        </div>
-                        <h4 className="font-bold text-gray-800">{gap.category}</h4>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3">
-                        {gap.supply === 0 ? "No competitors in this area" : `Only ${gap.supply} competitors nearby`}
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">No market gaps detected yet</h3>
+                <p className="text-gray-500">Run clustering to identify opportunities.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* First Mover Opportunities */}
+              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+                <CardHeader className="bg-linear-to-r from-purple-50 to-pink-50 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-linear-to-br from-purple-500 to-pink-600 rounded-xl text-white shadow-lg shadow-purple-200">
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">First-Mover Opportunities</CardTitle>
+                      <p className="text-sm text-gray-500">
+                        Categories with little to no competition — ideal for new entrants
                       </p>
-                      <Badge className="bg-purple-100 text-purple-700 border-0">
-                        <TrendingUp className="w-3 h-3 mr-1" />
-                        High Potential
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No high-gap opportunities identified yet. The market appears balanced.</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Time-Based Gaps */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-linear-to-r from-amber-50 to-orange-50 border-b">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-linear-to-br from-amber-500 to-orange-600 rounded-xl text-white shadow-lg shadow-amber-200">
-                    <Clock className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl">Time-Based Gaps</CardTitle>
-                    <p className="text-sm text-gray-500">
-                      Coverage analysis for {timeBasedGapsData.location}
-                    </p>
-                  </div>
-                </div>
-                {!timeBasedGapsData.overallAssessment.gapsFound && (
-                  <Badge className="bg-emerald-100 text-emerald-700 border-0">
-                    <CheckCircle2 className="w-3 h-3 mr-1" />
-                    All Periods Covered
-                  </Badge>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                {/* Morning Gap */}
-                <div className={`p-5 rounded-xl border-2 bg-white hover:shadow-md transition-all ${timeBasedGapsData.morning.status === "Gap Identified"
-                  ? "border-rose-200"
-                  : "border-emerald-200"
-                  }`}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-amber-100 rounded-lg">
-                      <Sun className="w-5 h-5 text-amber-600" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-800">Morning Hours ({timeBasedGapsData.morning.period})</h4>
-                      <Badge className={`mt-1 ${timeBasedGapsData.morning.status === "Gap Identified"
-                        ? "bg-rose-100 text-rose-700"
-                        : "bg-emerald-100 text-emerald-700"
-                        }`}>
-                        {timeBasedGapsData.morning.status}
-                      </Badge>
                     </div>
                   </div>
-
-                  {/* Business details */}
-                  <div className="mb-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span className="text-gray-600">Active Businesses</span>
-                      <span className="font-semibold text-gray-800">{timeBasedGapsData.morning.details.businessCount}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Main Types</span>
-                      <span className="font-medium text-gray-700">
-                        {timeBasedGapsData.morning.details.mainCategories.join(", ") || "—"}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Insight */}
-                  <p className="text-sm text-gray-700 mb-2">
-                    {timeBasedGapsData.morning.insight}
-                  </p>
-
-                  {/* Reason */}
-                  <p className="text-xs text-gray-500 italic">
-                    {timeBasedGapsData.morning.reason}
-                  </p>
-                </div>
-
-                {/* Evening Gap */}
-                <div className={`p-5 rounded-xl border-2 bg-white hover:shadow-md transition-all ${timeBasedGapsData.evening.status === "Gap Identified"
-                  ? "border-rose-200"
-                  : "border-emerald-200"
-                  }`}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-indigo-100 rounded-lg">
-                      <Moon className="w-5 h-5 text-indigo-600" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-800">Evening Hours ({timeBasedGapsData.evening.period})</h4>
-                      <Badge className={`mt-1 ${timeBasedGapsData.evening.status === "Gap Identified"
-                        ? "bg-rose-100 text-rose-700"
-                        : "bg-emerald-100 text-emerald-700"
-                        }`}>
-                        {timeBasedGapsData.evening.status}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  {/* Business details */}
-                  <div className="mb-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span className="text-gray-600">Active Businesses</span>
-                      <span className="font-semibold text-gray-800">{timeBasedGapsData.evening.details.businessCount}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Main Types</span>
-                      <span className="font-medium text-gray-700">
-                        {timeBasedGapsData.evening.details.mainCategories.join(", ") || "—"}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Insight */}
-                  <p className="text-sm text-gray-700 mb-2">
-                    {timeBasedGapsData.evening.insight}
-                  </p>
-
-                  {/* Reason */}
-                  <p className="text-xs text-gray-500 italic">
-                    {timeBasedGapsData.evening.reason}
-                  </p>
-                </div>
-              </div>
-
-              {/* Overall Assessment */}
-              <div className={`mt-4 p-4 rounded-xl border ${timeBasedGapsData.overallAssessment.gapsFound
-                ? "bg-amber-50 border-amber-200"
-                : "bg-emerald-50 border-emerald-200"
-                }`}>
-                <div className="flex items-start gap-3">
-                  {timeBasedGapsData.overallAssessment.gapsFound ? (
-                    <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                  ) : (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                  )}
-                  <div>
-                    <p className="text-sm font-medium text-gray-800 mb-1">
-                      {timeBasedGapsData.overallAssessment.summary}
-                    </p>
-                    <p className="text-xs text-gray-600">
-                      {timeBasedGapsData.overallAssessment.recommendation}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Underserved Categories with Suggestions */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-linear-to-r from-rose-50 to-pink-50 border-b">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-linear-to-br from-rose-500 to-pink-600 rounded-xl text-white shadow-lg shadow-rose-200">
-                  <Target className="w-5 h-5" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl">Market Gap Analysis</CardTitle>
-                  <p className="text-sm text-gray-500">
-                    Categories ranked by opportunity with actionable suggestions
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6 space-y-5">
-              {marketGaps.map((gap, index) => {
-                const maxValue = Math.max(gap.demand, gap.supply, 1);
-                const demandPercent = Math.round(
-                  (gap.demand / maxValue) * 100
-                );
-                const supplyPercent = Math.round(
-                  (gap.supply / maxValue) * 100
-                );
-
-                return (
-                  <div
-                    key={gap.category}
-                    className="border-2 rounded-2xl p-6 space-y-4 bg-white hover:shadow-xl transition-all hover:scale-[1.005]"
-                    style={{ borderColor: gap.gapLevel === 'High' ? '#f43f5e30' : gap.gapLevel === 'Medium' ? '#f59e0b30' : '#6b728030' }}
-                  >
-                    <div className="flex items-start justify-between gap-4 flex-wrap">
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-linear-to-br from-rose-500 to-pink-600 text-white font-bold text-sm shadow-lg">
-                            {index + 1}
-                          </span>
-                          <p className="text-lg font-bold text-gray-900">
-                            {gap.category}
+                </CardHeader>
+                <CardContent className="p-6">
+                  {marketGaps.filter(g => g.gapLevel === "High").length > 0 ? (
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {marketGaps.filter(g => g.gapLevel === "High").slice(0, 6).map((gap, index) => (
+                        <div
+                          key={gap.category}
+                          className="p-5 rounded-xl border-2 border-purple-100 bg-linear-to-br from-purple-50 to-pink-50 hover:shadow-lg transition-all"
+                        >
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-8 h-8 rounded-full bg-linear-to-br from-purple-500 to-pink-600 text-white flex items-center justify-center font-bold text-sm">
+                              {index + 1}
+                            </div>
+                            <h4 className="font-bold text-gray-800">{gap.category}</h4>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-3">
+                            {gap.supply === 0 ? "No competitors in this area" : `Only ${gap.supply} competitors nearby`}
                           </p>
-                          <Badge
-                            className={`border-0 text-white shadow-md ${gap.gapLevel === "High"
-                              ? "bg-linear-to-r from-rose-500 to-pink-600"
-                              : gap.gapLevel === "Medium"
-                                ? "bg-linear-to-r from-amber-500 to-orange-600"
-                                : "bg-linear-to-r from-gray-500 to-slate-600"
-                              }`}
-                          >
-                            {gap.gapLevel} Gap
+                          <Badge className="bg-purple-100 text-purple-700 border-0">
+                            <TrendingUp className="w-3 h-3 mr-1" />
+                            High Potential
                           </Badge>
                         </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">No high-gap opportunities identified yet. The market appears balanced.</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Time-Based Gaps */}
+              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+                <CardHeader className="bg-linear-to-r from-amber-50 to-orange-50 border-b">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-linear-to-br from-amber-500 to-orange-600 rounded-xl text-white shadow-lg shadow-amber-200">
+                        <Clock className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl">Time-Based Gaps</CardTitle>
                         <p className="text-sm text-gray-500">
-                          Gap Score: <span className="font-semibold text-rose-600">{gap.gapScore}</span> (demand minus supply)
-                        </p>
-                      </div>
-                      <div className="text-right p-4 bg-linear-to-br from-rose-50 to-pink-50 rounded-xl">
-                        <p className="text-3xl font-bold text-rose-600">
-                          {gap.demand}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Avg. demand index
+                          Coverage analysis for {timeBasedGapsData.location}
                         </p>
                       </div>
                     </div>
-
-                    <div className="space-y-3 p-4 bg-gray-50 rounded-xl">
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span className="font-medium text-gray-700">Market Demand</span>
-                          <span className="font-semibold text-emerald-600">{gap.demand}</span>
-                        </div>
-                        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-linear-to-r from-emerald-400 to-green-500 rounded-full transition-all"
-                            style={{ width: `${demandPercent}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span className="font-medium text-gray-700">Current Supply</span>
-                          <span className="font-semibold text-amber-600">{gap.supply}</span>
-                        </div>
-                        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-linear-to-r from-amber-400 to-orange-500 rounded-full transition-all"
-                            style={{ width: `${supplyPercent}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Time-based gap info */}
-                    {gap.timeGap && (
-                      <div className="p-4 bg-amber-50 rounded-xl border border-amber-100">
-                        <div className="flex items-start gap-3">
-                          <Clock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                          <div>
-                            <p className="text-sm font-medium text-amber-800">{gap.timeGap}</p>
-                          </div>
-                        </div>
-                      </div>
+                    {!timeBasedGapsData.overallAssessment.gapsFound && (
+                      <Badge className="bg-emerald-100 text-emerald-700 border-0">
+                        <CheckCircle2 className="w-3 h-3 mr-1" />
+                        All Periods Covered
+                      </Badge>
                     )}
-
-                    {/* Actionable suggestion */}
-                    {gap.suggestion && (
-                      <div className="p-4 bg-linear-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
-                        <div className="flex items-start gap-3">
-                          <Lightbulb className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                          <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">Suggestion</p>
-                            <p className="text-sm text-gray-600">{gap.suggestion}</p>
-                          </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* Morning Gap */}
+                    <div className={`p-5 rounded-xl border-2 bg-white hover:shadow-md transition-all ${timeBasedGapsData.morning.status === "Gap Identified"
+                      ? "border-rose-200"
+                      : "border-emerald-200"
+                      }`}>
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="p-2 bg-amber-100 rounded-lg">
+                          <Sun className="w-5 h-5 text-amber-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-800">Morning Hours ({timeBasedGapsData.morning.period})</h4>
+                          <Badge className={`mt-1 ${timeBasedGapsData.morning.status === "Gap Identified"
+                            ? "bg-rose-100 text-rose-700"
+                            : "bg-emerald-100 text-emerald-700"
+                            }`}>
+                            {timeBasedGapsData.morning.status}
+                          </Badge>
                         </div>
                       </div>
-                    )}
 
-                    <div className="pt-4 border-t">
-                      <p className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-indigo-500" />
-                        Recommended Locations
+                      {/* Business details */}
+                      <div className="mb-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between text-sm mb-1">
+                          <span className="text-gray-600">Active Businesses</span>
+                          <span className="font-semibold text-gray-800">{timeBasedGapsData.morning.details.businessCount}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Main Types</span>
+                          <span className="font-medium text-gray-700">
+                            {timeBasedGapsData.morning.details.mainCategories.join(", ") || "—"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Insight */}
+                      <p className="text-sm text-gray-700 mb-2">
+                        {timeBasedGapsData.morning.insight}
                       </p>
-                      <div className="flex flex-wrap gap-2">
-                        {gap.recommendedLocations.length > 0 ? (
-                          gap.recommendedLocations.map((loc) => (
-                            <Badge
-                              key={loc}
-                              variant="outline"
-                              className="px-3 py-1.5 font-medium hover:bg-indigo-50 hover:border-indigo-300 transition-colors cursor-pointer"
-                            >
-                              {loc}
-                            </Badge>
-                          ))
-                        ) : (
-                          <p className="text-sm text-gray-500 italic">
-                            No specific recommended streets yet for this category.
-                          </p>
-                        )}
+
+                      {/* Reason */}
+                      <p className="text-xs text-gray-500 italic">
+                        {timeBasedGapsData.morning.reason}
+                      </p>
+                    </div>
+
+                    {/* Evening Gap */}
+                    <div className={`p-5 rounded-xl border-2 bg-white hover:shadow-md transition-all ${timeBasedGapsData.evening.status === "Gap Identified"
+                      ? "border-rose-200"
+                      : "border-emerald-200"
+                      }`}>
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="p-2 bg-indigo-100 rounded-lg">
+                          <Moon className="w-5 h-5 text-indigo-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-800">Evening Hours ({timeBasedGapsData.evening.period})</h4>
+                          <Badge className={`mt-1 ${timeBasedGapsData.evening.status === "Gap Identified"
+                            ? "bg-rose-100 text-rose-700"
+                            : "bg-emerald-100 text-emerald-700"
+                            }`}>
+                            {timeBasedGapsData.evening.status}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      {/* Business details */}
+                      <div className="mb-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between text-sm mb-1">
+                          <span className="text-gray-600">Active Businesses</span>
+                          <span className="font-semibold text-gray-800">{timeBasedGapsData.evening.details.businessCount}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Main Types</span>
+                          <span className="font-medium text-gray-700">
+                            {timeBasedGapsData.evening.details.mainCategories.join(", ") || "—"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Insight */}
+                      <p className="text-sm text-gray-700 mb-2">
+                        {timeBasedGapsData.evening.insight}
+                      </p>
+
+                      {/* Reason */}
+                      <p className="text-xs text-gray-500 italic">
+                        {timeBasedGapsData.evening.reason}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Overall Assessment */}
+                  <div className={`mt-4 p-4 rounded-xl border ${timeBasedGapsData.overallAssessment.gapsFound
+                    ? "bg-amber-50 border-amber-200"
+                    : "bg-emerald-50 border-emerald-200"
+                    }`}>
+                    <div className="flex items-start gap-3">
+                      {timeBasedGapsData.overallAssessment.gapsFound ? (
+                        <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                      ) : (
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-gray-800 mb-1">
+                          {timeBasedGapsData.overallAssessment.summary}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          {timeBasedGapsData.overallAssessment.recommendation}
+                        </p>
                       </div>
                     </div>
                   </div>
-                );
-              })}
+                </CardContent>
+              </Card>
 
-              {marketGaps.length === 0 && (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                    <Target className="w-8 h-8 text-gray-400" />
+              {/* Underserved Categories with Suggestions */}
+              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+                <CardHeader className="bg-linear-to-r from-rose-50 to-pink-50 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-linear-to-br from-rose-500 to-pink-600 rounded-xl text-white shadow-lg shadow-rose-200">
+                      <Target className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Market Gap Analysis</CardTitle>
+                      <p className="text-sm text-gray-500">
+                        Categories ranked by opportunity with actionable suggestions
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-700">No market gaps detected</h3>
-                  <p className="text-gray-500 mt-2">Run a clustering analysis to identify market opportunities.</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </CardHeader>
+                <CardContent className="p-6 space-y-5">
+                  {marketGaps.map((gap, index) => {
+                    const maxValue = Math.max(gap.demand, gap.supply, 1);
+                    const demandPercent = Math.round(
+                      (gap.demand / maxValue) * 100
+                    );
+                    const supplyPercent = Math.round(
+                      (gap.supply / maxValue) * 100
+                    );
+
+                    return (
+                      <div
+                        key={gap.category}
+                        className="border-2 rounded-2xl p-6 space-y-4 bg-white hover:shadow-xl transition-all hover:scale-[1.005]"
+                        style={{ borderColor: gap.gapLevel === 'High' ? '#f43f5e30' : gap.gapLevel === 'Medium' ? '#f59e0b30' : '#6b728030' }}
+                      >
+                        <div className="flex items-start justify-between gap-4 flex-wrap">
+                          <div>
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-linear-to-br from-rose-500 to-pink-600 text-white font-bold text-sm shadow-lg">
+                                {index + 1}
+                              </span>
+                              <p className="text-lg font-bold text-gray-900">
+                                {gap.category}
+                              </p>
+                              <Badge
+                                className={`border-0 text-white shadow-md ${gap.gapLevel === "High"
+                                  ? "bg-linear-to-r from-rose-500 to-pink-600"
+                                  : gap.gapLevel === "Medium"
+                                    ? "bg-linear-to-r from-amber-500 to-orange-600"
+                                    : "bg-linear-to-r from-gray-500 to-slate-600"
+                                  }`}
+                              >
+                                {gap.gapLevel} Gap
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-gray-500">
+                              Gap Score: <span className="font-semibold text-rose-600">{gap.gapScore}</span> (demand minus supply)
+                            </p>
+                          </div>
+                          <div className="text-right p-4 bg-linear-to-br from-rose-50 to-pink-50 rounded-xl">
+                            <p className="text-3xl font-bold text-rose-600">
+                              {gap.demand}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Avg. demand index
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3 p-4 bg-gray-50 rounded-xl">
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-sm">
+                              <span className="font-medium text-gray-700">Market Demand</span>
+                              <span className="font-semibold text-emerald-600">{gap.demand}</span>
+                            </div>
+                            <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-linear-to-r from-emerald-400 to-green-500 rounded-full transition-all"
+                                style={{ width: `${demandPercent}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-sm">
+                              <span className="font-medium text-gray-700">Current Supply</span>
+                              <span className="font-semibold text-amber-600">{gap.supply}</span>
+                            </div>
+                            <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-linear-to-r from-amber-400 to-orange-500 rounded-full transition-all"
+                                style={{ width: `${supplyPercent}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Time-based gap info */}
+                        {gap.timeGap && (
+                          <div className="p-4 bg-amber-50 rounded-xl border border-amber-100">
+                            <div className="flex items-start gap-3">
+                              <Clock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="text-sm font-medium text-amber-800">{gap.timeGap}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Actionable suggestion */}
+                        {gap.suggestion && (
+                          <div className="p-4 bg-linear-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
+                            <div className="flex items-start gap-3">
+                              <Lightbulb className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="text-sm font-medium text-gray-700 mb-1">Suggestion</p>
+                                <p className="text-sm text-gray-600">{gap.suggestion}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="pt-4 border-t">
+                          <p className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-indigo-500" />
+                            Recommended Locations
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {gap.recommendedLocations.length > 0 ? (
+                              gap.recommendedLocations.map((loc) => (
+                                <Badge
+                                  key={loc}
+                                  variant="outline"
+                                  className="px-3 py-1.5 font-medium hover:bg-indigo-50 hover:border-indigo-300 transition-colors cursor-pointer"
+                                >
+                                  {loc}
+                                </Badge>
+                              ))
+                            ) : (
+                              <p className="text-sm text-gray-500 italic">
+                                No specific recommended streets yet for this category.
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {marketGaps.length === 0 && (
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                        <Target className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-700">No market gaps detected</h3>
+                      <p className="text-gray-500 mt-2">Run a clustering analysis to identify market opportunities.</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </>
+          )}
         </TabsContent>
 
         {/* HISTORY TAB */}
