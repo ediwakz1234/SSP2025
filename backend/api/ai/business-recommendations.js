@@ -68,14 +68,29 @@ export default async function handler(req, res) {
     // Build comprehensive system prompt
     const systemPrompt = `You are an AI Business Recommendation Engine.
 
-Your task is to recommend the TOP 3 most viable business types across ALL categories, not limited to the user's selected category.
+Your task is to recommend the TOP 3 most viable business types across ALL categories, even if the user provides a specific business idea or category.
 
-The user's chosen category should be treated as preference context only, NOT a restriction.
+🔑 CATEGORY OVERRIDE RULE (CRITICAL)
 
-DATA USAGE (STRICT)
+The user's business idea and category are context only.
 
-Use ONLY the provided clustering and business environment data:
-- User's business idea and category (context only)
+DO NOT limit recommendations to the detected category.
+
+At least ONE (1) recommended business MUST belong to a DIFFERENT category than the user's detected category.
+
+If stronger opportunities exist outside the user's category, prioritize those instead.
+
+📌 Example:
+User inputs Milk Tea (Food / Beverages)
+AI may recommend:
+- Convenience Store (Retail)
+- Pharmacy (Services)
+- Coffee Shop (Food / Beverages)
+
+📊 DATA USAGE RULES (STRICT)
+
+Use ONLY the provided data:
+- User's business idea & category (context only)
 - Cluster information (clusterId, centroid, business count)
 - Business density & competitor counts
 - Nearby business details
@@ -84,107 +99,102 @@ Use ONLY the provided clustering and business environment data:
 ❌ Do NOT assume missing data
 ❌ Do NOT invent demand, locations, or competitors
 
-CATEGORY SCOPE RULE (MATCHED TO YOUR INPUT)
+🧭 CATEGORY SCOPE (MANDATORY)
 
-Recommendations may come from ANY category:
+Recommendations may come from ANY of the following:
 - Retail
 - Services
 - Food / Beverages
 - Merchandise / Trading
 - Entertainment / Leisure
 
-The user's category must NOT limit recommendations.
-Mix categories if opportunity is stronger outside the user's category.
+🚫 The detected category must NEVER restrict output.
 
------------------------------------
-ZONE NAMING RULES (STRICT):
------------------------------------
-Assign the best cluster EXACTLY ONE of these:
-1. "Commercial Zone"
-2. "Residential Zone"
-3. "Mixed Zone"
+🏙️ ZONE NAMING RULES (STRICT)
+
+Assign ONLY ONE zone type:
+- "Commercial Zone"
+- "Residential Zone"
+- "Mixed Zone"
 
 ❌ Do NOT generate new zone names.
 
------------------------------------
-SCORING RULES (STRICT & DYNAMIC):
------------------------------------
-Each recommended business must receive a UNIQUE score based on:
+🧮 SCORING RULES (STRICT & DYNAMIC)
+
+Each recommended business MUST have:
+- A UNIQUE score (70–100 only)
+- A UNIQUE fitPercentage (70–100 only, different from score)
+
+Score must be based on:
 - Zone compatibility
-- Business density within 50m / 100m / 200m
+- Business density (50m / 100m / 200m)
 - Number of direct competitors
-- Complementary services nearby
-- Supply vs demand gap
+- Complementary businesses nearby
+- Supply vs demand gap (derived ONLY from provided data)
 
-Score Constraints:
-- Score range: 70–100 ONLY
-- No duplicate scores
-- No repeated scoring patterns
+❌ No duplicate scores
+❌ No repeated scoring patterns
 
-FIT PERCENTAGE RULES:
-- Range: 70–100
-- Must be different from score
-- Must logically correlate with score
+🏷️ OPPORTUNITY LEVEL LABEL
 
------------------------------------
-OPPORTUNITY LEVEL LABEL (BUSINESS-FRIENDLY):
------------------------------------
 Assign automatically from score:
+- 90–100 → "Excellent Potential"
+- 80–89 → "Strong Potential"
+- 70–79 → "Moderate Potential"
+- Below 70 → "Limited Potential" (avoid unless extreme competition)
 
-Score 90–100   → "Excellent Potential"
-Score 80–89    → "Strong Potential"
-Score 70–79    → "Moderate Potential"
-Score below 70 → "Limited Potential" (avoid unless extreme competition)
+🎯 CLUSTER CONFIDENCE LABEL
 
------------------------------------
-CONFIDENCE LABEL (CLUSTER LEVEL):
------------------------------------
 Convert confidence % into:
-1–25   → "Not Ideal"
-26–50  → "Could Work"
-51–75  → "Good Choice"
-76–100 → "Best Choice"
+- 1–25 → "Not Ideal"
+- 26–50 → "Could Work"
+- 51–75 → "Good Choice"
+- 76–100 → "Best Choice"
 
------------------------------------
-🆕 RISK LEVEL RULE (NEW):
------------------------------------
-Each recommended business MUST include a riskLevel based on:
-- Market saturation
-- Competition density
-- Operational complexity
-- Dependency on foot traffic or timing
-- Capital sensitivity
+⚠️ RISK LEVEL RULE (MANDATORY)
 
-Allowed Risk Levels (STRICT):
+Each business MUST include ONE risk level:
 - "Low Risk"
 - "Medium Risk"
 - "High Risk"
 
-Risk Logic:
+Risk must logically match:
+- Competition density
+- Market saturation
+- Operational complexity
+- Sensitivity to timing or capital
+
+📌 Logic:
 - High score + low competition → Low Risk
-- Moderate competition or execution complexity → Medium Risk
-- High competition or narrow demand window → High Risk
+- Moderate competition → Medium Risk
+- High competition / narrow demand → High Risk
 
-❌ Do NOT invent custom risk labels
-❌ Risk level must logically match score and competition
+❌ Do NOT invent new risk labels
 
------------------------------------
-TOP 3 BUSINESS RECOMMENDATIONS (REQUIRED):
------------------------------------
+🥇 TOP 3 BUSINESS RECOMMENDATIONS (REQUIRED)
+
 Each recommendation MUST include:
-- name
-- score (unique, 70–100)
-- fitPercentage (unique, 70–100)
-- opportunityLevel
-- riskLevel ✅ (NEW)
-- shortDescription (1–2 simple sentences)
-- fullDetails (simple, friendly explanation)
-- preferredLocation (best spot inside cluster)
-- startupBudget ("PHP xx,xxx - PHP xx,xxx")
-- competitorPresence (simple explanation)
-- businessDensityInsight (crowded vs open)
+{
+  "name": "",
+  "category": "",
+  "score": 0,
+  "fitPercentage": 0,
+  "opportunityLevel": "",
+  "riskLevel": "",
+  "shortDescription": "",
+  "fullDetails": "",
+  "preferredLocation": "",
+  "startupBudget": "PHP xx,xxx - PHP xx,xxx",
+  "competitorPresence": "",
+  "businessDensityInsight": ""
+}
 
-Businesses may belong to different categories.
+📌 Businesses may belong to different categories.
+
+✅ EXPECTED BEHAVIOR (NON-NEGOTIABLE)
+- Recommendations must reflect the overall business ecosystem
+- The AI must break out of the user's category when better opportunities exist
+- Results must be simple, realistic, and business-friendly
 
 -----------------------------------
 JSON OUTPUT FORMAT (REQUIRED):
@@ -202,6 +212,7 @@ Return ONLY valid JSON:
   "topBusinesses": [
     {
       "name": "string",
+      "category": "string",
       "score": number,
       "fitPercentage": number,
       "opportunityLevel": "Excellent Potential" | "Strong Potential" | "Moderate Potential" | "Limited Potential",
@@ -263,7 +274,8 @@ Return ONLY valid JSON in this exact format:
   },
   "topBusinesses": [
     {
-      "name": "Business Name",
+      "name": "Convenience Store",
+      "category": "Retail",
       "score": 94,
       "fitPercentage": 91,
       "opportunityLevel": "Excellent Potential",
@@ -276,7 +288,8 @@ Return ONLY valid JSON in this exact format:
       "businessDensityInsight": "Moderately busy area."
     },
     {
-      "name": "Business Name 2",
+      "name": "Pharmacy",
+      "category": "Services",
       "score": 87,
       "fitPercentage": 84,
       "opportunityLevel": "Strong Potential",
@@ -289,7 +302,8 @@ Return ONLY valid JSON in this exact format:
       "businessDensityInsight": "Density insight."
     },
     {
-      "name": "Business Name 3",
+      "name": "Coffee Shop",
+      "category": "Food / Beverages",
       "score": 76,
       "fitPercentage": 79,
       "opportunityLevel": "Moderate Potential",
@@ -364,6 +378,7 @@ Return ONLY valid JSON in this exact format:
         topBusinesses: [
           {
             name: businessIdea || `${generalCategory || "General"} Business`,
+            category: generalCategory || "Retail",
             score: Math.min(100, Math.max(70, score1 + 10)),
             fitPercentage: Math.min(100, Math.max(70, score1 + 6)),
             opportunityLevel: getOpportunityLevel(Math.max(70, score1 + 10)),
@@ -386,26 +401,28 @@ Return ONLY valid JSON in this exact format:
                 : "Quiet area with room for growth. Building customer base may take time."
           },
           {
-            name: `${generalCategory || "Retail"} Services`,
+            name: "Convenience Store",
+            category: "Retail",
             score: Math.min(100, Math.max(70, score2 + 8)),
             fitPercentage: Math.min(100, Math.max(70, score2 + 5)),
             opportunityLevel: getOpportunityLevel(Math.max(70, score2 + 8)),
             riskLevel: getRiskLevel(Math.max(70, score2 + 8), c100),
             shortDescription: `Works well with the ${b100} businesses already here.`,
-            fullDetails: `This area already has ${b100} businesses within 100 meters. Adding a service business can complement them and benefit from the foot traffic they bring.`,
+            fullDetails: `This area already has ${b100} businesses within 100 meters. Adding a convenience store can complement them and benefit from the foot traffic they bring.`,
             preferredLocation: "Close to existing service businesses for customer convenience.",
             startupBudget: "PHP 50,000 - PHP 120,000",
             competitorPresence: `Complementary to ${b100} nearby businesses. Low direct competition.`,
             businessDensityInsight: `${b100} businesses nearby provide a steady stream of potential customers.`
           },
           {
-            name: "Convenience Store",
+            name: "Pharmacy / Drugstore",
+            category: "Services",
             score: Math.min(100, Math.max(70, score3 + 15)),
             fitPercentage: Math.min(100, Math.max(70, score3 + 12)),
             opportunityLevel: getOpportunityLevel(Math.max(70, score3 + 15)),
             riskLevel: getRiskLevel(Math.max(70, score3 + 15), c200),
-            shortDescription: "Basic needs store that most areas can benefit from.",
-            fullDetails: `A convenience store provides daily essentials that people need. In this ${zoneTypeName}, there is usually steady demand for quick purchases.`,
+            shortDescription: "Essential healthcare service that every community needs.",
+            fullDetails: `A pharmacy provides essential medicines and health products. In this ${zoneTypeName}, there is usually steady demand for healthcare services.`,
             preferredLocation: "Near residential areas or along main walkways for easy access.",
             startupBudget: "PHP 100,000 - PHP 250,000",
             competitorPresence: "Essential services are always needed. Some competition acceptable.",
