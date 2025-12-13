@@ -251,7 +251,7 @@ function calculateOpportunityScore(
   else if (zone.includes("mixed")) score += 10;
   else if (zone.includes("residential")) score += 5;
 
-  // Density bonus (higher density = more foot traffic)
+  // Density bonus (higher density = more accessibility)
   if (density >= 15) score += 15;
   else if (density >= 8) score += 10;
   else if (density >= 3) score += 5;
@@ -595,7 +595,7 @@ function calculatePredictiveScore(
   const minCompetitors = Math.min(...competitors);
   const maxCompetitors = Math.max(...competitors);
 
-  // 1. Density Score (higher density = higher foot traffic = better)
+  // 1. Density Score (higher density = higher accessibility = better)
   const densityScore = normalize(loc.business_density_200m, minDensity, maxDensity);
 
   // 2. Competition Score (lower = better, so invert)
@@ -609,13 +609,11 @@ function calculatePredictiveScore(
     competitionScore = 0.5 + competitionScore * 0.5; // Be lenient
   }
 
-  // 3. Zone Score (Commercial > Mixed > Residential)
+  // 3. Zone Score (Commercial > Residential)
   let zoneScore = 0.5;
   const zone = loc.zone_type?.toLowerCase() || "";
   if (zone === "commercial") {
     zoneScore = 1.0;
-  } else if (zone === "mixed") {
-    zoneScore = 0.7;
   } else if (zone === "residential") {
     zoneScore = 0.4;
   }
@@ -961,7 +959,7 @@ function generateClusterInsights(kpis: ClusterKPIs, locations: LocationData[]): 
   if (kpis.highestDensityCluster && kpis.highestDensityCluster.avgDensity > 0) {
     const denseLocs = locations.filter(loc => loc.cluster === kpis.highestDensityCluster?.clusterId);
     const denseStreet = denseLocs[0]?.street || `Cluster ${kpis.highestDensityCluster.clusterId}`;
-    insights.push(`Highest activity: Near ${denseStreet} — ${kpis.highestDensityCluster.avgDensity} businesses nearby (high traffic zone)`);
+    insights.push(`Highest activity: Near ${denseStreet} — ${kpis.highestDensityCluster.avgDensity} businesses nearby (high accessibility zone)`);
   }
 
   // 7. CATEGORY DIVERSITY check
@@ -1713,7 +1711,7 @@ export function OpportunitiesPage() {
       // Location fit
       const locationFit = aiTop.preferredLocation
         ? `This location suits ${aiTop.name} because ${aiTop.preferredLocation.toLowerCase()}.`
-        : `This area has good foot traffic and visibility for ${aiTop.name}.`;
+        : `This area has good accessibility and visibility for ${aiTop.name}.`;
 
       return {
         name: aiTop.name,
@@ -3703,7 +3701,7 @@ export function OpportunitiesPage() {
                             <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
                               <p className="text-sm text-gray-700">
                                 <AlertTriangle className="w-4 h-4 text-amber-500 inline mr-2" />
-                                Morning hours may be slower for customer traffic
+                                Morning hours may be slower for customer activity
                               </p>
                             </div>
                           </>
