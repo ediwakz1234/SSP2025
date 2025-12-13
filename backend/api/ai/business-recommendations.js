@@ -62,7 +62,7 @@ export default async function handler(req, res) {
 
     // Cluster analytics
     const clusterProfile = clusterAnalytics?.clusterProfile || "Unknown";
-    const dominantCategory = clusterAnalytics?.dominantCategory || generalCategory || "Mixed";
+    const dominantCategory = clusterAnalytics?.dominantCategory || generalCategory || "General";
     const totalBusinesses = clusterAnalytics?.totalBusinesses ?? nearbyBusinesses?.length ?? 0;
 
     // Build comprehensive system prompt
@@ -112,10 +112,26 @@ Use ONLY the provided data:
 - Direct competitors
 - Zone type
 - Opportunity level
+- Accessibility (based on road proximity)
 
 ❌ Do NOT assume foot traffic
 ❌ Do NOT assume population
 ❌ Do NOT invent demand, locations, or competitors
+
+🚗 ACCESSIBILITY PROXY (REPLACES FOOT TRAFFIC)
+
+Use business density and road proximity as accessibility proxy:
+- High density (10+ businesses) = High Accessibility
+- Medium density (5-9 businesses) = Medium Accessibility
+- Low density (<5 businesses) = Low Accessibility
+
+Required explanation format:
+"Accessibility is based on business density and road proximity.
+Areas with more businesses are typically closer to main roads
+and easier for customers to access."
+
+❌ Do NOT use "foot traffic" terminology
+✅ Use "accessibility", "customer flow", or "customer reach" instead
 
 🏙️ ZONE NAMING RULES (STRICT)
 
@@ -123,6 +139,7 @@ Assign ONLY ONE of the following:
 - "Commercial Zone"
 - "Residential Zone"
 
+❌ Do NOT use "Mixed Zone"
 ❌ Do NOT generate new zone names
 
 🧮 SCORING RULES (STRICT)
@@ -450,7 +467,7 @@ Return ONLY valid JSON in this exact format:
               ? "No direct competitors found within 50 meters. Excellent opportunity."
               : `${c50} similar businesses within 50 meters. Moderate competition.`,
             businessDensityInsight: b100 >= 10
-              ? "Busy area with many businesses. High foot traffic expected."
+              ? "Busy area with many businesses. High accessibility and customer flow expected."
               : b100 >= 5
                 ? "Moderately active area with steady customer flow."
                 : "Quiet area with room for growth. Building customer base may take time."
@@ -463,7 +480,7 @@ Return ONLY valid JSON in this exact format:
             opportunityLevel: getOpportunityLevel(Math.max(70, score2 + 8)),
             riskLevel: getRiskLevel(Math.max(70, score2 + 8), c100),
             shortDescription: `Works well with the ${b100} businesses already here.`,
-            fullDetails: `This area already has ${b100} businesses within 100 meters. Adding a convenience store can complement them and benefit from the foot traffic they bring.`,
+            fullDetails: `This area already has ${b100} businesses within 100 meters. Adding a convenience store can complement them and benefit from the customer flow they bring.`,
             preferredLocation: "Close to existing service businesses for customer convenience.",
             startupBudget: "PHP 50,000 - PHP 120,000",
             competitorPresence: `Complementary to ${b100} nearby businesses. Low direct competition.`,
