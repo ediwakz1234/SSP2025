@@ -108,12 +108,30 @@ function generateTimePeriodGap(
 ): TimePeriodGap {
     const { businessCount, mainCategories, demandScore, operatingHours } = metrics;
 
-    // Determine if this period is well covered
+    // ZERO-DATA GUARD: If businessCount is 0, return "Insufficient Activity Data" instead of "Gap Identified"
+    if (businessCount === 0) {
+        return {
+            period: periodLabel,
+            status: "No Data Available",
+            statusColor: "gray",
+            summary: `Insufficient data to analyze ${periodType} coverage. No active businesses detected in this period.`,
+            details: {
+                businessCount: 0,
+                mainCategories: [],
+                averageDemandScore: 0,
+                typicalHours: "—",
+            },
+            insight: "Run clustering with more business data to generate accurate coverage insights.",
+            reason: "No active businesses detected during this time period.",
+        };
+    }
+
+    // Determine if this period is well covered (only if we have data)
     const isWellCovered = businessCount >= COVERAGE_THRESHOLDS.minBusinessCount &&
         demandScore >= COVERAGE_THRESHOLDS.minDemandScore;
 
-    const status: "Well Covered" | "Gap Identified" = isWellCovered ? "Well Covered" : "Gap Identified";
-    const statusColor: "green" | "red" = isWellCovered ? "green" : "red";
+    const status: "Well Covered" | "Gap Identified" | "No Data Available" = isWellCovered ? "Well Covered" : "Gap Identified";
+    const statusColor: "green" | "red" | "gray" = isWellCovered ? "green" : "red";
 
     // Generate human-readable summary
     const summary = isWellCovered
