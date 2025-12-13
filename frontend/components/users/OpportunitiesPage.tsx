@@ -1407,33 +1407,61 @@ export function OpportunitiesPage() {
         opportunityFocusWhy: "",
         areaReadiness: "N/A" as const,
         areaReadinessWhy: "",
+        // New AI-powered fields
+        marketSaturationPercent: 0,
+        marketSaturationStatus: "N/A" as const,
+        ideaFitScore: 0,
+        ideaFitLabel: "N/A" as const,
+        riskLevel: "N/A" as const,
+        setupDifficulty: "N/A" as const,
+        suggestedAdjustments: "",
+        aiSummary: "",
       };
     }
 
+    // Use AI marketOverview and ideaFit if available
+    const aiMarket = aiRecommendations?.marketOverview;
+    const aiIdea = aiRecommendations?.ideaFit;
+
+    // Calculate fallback values
     const avgScore = opportunities.length > 0
       ? Math.round(opportunities.reduce((s, o) => s + o.score, 0) / opportunities.length)
       : 0;
-
     const avgDensity = clusterKPIs.avgBusinessDensity;
     const avgComp = clusterKPIs.avgCompetition;
     const category = businessType || "General Business";
+    const commercialRatio = clusterKPIs.commercialZoneCount / Math.max(1, clusterKPIs.totalOpportunities);
+    const residentialRatio = clusterKPIs.residentialZoneCount / Math.max(1, clusterKPIs.totalOpportunities);
+
+    // Use AI score if available, otherwise calculate
+    const overallScore = aiMarket?.overallScore ?? avgScore;
 
     // Generate score explanation
-    let overallScoreWhy = "";
-    if (avgScore >= 70) {
-      overallScoreWhy = `Strong demand for ${category.toLowerCase()} with limited competition nearby.`;
-    } else if (avgScore >= 50) {
-      overallScoreWhy = `Demand exists for ${category.toLowerCase()}, but similar businesses are already present nearby.`;
+    let overallScoreWhy = aiMarket?.summary || "";
+    if (!overallScoreWhy) {
+      if (overallScore >= 70) {
+        overallScoreWhy = `Strong demand for ${category.toLowerCase()} with limited competition nearby.`;
+      } else if (overallScore >= 50) {
+        overallScoreWhy = `Demand exists for ${category.toLowerCase()}, but similar businesses are already present nearby.`;
+      } else {
+        overallScoreWhy = `The area has moderate demand, but competition is higher than average.`;
+      }
+    }
+
+    // Use AI competition level if available
+    const competitionLevel = (aiMarket?.competitionLevel as "Low" | "Medium" | "High" | "N/A") ?? getCompetitionLevel(avgComp);
+    let competitionLevelWhy = "";
+    if (competitionLevel === "Low") {
+      competitionLevelWhy = "Few similar businesses operate in this area, giving you an advantage.";
+    } else if (competitionLevel === "Medium") {
+      competitionLevelWhy = "Several businesses in the same category operate within the area.";
     } else {
-      overallScoreWhy = `The area has moderate demand, but competition is higher than average.`;
+      competitionLevelWhy = "Many competitors are already established in this location.";
     }
 
     // Determine best operating time from zone and category analysis
     let operatingTime: "Day" | "Evening" | "Both" | "N/A" = "Both";
     let operatingTimeWhy = "";
-    const commercialRatio = clusterKPIs.commercialZoneCount / Math.max(1, clusterKPIs.totalOpportunities);
-    const residentialRatio = clusterKPIs.residentialZoneCount / Math.max(1, clusterKPIs.totalOpportunities);
-
     if (commercialRatio > 0.7) {
       operatingTime = "Both";
       operatingTimeWhy = "Customer activity is spread across morning and evening based on clustering data.";
@@ -1447,8 +1475,11 @@ export function OpportunitiesPage() {
       operatingTimeWhy = "Customer activity is spread across morning and evening based on clustering data.";
     }
 
-    // Determine setup speed based on category
-    const setupSpeed = determineSetupSpeed(businessType);
+    // Use AI setup difficulty if available, otherwise determine from category
+    const setupSpeed = aiIdea?.setupDifficulty === "Easy" ? "Fast" as const :
+      aiIdea?.setupDifficulty === "Complex" ? "Slow" as const :
+        aiIdea?.setupDifficulty === "Moderate" ? "Moderate" as const :
+          determineSetupSpeed(businessType);
     let setupSpeedWhy = "";
     if (setupSpeed === "Fast") {
       setupSpeedWhy = `${category} businesses require less space and lower setup time based on local patterns.`;
@@ -1456,17 +1487,6 @@ export function OpportunitiesPage() {
       setupSpeedWhy = `${category} businesses need moderate preparation time for equipment and permits.`;
     } else {
       setupSpeedWhy = `${category} businesses typically need longer setup time for proper establishment.`;
-    }
-
-    // Determine competition level
-    const competitionLevel = getCompetitionLevel(avgComp);
-    let competitionLevelWhy = "";
-    if (competitionLevel === "Low") {
-      competitionLevelWhy = "Few similar businesses operate in this area, giving you an advantage.";
-    } else if (competitionLevel === "Medium") {
-      competitionLevelWhy = "Several businesses in the same category operate within the area.";
-    } else {
-      competitionLevelWhy = "Many competitors are already established in this location.";
     }
 
     // Determine opportunity focus based on operating time and setup speed
@@ -1491,22 +1511,32 @@ export function OpportunitiesPage() {
       opportunityFocusWhy = "This location offers balanced opportunities for various business approaches.";
     }
 
-    // Determine area readiness level
-    let areaReadiness: "High" | "Medium" | "Low" | "N/A" = "Medium";
+    // Use AI area readiness if available
+    const areaReadiness = (aiMarket?.areaReadiness as "High" | "Medium" | "Low" | "N/A") ??
+      (overallScore >= 70 && commercialRatio > 0.4 ? "High" :
+        overallScore < 50 || commercialRatio < 0.2 ? "Low" : "Medium");
     let areaReadinessWhy = "";
-    if (avgScore >= 70 && commercialRatio > 0.4) {
-      areaReadiness = "High";
+    if (areaReadiness === "High") {
       areaReadinessWhy = "The area is well-developed with good infrastructure for your business type.";
-    } else if (avgScore < 50 || commercialRatio < 0.2) {
-      areaReadiness = "Low";
+    } else if (areaReadiness === "Low") {
       areaReadinessWhy = "The area may need more development before it fully supports your business.";
     } else {
       areaReadinessWhy = "The area supports the business type but may need minor preparation.";
     }
 
+    // Get AI-specific values
+    const marketSaturationPercent = aiMarket?.marketSaturationPercent ?? 0;
+    const marketSaturationStatus = (aiMarket?.marketSaturationStatus as "Good Opportunity" | "Needs Strategic Planning" | "Highly Saturated" | "N/A") ?? "N/A";
+    const ideaFitScore = aiIdea?.ideaFitScore ?? 0;
+    const ideaFitLabel = (aiIdea?.fitLabel as "Highly Recommended" | "Good Choice" | "Fair Option" | "N/A") ?? "N/A";
+    const riskLevel = (aiIdea?.riskLevel as "Low Risk" | "Medium Risk" | "High Risk" | "N/A") ?? "N/A";
+    const setupDifficulty = (aiIdea?.setupDifficulty as "Easy" | "Moderate" | "Complex" | "N/A") ?? "N/A";
+    const suggestedAdjustments = aiIdea?.suggestedAdjustments ?? "";
+    const aiSummary = aiMarket?.summary ?? "";
+
     return {
       category,
-      overallScore: avgScore,
+      overallScore,
       overallScoreWhy,
       operatingTime,
       operatingTimeWhy,
@@ -1514,13 +1544,22 @@ export function OpportunitiesPage() {
       setupSpeedWhy,
       competitionLevel,
       competitionLevelWhy,
-      status: getStatusFromScore(avgScore),
+      status: getStatusFromScore(overallScore),
       opportunityFocus,
       opportunityFocusWhy,
       areaReadiness,
       areaReadinessWhy,
+      // New AI-powered fields
+      marketSaturationPercent,
+      marketSaturationStatus,
+      ideaFitScore,
+      ideaFitLabel,
+      riskLevel,
+      setupDifficulty,
+      suggestedAdjustments,
+      aiSummary,
     };
-  }, [opportunities, clusterKPIs, businessType, hasClusteringResults]);
+  }, [opportunities, clusterKPIs, businessType, hasClusteringResults, aiRecommendations]);
 
   // Group opportunities by category for the Opportunities tab
   const opportunitiesByCategory = useMemo(() => {
@@ -2424,6 +2463,120 @@ export function OpportunitiesPage() {
               </CardContent>
             </Card>
           </div>
+
+          {/* AI-Powered Dual-View Section */}
+          {hasClusteringResults && aiRecommendations?.marketOverview && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-500" />
+                AI Market Analysis
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Market Saturation */}
+                <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all hover:scale-[1.02]">
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`p-2 rounded-lg text-white ${overviewSummary.marketSaturationStatus === "Good Opportunity" ? "bg-gradient-to-br from-emerald-500 to-green-600" :
+                          overviewSummary.marketSaturationStatus === "Needs Strategic Planning" ? "bg-gradient-to-br from-amber-500 to-yellow-600" :
+                            "bg-gradient-to-br from-rose-500 to-red-600"
+                        }`}>
+                        <Activity className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-600">Market Saturation</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-800">
+                      {overviewSummary.marketSaturationPercent}%
+                    </div>
+                    <Badge className={`mt-1 ${overviewSummary.marketSaturationStatus === "Good Opportunity" ? "bg-emerald-100 text-emerald-700" :
+                        overviewSummary.marketSaturationStatus === "Needs Strategic Planning" ? "bg-amber-100 text-amber-700" :
+                          "bg-rose-100 text-rose-700"
+                      }`}>
+                      {overviewSummary.marketSaturationStatus !== "N/A" ? overviewSummary.marketSaturationStatus : "—"}
+                    </Badge>
+                    <p className="text-xs text-gray-400 mt-2">
+                      {overviewSummary.marketSaturationStatus === "Good Opportunity"
+                        ? "Low competition — ideal for new business"
+                        : overviewSummary.marketSaturationStatus === "Needs Strategic Planning"
+                          ? "Moderate — differentiation needed"
+                          : "High competition — requires strong advantage"}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Idea Fit Score */}
+                <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all hover:scale-[1.02]">
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`p-2 rounded-lg text-white ${overviewSummary.ideaFitLabel === "Highly Recommended" ? "bg-gradient-to-br from-emerald-500 to-green-600" :
+                          overviewSummary.ideaFitLabel === "Good Choice" ? "bg-gradient-to-br from-blue-500 to-indigo-600" :
+                            "bg-gradient-to-br from-amber-500 to-orange-600"
+                        }`}>
+                        <Lightbulb className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-600">Your Idea Fit</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-800">
+                      {overviewSummary.ideaFitScore > 0 ? `${overviewSummary.ideaFitScore}%` : "—"}
+                    </div>
+                    {overviewSummary.ideaFitLabel !== "N/A" && (
+                      <Badge className={`mt-1 ${overviewSummary.ideaFitLabel === "Highly Recommended" ? "bg-emerald-100 text-emerald-700" :
+                          overviewSummary.ideaFitLabel === "Good Choice" ? "bg-blue-100 text-blue-700" :
+                            "bg-amber-100 text-amber-700"
+                        }`}>
+                        {overviewSummary.ideaFitLabel}
+                      </Badge>
+                    )}
+                    <p className="text-xs text-gray-400 mt-2">How well your business idea fits this location</p>
+                  </CardContent>
+                </Card>
+
+                {/* Risk Level */}
+                <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all hover:scale-[1.02]">
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`p-2 rounded-lg text-white ${overviewSummary.riskLevel === "Low Risk" ? "bg-gradient-to-br from-emerald-500 to-green-600" :
+                          overviewSummary.riskLevel === "Medium Risk" ? "bg-gradient-to-br from-amber-500 to-yellow-600" :
+                            "bg-gradient-to-br from-rose-500 to-red-600"
+                        }`}>
+                        <AlertTriangle className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-600">Risk Level</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-800">
+                      {overviewSummary.riskLevel !== "N/A" ? overviewSummary.riskLevel : "—"}
+                    </div>
+                    {overviewSummary.riskLevel !== "N/A" && (
+                      <Badge className={`mt-1 ${overviewSummary.riskLevel === "Low Risk" ? "bg-emerald-100 text-emerald-700" :
+                          overviewSummary.riskLevel === "Medium Risk" ? "bg-amber-100 text-amber-700" :
+                            "bg-rose-100 text-rose-700"
+                        }`}>
+                        {overviewSummary.riskLevel === "Low Risk" ? "Safe investment" :
+                          overviewSummary.riskLevel === "Medium Risk" ? "Manageable risk" : "Proceed with caution"}
+                      </Badge>
+                    )}
+                    <p className="text-xs text-gray-400 mt-2">Based on competition and market conditions</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* AI Suggestion Box */}
+              {overviewSummary.suggestedAdjustments && (
+                <Card className="mt-4 border-0 shadow-lg bg-gradient-to-r from-blue-50 to-indigo-50">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg text-white shrink-0">
+                        <Sparkles className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-800 mb-1">AI Suggestion</h4>
+                        <p className="text-sm text-gray-600">{overviewSummary.suggestedAdjustments}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
         </TabsContent>
 
 
