@@ -2636,1008 +2636,1038 @@ export function OpportunitiesPage() {
 
         {/* OPPORTUNITIES TAB */}
         <TabsContent value="opportunities" className="space-y-6">
-          {/* Header with Export */}
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800">Ranked Business Opportunities</h2>
-              <p className="text-gray-500 mt-1">Business types ranked from highest to lowest opportunity score</p>
-            </div>
-            <Button
-              onClick={() => setShowExportModal(true)}
-              className="flex items-center gap-2 px-6 py-3 h-12 bg-linear-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl shadow-lg shadow-blue-200 transition-all hover:scale-[1.02]"
-            >
-              <FileDown className="w-5 h-5" />
-              Export Report
-            </Button>
-          </div>
-
-          {/* Your Preferences Panel */}
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm overflow-hidden">
-            <CardHeader
-              className="bg-linear-to-r from-indigo-50 to-purple-50 border-b cursor-pointer hover:bg-linear-to-r hover:from-indigo-100 hover:to-purple-100 transition-all"
-              onClick={() => setShowPreferencesModal(!showPreferencesModal)}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl text-white shadow-lg shadow-indigo-200">
-                    <Zap className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Your Preferences</CardTitle>
-                    <p className="text-sm text-gray-500">
-                      {appliedPreferences ? "Preferences applied – opportunities ranked by your fit" : "Set your preferences to find the best opportunities for you"}
-                    </p>
-                  </div>
+          {/* Empty State - No Clustering */}
+          {!hasClusteringResults ? (
+            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+              <CardContent className="p-12 text-center">
+                <div className="p-4 bg-amber-100 rounded-full w-fit mx-auto mb-4">
+                  <AlertCircle className="w-8 h-8 text-amber-600" />
                 </div>
-                <div className="flex items-center gap-2">
-                  {appliedPreferences && (
-                    <Badge className="bg-emerald-100 text-emerald-700 border-0">
-                      <CheckCircle2 className="w-3 h-3 mr-1" />
-                      Applied
-                    </Badge>
-                  )}
-                  <div className={`transition-transform ${showPreferencesModal ? "rotate-180" : ""}`}>
-                    <TrendingUp className="w-5 h-5 text-gray-400" />
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-
-            {showPreferencesModal && (
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {/* Operating Time */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <Clock className="w-4 h-4 inline mr-1" />
-                      Preferred Operating Time
-                    </label>
-                    <select
-                      value={preferences.businessType.includes("Evening") ? "Evening" : preferences.businessType.includes("Day") ? "Day" : "Both"}
-                      onChange={(e) => setPreferences({ ...preferences, businessType: e.target.value })}
-                      className="w-full p-3 border rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    >
-                      <option value="Both">All Day (Flexible)</option>
-                      <option value="Day">Daytime Only</option>
-                      <option value="Evening">Evening / Night</option>
-                    </select>
-                  </div>
-
-                  {/* Setup Speed */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <Rocket className="w-4 h-4 inline mr-1" />
-                      Desired Setup Speed
-                    </label>
-                    <select
-                      value={preferences.competitorTolerance === "Low" ? "Fast" : preferences.competitorTolerance === "High" ? "Slow" : "Moderate"}
-                      onChange={(e) => {
-                        const speed = e.target.value;
-                        setPreferences({ ...preferences, competitorTolerance: speed === "Fast" ? "Low" : speed === "Slow" ? "High" : "Medium" });
-                      }}
-                      className="w-full p-3 border rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    >
-                      <option value="Fast">Fast (Quick Start)</option>
-                      <option value="Moderate">Moderate</option>
-                      <option value="Slow">Slow (Complex Setup)</option>
-                    </select>
-                  </div>
-
-                  {/* Risk Tolerance */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <AlertTriangle className="w-4 h-4 inline mr-1" />
-                      Risk Tolerance
-                    </label>
-                    <select
-                      value={preferences.customerPriority < 40 ? "Low" : preferences.customerPriority > 60 ? "High" : "Medium"}
-                      onChange={(e) => {
-                        const risk = e.target.value;
-                        setPreferences({ ...preferences, customerPriority: risk === "Low" ? 30 : risk === "High" ? 80 : 50 });
-                      }}
-                      className="w-full p-3 border rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    >
-                      <option value="Low">Low Risk (Safe Choices)</option>
-                      <option value="Medium">Medium Risk</option>
-                      <option value="High">High Risk (Higher Reward)</option>
-                    </select>
-                  </div>
-
-                  {/* Business Size */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <Building2 className="w-4 h-4 inline mr-1" />
-                      Business Size Preference
-                    </label>
-                    <select
-                      value={preferences.startupCapital < 50000 ? "Small" : preferences.startupCapital > 150000 ? "Large" : "Medium"}
-                      onChange={(e) => {
-                        const size = e.target.value;
-                        setPreferences({ ...preferences, startupCapital: size === "Small" ? 30000 : size === "Large" ? 200000 : 100000 });
-                      }}
-                      className="w-full p-3 border rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    >
-                      <option value="Small">Small (Home-based / Kiosk)</option>
-                      <option value="Medium">Medium (Storefront)</option>
-                      <option value="Large">Large (Full Establishment)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between mt-6 pt-4 border-t">
-                  <p className="text-sm text-gray-500">
-                    Preferences will re-rank opportunities to show your best matches first.
-                  </p>
-                  <div className="flex gap-3">
-                    {appliedPreferences && (
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setAppliedPreferences(null);
-                          setPreferences(DEFAULT_PREFERENCES);
-                        }}
-                        className="rounded-xl"
-                      >
-                        Clear Preferences
-                      </Button>
-                    )}
-                    <Button
-                      onClick={() => {
-                        setAppliedPreferences(preferences);
-                        setShowPreferencesModal(false);
-                      }}
-                      className="bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl shadow-lg"
-                    >
-                      <CheckCircle2 className="w-4 h-4 mr-2" />
-                      Apply Preferences
-                    </Button>
-                  </div>
-                </div>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">No opportunities detected yet</h3>
+                <p className="text-gray-500">Run clustering to identify opportunities.</p>
               </CardContent>
-            )}
-          </Card>
+            </Card>
+          ) : (
+            <>
+              {/* Header with Export */}
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">Ranked Business Opportunities</h2>
+                  <p className="text-gray-500 mt-1">Business types ranked from highest to lowest opportunity score</p>
+                </div>
+                <Button
+                  onClick={() => setShowExportModal(true)}
+                  className="flex items-center gap-2 px-6 py-3 h-12 bg-linear-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl shadow-lg shadow-blue-200 transition-all hover:scale-[1.02]"
+                >
+                  <FileDown className="w-5 h-5" />
+                  Export Report
+                </Button>
+              </div>
 
-          {/* Best Match Explanation - Shown when preferences are applied */}
-          {appliedPreferences && topOpportunity && (
-            <Card className="border-0 shadow-xl bg-linear-to-r from-emerald-50 to-teal-50 overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-linear-to-br from-emerald-500 to-teal-600 rounded-xl text-white shadow-lg">
-                    <Sparkles className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-800 mb-2">
-                      Best Match: {topOpportunity.name}
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      This opportunity matches your preference for {
-                        preferences.competitorTolerance === "Low" ? "quick setup" :
-                          preferences.competitorTolerance === "High" ? "thorough preparation" : "balanced setup"
-                      } and {
-                        preferences.businessType.includes("Evening") ? "evening operation" :
-                          preferences.businessType.includes("Day") ? "daytime operation" : "flexible all-day operation"
-                      }, with {
-                        topOpportunity.competitionLevel.toLowerCase()
-                      } competition and {
-                        topOpportunity.operatingTime === "Both" ? "steady all-day" :
-                          topOpportunity.operatingTime === "Evening" ? "evening-focused" : "daytime"
-                      } demand.
-                    </p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      <div className="p-3 bg-white rounded-lg border">
-                        <p className="text-xs text-gray-500 mb-1">Match Score</p>
-                        <p className="font-bold text-emerald-600">{topOpportunity.score}%</p>
+              {/* Your Preferences Panel */}
+              <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm overflow-hidden">
+                <CardHeader
+                  className="bg-linear-to-r from-indigo-50 to-purple-50 border-b cursor-pointer hover:bg-linear-to-r hover:from-indigo-100 hover:to-purple-100 transition-all"
+                  onClick={() => setShowPreferencesModal(!showPreferencesModal)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl text-white shadow-lg shadow-indigo-200">
+                        <Zap className="w-5 h-5" />
                       </div>
-                      <div className="p-3 bg-white rounded-lg border">
-                        <p className="text-xs text-gray-500 mb-1">Best Time</p>
-                        <p className="font-semibold text-gray-700">{topOpportunity.operatingTime}</p>
-                      </div>
-                      <div className="p-3 bg-white rounded-lg border">
-                        <p className="text-xs text-gray-500 mb-1">Setup Speed</p>
-                        <p className="font-semibold text-gray-700">{topOpportunity.setupSpeed}</p>
-                      </div>
-                      <div className="p-3 bg-white rounded-lg border">
-                        <p className="text-xs text-gray-500 mb-1">Risk Level</p>
-                        <p className={`font-semibold ${topOpportunity.competitionLevel === "Low" ? "text-emerald-600" : topOpportunity.competitionLevel === "Medium" ? "text-amber-600" : "text-rose-600"}`}>
-                          {topOpportunity.competitionLevel === "Low" ? "Low Risk" : topOpportunity.competitionLevel === "Medium" ? "Medium Risk" : "Higher Risk"}
+                      <div>
+                        <CardTitle className="text-lg">Your Preferences</CardTitle>
+                        <p className="text-sm text-gray-500">
+                          {appliedPreferences ? "Preferences applied – opportunities ranked by your fit" : "Set your preferences to find the best opportunities for you"}
                         </p>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Export Modal (PDF and Excel only) */}
-          {openExportModal && (
-            <>
-              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
-              <div className="fixed z-50 bg-white p-8 rounded-2xl shadow-2xl w-[420px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <h2 className="text-xl font-bold mb-1">Export Report</h2>
-                <p className="text-sm text-gray-500 mb-6">
-                  Choose a file format. PDF includes charts and insights.
-                </p>
-
-                <div className="space-y-3">
-                  <Button
-                    variant="outline"
-                    className="w-full h-14 flex justify-start gap-3 rounded-xl hover:bg-red-50 hover:border-red-300 transition-all"
-                    onClick={exportPDF}
-                  >
-                    <div className="p-2 bg-red-100 rounded-lg">
-                      <FileText className="w-5 h-5 text-red-600" />
-                    </div>
-                    <div className="text-left">
-                      <span className="font-medium block">Export as PDF</span>
-                      <span className="text-xs text-gray-500">Dashboard, charts, insights</span>
-                    </div>
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    className="w-full h-14 flex justify-start gap-3 rounded-xl hover:bg-green-50 hover:border-green-300 transition-all"
-                    onClick={exportExcel}
-                  >
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <FileType className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div className="text-left">
-                      <span className="font-medium block">Export as Excel</span>
-                      <span className="text-xs text-gray-500">3 sheets: Clusters, Raw Data, Insights</span>
-                    </div>
-                  </Button>
-                </div>
-
-                <Button
-                  className="w-full mt-6 h-12 bg-linear-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white rounded-xl"
-                  onClick={() => setOpenExportModal(false)}
-                >
-                  Close
-                </Button>
-              </div>
-            </>
-          )}
-
-          {/* Top Opportunity – Details */}
-          {topOpportunity && (
-            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-              <CardHeader className="bg-linear-to-r from-emerald-50 to-teal-50 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-linear-to-br from-emerald-500 to-teal-600 rounded-xl text-white shadow-lg shadow-emerald-200">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl">Top Opportunity – Details</CardTitle>
-                    <p className="text-sm text-gray-500">Your best business opportunity based on location analysis</p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                {/* Main content */}
-                <div className="flex items-start justify-between flex-wrap gap-6">
-                  {/* Left side - Business info */}
-                  <div className="flex-1 min-w-[280px]">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className={`flex items-center justify-center w-12 h-12 rounded-xl text-white font-bold shadow-lg ${topOpportunity.status === "Strong" ? "bg-linear-to-br from-emerald-500 to-green-600" : topOpportunity.status === "Good" ? "bg-linear-to-br from-blue-500 to-indigo-600" : "bg-linear-to-br from-amber-500 to-orange-600"}`}>
-                        #1
+                    <div className="flex items-center gap-2">
+                      {appliedPreferences && (
+                        <Badge className="bg-emerald-100 text-emerald-700 border-0">
+                          <CheckCircle2 className="w-3 h-3 mr-1" />
+                          Applied
+                        </Badge>
+                      )}
+                      <div className={`transition-transform ${showPreferencesModal ? "rotate-180" : ""}`}>
+                        <TrendingUp className="w-5 h-5 text-gray-400" />
                       </div>
+                    </div>
+                  </div>
+                </CardHeader>
+
+                {showPreferencesModal && (
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {/* Operating Time */}
                       <div>
-                        <h3 className="text-xl font-bold text-gray-800">{topOpportunity.name}</h3>
-                        <p className="text-sm text-gray-500">{topOpportunity.description}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <Clock className="w-4 h-4 inline mr-1" />
+                          Preferred Operating Time
+                        </label>
+                        <select
+                          value={preferences.businessType.includes("Evening") ? "Evening" : preferences.businessType.includes("Day") ? "Day" : "Both"}
+                          onChange={(e) => setPreferences({ ...preferences, businessType: e.target.value })}
+                          className="w-full p-3 border rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                          <option value="Both">All Day (Flexible)</option>
+                          <option value="Day">Daytime Only</option>
+                          <option value="Evening">Evening / Night</option>
+                        </select>
+                      </div>
+
+                      {/* Setup Speed */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <Rocket className="w-4 h-4 inline mr-1" />
+                          Desired Setup Speed
+                        </label>
+                        <select
+                          value={preferences.competitorTolerance === "Low" ? "Fast" : preferences.competitorTolerance === "High" ? "Slow" : "Moderate"}
+                          onChange={(e) => {
+                            const speed = e.target.value;
+                            setPreferences({ ...preferences, competitorTolerance: speed === "Fast" ? "Low" : speed === "Slow" ? "High" : "Medium" });
+                          }}
+                          className="w-full p-3 border rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                          <option value="Fast">Fast (Quick Start)</option>
+                          <option value="Moderate">Moderate</option>
+                          <option value="Slow">Slow (Complex Setup)</option>
+                        </select>
+                      </div>
+
+                      {/* Risk Tolerance */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <AlertTriangle className="w-4 h-4 inline mr-1" />
+                          Risk Tolerance
+                        </label>
+                        <select
+                          value={preferences.customerPriority < 40 ? "Low" : preferences.customerPriority > 60 ? "High" : "Medium"}
+                          onChange={(e) => {
+                            const risk = e.target.value;
+                            setPreferences({ ...preferences, customerPriority: risk === "Low" ? 30 : risk === "High" ? 80 : 50 });
+                          }}
+                          className="w-full p-3 border rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                          <option value="Low">Low Risk (Safe Choices)</option>
+                          <option value="Medium">Medium Risk</option>
+                          <option value="High">High Risk (Higher Reward)</option>
+                        </select>
+                      </div>
+
+                      {/* Business Size */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <Building2 className="w-4 h-4 inline mr-1" />
+                          Business Size Preference
+                        </label>
+                        <select
+                          value={preferences.startupCapital < 50000 ? "Small" : preferences.startupCapital > 150000 ? "Large" : "Medium"}
+                          onChange={(e) => {
+                            const size = e.target.value;
+                            setPreferences({ ...preferences, startupCapital: size === "Small" ? 30000 : size === "Large" ? 200000 : 100000 });
+                          }}
+                          className="w-full p-3 border rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                          <option value="Small">Small (Home-based / Kiosk)</option>
+                          <option value="Medium">Medium (Storefront)</option>
+                          <option value="Large">Large (Full Establishment)</option>
+                        </select>
                       </div>
                     </div>
 
-                    {/* Why It Stands Out */}
-                    <div className="p-4 rounded-xl bg-linear-to-r from-amber-50 to-orange-50 border border-amber-100 mb-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Lightbulb className="w-5 h-5 text-amber-600" />
-                        <span className="font-semibold text-gray-700">Why This Stands Out</span>
-                      </div>
-                      <p className="text-gray-600">{topOpportunity.whyStandsOut}</p>
-                    </div>
-
-                    {/* Quick Stats Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      <div className="p-3 rounded-lg bg-gray-50 border">
-                        <div className="flex items-center gap-2 mb-1">
-                          {topOpportunity.operatingTime === "Day" ? <Sun className="w-4 h-4 text-amber-500" /> :
-                            topOpportunity.operatingTime === "Evening" ? <Moon className="w-4 h-4 text-indigo-500" /> :
-                              <Clock className="w-4 h-4 text-blue-500" />}
-                          <span className="text-xs text-gray-500">Best Time</span>
-                        </div>
-                        <span className="font-semibold text-gray-700">{topOpportunity.operatingTime}</span>
-                      </div>
-
-                      <div className="p-3 rounded-lg bg-gray-50 border">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Rocket className="w-4 h-4 text-emerald-500" />
-                          <span className="text-xs text-gray-500">Setup Speed</span>
-                        </div>
-                        <span className="font-semibold text-gray-700">{topOpportunity.setupSpeed}</span>
-                      </div>
-
-                      <div className="p-3 rounded-lg bg-gray-50 border">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Users className="w-4 h-4 text-rose-500" />
-                          <span className="text-xs text-gray-500">Competition</span>
-                        </div>
-                        <span className={`font-semibold ${topOpportunity.competitionLevel === "Low" ? "text-emerald-600" : topOpportunity.competitionLevel === "Medium" ? "text-amber-600" : "text-rose-600"}`}>
-                          {topOpportunity.competitionLevel}
-                        </span>
-                      </div>
-
-                      <div className="p-3 rounded-lg bg-gray-50 border">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Building2 className="w-4 h-4 text-blue-500" />
-                          <span className="text-xs text-gray-500">Suggested Size</span>
-                        </div>
-                        <span className="font-semibold text-gray-700">{topOpportunity.suggestedSize}</span>
+                    <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                      <p className="text-sm text-gray-500">
+                        Preferences will re-rank opportunities to show your best matches first.
+                      </p>
+                      <div className="flex gap-3">
+                        {appliedPreferences && (
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setAppliedPreferences(null);
+                              setPreferences(DEFAULT_PREFERENCES);
+                            }}
+                            className="rounded-xl"
+                          >
+                            Clear Preferences
+                          </Button>
+                        )}
+                        <Button
+                          onClick={() => {
+                            setAppliedPreferences(preferences);
+                            setShowPreferencesModal(false);
+                          }}
+                          className="bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl shadow-lg"
+                        >
+                          <CheckCircle2 className="w-4 h-4 mr-2" />
+                          Apply Preferences
+                        </Button>
                       </div>
                     </div>
-                  </div>
+                  </CardContent>
+                )}
+              </Card>
 
-                  {/* Right side - Score and Action */}
-                  <div className="flex flex-col items-center gap-4 min-w-[160px]">
-                    <div className="text-center">
-                      <div className="text-5xl font-bold bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                        {topOpportunity.score}%
+              {/* Best Match Explanation - Shown when preferences are applied */}
+              {appliedPreferences && topOpportunity && (
+                <Card className="border-0 shadow-xl bg-linear-to-r from-emerald-50 to-teal-50 overflow-hidden">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-linear-to-br from-emerald-500 to-teal-600 rounded-xl text-white shadow-lg">
+                        <Sparkles className="w-6 h-6" />
                       </div>
-                      <p className="text-sm text-gray-500 mt-1">Opportunity Score</p>
-                      <Badge className={`mt-2 ${topOpportunity.status === "Strong" ? "bg-emerald-100 text-emerald-700" : topOpportunity.status === "Good" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
-                        {topOpportunity.status} Opportunity
-                      </Badge>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-gray-800 mb-2">
+                          Best Match: {topOpportunity.name}
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                          This opportunity matches your preference for {
+                            preferences.competitorTolerance === "Low" ? "quick setup" :
+                              preferences.competitorTolerance === "High" ? "thorough preparation" : "balanced setup"
+                          } and {
+                            preferences.businessType.includes("Evening") ? "evening operation" :
+                              preferences.businessType.includes("Day") ? "daytime operation" : "flexible all-day operation"
+                          }, with {
+                            topOpportunity.competitionLevel.toLowerCase()
+                          } competition and {
+                            topOpportunity.operatingTime === "Both" ? "steady all-day" :
+                              topOpportunity.operatingTime === "Evening" ? "evening-focused" : "daytime"
+                          } demand.
+                        </p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          <div className="p-3 bg-white rounded-lg border">
+                            <p className="text-xs text-gray-500 mb-1">Match Score</p>
+                            <p className="font-bold text-emerald-600">{topOpportunity.score}%</p>
+                          </div>
+                          <div className="p-3 bg-white rounded-lg border">
+                            <p className="text-xs text-gray-500 mb-1">Best Time</p>
+                            <p className="font-semibold text-gray-700">{topOpportunity.operatingTime}</p>
+                          </div>
+                          <div className="p-3 bg-white rounded-lg border">
+                            <p className="text-xs text-gray-500 mb-1">Setup Speed</p>
+                            <p className="font-semibold text-gray-700">{topOpportunity.setupSpeed}</p>
+                          </div>
+                          <div className="p-3 bg-white rounded-lg border">
+                            <p className="text-xs text-gray-500 mb-1">Risk Level</p>
+                            <p className={`font-semibold ${topOpportunity.competitionLevel === "Low" ? "text-emerald-600" : topOpportunity.competitionLevel === "Medium" ? "text-amber-600" : "text-rose-600"}`}>
+                              {topOpportunity.competitionLevel === "Low" ? "Low Risk" : topOpportunity.competitionLevel === "Medium" ? "Medium Risk" : "Higher Risk"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Export Modal (PDF and Excel only) */}
+              {openExportModal && (
+                <>
+                  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
+                  <div className="fixed z-50 bg-white p-8 rounded-2xl shadow-2xl w-[420px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <h2 className="text-xl font-bold mb-1">Export Report</h2>
+                    <p className="text-sm text-gray-500 mb-6">
+                      Choose a file format. PDF includes charts and insights.
+                    </p>
+
+                    <div className="space-y-3">
+                      <Button
+                        variant="outline"
+                        className="w-full h-14 flex justify-start gap-3 rounded-xl hover:bg-red-50 hover:border-red-300 transition-all"
+                        onClick={exportPDF}
+                      >
+                        <div className="p-2 bg-red-100 rounded-lg">
+                          <FileText className="w-5 h-5 text-red-600" />
+                        </div>
+                        <div className="text-left">
+                          <span className="font-medium block">Export as PDF</span>
+                          <span className="text-xs text-gray-500">Dashboard, charts, insights</span>
+                        </div>
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        className="w-full h-14 flex justify-start gap-3 rounded-xl hover:bg-green-50 hover:border-green-300 transition-all"
+                        onClick={exportExcel}
+                      >
+                        <div className="p-2 bg-green-100 rounded-lg">
+                          <FileType className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div className="text-left">
+                          <span className="font-medium block">Export as Excel</span>
+                          <span className="text-xs text-gray-500">3 sheets: Clusters, Raw Data, Insights</span>
+                        </div>
+                      </Button>
                     </div>
 
                     <Button
-                      onClick={() => setShowTopOpportunityDetails(true)}
-                      className="w-full bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-200 transition-all hover:scale-[1.02]"
+                      className="w-full mt-6 h-12 bg-linear-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white rounded-xl"
+                      onClick={() => setOpenExportModal(false)}
                     >
-                      <Target className="w-4 h-4 mr-2" />
-                      View More Info
+                      Close
                     </Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                </>
+              )}
 
-          {/* View More Info Modal */}
-          {showTopOpportunityDetails && topOpportunity && (
-            <>
-              <div
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-                onClick={() => setShowTopOpportunityDetails(false)}
-              />
-              <div className="fixed z-50 bg-white p-8 rounded-2xl shadow-2xl w-[520px] max-h-[85vh] overflow-y-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                {/* Modal Header */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className={`flex items-center justify-center w-12 h-12 rounded-xl text-white font-bold shadow-lg ${topOpportunity.status === "Strong" ? "bg-linear-to-br from-emerald-500 to-green-600" : topOpportunity.status === "Good" ? "bg-linear-to-br from-blue-500 to-indigo-600" : "bg-linear-to-br from-amber-500 to-orange-600"}`}>
-                    <Sparkles className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-800">{topOpportunity.name}</h2>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-2xl font-bold text-emerald-600">{topOpportunity.score}%</span>
-                      <Badge className={`${topOpportunity.status === "Strong" ? "bg-emerald-100 text-emerald-700" : topOpportunity.status === "Good" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
-                        {topOpportunity.status}
-                      </Badge>
+              {/* Top Opportunity – Details */}
+              {topOpportunity && (
+                <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+                  <CardHeader className="bg-linear-to-r from-emerald-50 to-teal-50 border-b">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-linear-to-br from-emerald-500 to-teal-600 rounded-xl text-white shadow-lg shadow-emerald-200">
+                        <Sparkles className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl">Top Opportunity – Details</CardTitle>
+                        <p className="text-sm text-gray-500">Your best business opportunity based on location analysis</p>
+                      </div>
                     </div>
-                  </div>
-                </div>
-
-                {/* Business Concept */}
-                <div className="mb-5">
-                  <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <Store className="w-4 h-4 text-blue-500" />
-                    Business Concept
-                  </h3>
-                  <p className="text-gray-600 bg-gray-50 p-4 rounded-lg">{topOpportunity.description}</p>
-                </div>
-
-                {/* Recommended Operating Hours */}
-                <div className="mb-5">
-                  <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-amber-500" />
-                    Recommended Operating Hours
-                  </h3>
-                  <p className="text-gray-600 bg-amber-50 p-4 rounded-lg border border-amber-100">
-                    {topOpportunity.operatingHours}
-                  </p>
-                </div>
-
-                {/* Entry Strategy */}
-                <div className="mb-5">
-                  <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <Rocket className="w-4 h-4 text-emerald-500" />
-                    Entry Strategy
-                  </h3>
-                  <p className="text-gray-600 bg-emerald-50 p-4 rounded-lg border border-emerald-100">
-                    {topOpportunity.entryStrategy}
-                  </p>
-                </div>
-
-                {/* Risk Summary */}
-                <div className="mb-5">
-                  <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-rose-500" />
-                    Risk Summary
-                  </h3>
-                  <p className="text-gray-600 bg-rose-50 p-4 rounded-lg border border-rose-100">
-                    {topOpportunity.riskSummary}
-                  </p>
-                </div>
-
-                {/* Why This Location Fits */}
-                <div className="mb-6">
-                  <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-indigo-500" />
-                    Why This Location Fits
-                  </h3>
-                  <p className="text-gray-600 bg-indigo-50 p-4 rounded-lg border border-indigo-100">
-                    {topOpportunity.locationFit}
-                  </p>
-                </div>
-
-                {/* Close Button */}
-                <Button
-                  className="w-full h-12 bg-linear-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white rounded-xl"
-                  onClick={() => setShowTopOpportunityDetails(false)}
-                >
-                  Close
-                </Button>
-              </div>
-            </>
-          )}
-
-          {/* Recommended for You - Personalized Insights */}
-          <RecommendedForYou
-            businessType={businessType}
-            competitionLevel={overviewSummary.competitionLevel === "N/A" ? "Medium" : overviewSummary.competitionLevel}
-            zoneType={zoneAnalysisData.zoneType}
-            activityTime={overviewSummary.operatingTime === "N/A" ? "Both" : overviewSummary.operatingTime}
-            avgDensity={clusterKPIs.avgBusinessDensity}
-            avgCompetitors={clusterKPIs.avgCompetition}
-            clusterCount={clusterKPIs.numClusters}
-          />
-
-          {/* Grouped by Category */}
-          {Array.from(opportunitiesByCategory.entries()).map(([category, opps]) => (
-            <Card key={category} className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-              <CardHeader className="bg-linear-to-r from-slate-50 to-gray-50 border-b">
-                <div className="flex items-center justify-between flex-wrap gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-linear-to-br from-slate-600 to-gray-700 rounded-xl text-white shadow-lg">
-                      <Store className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl">{category}</CardTitle>
-                      <p className="text-sm text-gray-500">{opps.length} opportunities ranked by score</p>
-                    </div>
-                  </div>
-                  <Badge className="bg-slate-100 text-slate-700 border-0 px-3 py-1">
-                    Top Score: {opps[0]?.score || 0}%
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-3">
-                  {opps.slice(0, showAll ? opps.length : 5).map((op, index) => {
-                    const isSelected = selectedForCompare.some(o => o.name === op.name && o.score === op.score);
-                    return (
-                      <div
-                        key={index}
-                        className={`p-5 rounded-xl border-2 bg-white hover:shadow-lg transition-all ${isSelected ? "ring-2 ring-indigo-500" : ""}`}
-                        style={{ borderColor: isSelected ? "#6366f1" : op.status === "Strong" ? "#10b98130" : op.status === "Good" ? "#3b82f630" : "#f59e0b30" }}
-                      >
-                        {/* Top Row: Checkbox, Rank, Name, Score */}
-                        <div className="flex items-start justify-between gap-4 mb-4">
-                          <div className="flex items-start gap-3">
-                            {/* Compare Checkbox */}
-                            <button
-                              onClick={() => toggleCompareSelection(op)}
-                              className={`flex items-center justify-center w-6 h-6 rounded border-2 transition-all flex-shrink-0 mt-2 ${isSelected
-                                ? "bg-indigo-500 border-indigo-500 text-white"
-                                : "border-gray-300 hover:border-indigo-400"
-                                }`}
-                              title={isSelected ? "Remove from comparison" : selectedForCompare.length >= 3 ? "Max 3 items" : "Add to comparison"}
-                            >
-                              {isSelected && <CheckCircle2 className="w-4 h-4" />}
-                            </button>
-                            <div className={`flex items-center justify-center w-10 h-10 rounded-xl text-white font-bold shadow-lg flex-shrink-0 ${op.status === "Strong" ? "bg-linear-to-br from-emerald-500 to-green-600" : op.status === "Good" ? "bg-linear-to-br from-blue-500 to-indigo-600" : "bg-linear-to-br from-amber-500 to-orange-600"}`}>
-                              {index + 1}
-                            </div>
-                            <div>
-                              <h4 className="font-bold text-gray-800">{op.name}</h4>
-                              {op.location && <p className="text-xs text-gray-400 mt-0.5">{op.location}</p>}
-                            </div>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    {/* Main content */}
+                    <div className="flex items-start justify-between flex-wrap gap-6">
+                      {/* Left side - Business info */}
+                      <div className="flex-1 min-w-[280px]">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className={`flex items-center justify-center w-12 h-12 rounded-xl text-white font-bold shadow-lg ${topOpportunity.status === "Strong" ? "bg-linear-to-br from-emerald-500 to-green-600" : topOpportunity.status === "Good" ? "bg-linear-to-br from-blue-500 to-indigo-600" : "bg-linear-to-br from-amber-500 to-orange-600"}`}>
+                            #1
                           </div>
-                          <div className="flex flex-col items-end gap-1">
-                            <div className={`text-2xl font-bold ${op.status === "Strong" ? "text-emerald-600" : op.status === "Good" ? "text-blue-600" : "text-amber-600"}`}>
-                              {op.score}%
-                            </div>
-                            <Badge className={`${op.status === "Strong" ? "bg-emerald-100 text-emerald-700" : op.status === "Good" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
-                              {op.status}
-                            </Badge>
+                          <div>
+                            <h3 className="text-xl font-bold text-gray-800">{topOpportunity.name}</h3>
+                            <p className="text-sm text-gray-500">{topOpportunity.description}</p>
                           </div>
                         </div>
 
-                        {/* Opportunity Type Badge */}
-                        <div className="mb-3">
-                          <Badge className="bg-linear-to-r from-indigo-100 to-purple-100 text-indigo-700 border-0 px-3 py-1.5">
-                            <Target className="w-3.5 h-3.5 mr-1.5" />
-                            {op.opportunityType}
-                          </Badge>
+                        {/* Why It Stands Out */}
+                        <div className="p-4 rounded-xl bg-linear-to-r from-amber-50 to-orange-50 border border-amber-100 mb-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Lightbulb className="w-5 h-5 text-amber-600" />
+                            <span className="font-semibold text-gray-700">Why This Stands Out</span>
+                          </div>
+                          <p className="text-gray-600">{topOpportunity.whyStandsOut}</p>
                         </div>
 
-                        {/* Primary Advantage */}
-                        <div className="p-3 rounded-lg bg-amber-50 border border-amber-100 mb-4">
-                          <div className="flex items-center gap-2 text-sm">
-                            <Lightbulb className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                            <span className="text-gray-700 font-medium">{op.primaryAdvantage}</span>
-                          </div>
-                        </div>
-
-                        {/* Stats Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                          {/* Demand Pattern */}
-                          <div className="p-2.5 rounded-lg bg-gray-50 border text-center">
-                            <p className="text-xs text-gray-400 mb-1">Demand</p>
-                            <p className="text-sm font-semibold text-gray-700">{op.demandPattern}</p>
-                          </div>
-
-                          {/* Operating Time */}
-                          <div className="p-2.5 rounded-lg bg-gray-50 border text-center">
-                            <p className="text-xs text-gray-400 mb-1">Best Time</p>
-                            <div className="flex items-center justify-center gap-1">
-                              {op.operatingTime === "Day" ? <Sun className="w-3.5 h-3.5 text-amber-500" /> :
-                                op.operatingTime === "Evening" ? <Moon className="w-3.5 h-3.5 text-indigo-500" /> :
-                                  <Clock className="w-3.5 h-3.5 text-blue-500" />}
-                              <span className="text-sm font-semibold text-gray-700">{op.operatingTime}</span>
+                        {/* Quick Stats Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          <div className="p-3 rounded-lg bg-gray-50 border">
+                            <div className="flex items-center gap-2 mb-1">
+                              {topOpportunity.operatingTime === "Day" ? <Sun className="w-4 h-4 text-amber-500" /> :
+                                topOpportunity.operatingTime === "Evening" ? <Moon className="w-4 h-4 text-indigo-500" /> :
+                                  <Clock className="w-4 h-4 text-blue-500" />}
+                              <span className="text-xs text-gray-500">Best Time</span>
                             </div>
+                            <span className="font-semibold text-gray-700">{topOpportunity.operatingTime}</span>
                           </div>
 
-                          {/* Setup Speed */}
-                          <div className="p-2.5 rounded-lg bg-gray-50 border text-center">
-                            <p className="text-xs text-gray-400 mb-1">Setup</p>
-                            <div className="flex items-center justify-center gap-1">
-                              <Rocket className="w-3.5 h-3.5 text-emerald-500" />
-                              <span className="text-sm font-semibold text-gray-700">{op.setupSpeed}</span>
+                          <div className="p-3 rounded-lg bg-gray-50 border">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Rocket className="w-4 h-4 text-emerald-500" />
+                              <span className="text-xs text-gray-500">Setup Speed</span>
                             </div>
+                            <span className="font-semibold text-gray-700">{topOpportunity.setupSpeed}</span>
                           </div>
 
-                          {/* Competition */}
-                          <div className="p-2.5 rounded-lg bg-gray-50 border text-center">
-                            <p className="text-xs text-gray-400 mb-1">Competition</p>
-                            <span className={`text-sm font-semibold ${op.competitionLevel === "Low" ? "text-emerald-600" : op.competitionLevel === "Medium" ? "text-amber-600" : "text-rose-600"}`}>
-                              {op.competitionLevel}
+                          <div className="p-3 rounded-lg bg-gray-50 border">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Users className="w-4 h-4 text-rose-500" />
+                              <span className="text-xs text-gray-500">Competition</span>
+                            </div>
+                            <span className={`font-semibold ${topOpportunity.competitionLevel === "Low" ? "text-emerald-600" : topOpportunity.competitionLevel === "Medium" ? "text-amber-600" : "text-rose-600"}`}>
+                              {topOpportunity.competitionLevel}
                             </span>
                           </div>
 
-                          {/* User Fit */}
-                          <div className="p-2.5 rounded-lg bg-gray-50 border text-center">
-                            <p className="text-xs text-gray-400 mb-1">User Fit</p>
-                            <Badge className={`text-xs ${op.userFitLevel === "High" ? "bg-emerald-100 text-emerald-700" : op.userFitLevel === "Medium" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
-                              {op.userFitLevel}
-                            </Badge>
+                          <div className="p-3 rounded-lg bg-gray-50 border">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Building2 className="w-4 h-4 text-blue-500" />
+                              <span className="text-xs text-gray-500">Suggested Size</span>
+                            </div>
+                            <span className="font-semibold text-gray-700">{topOpportunity.suggestedSize}</span>
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
 
-                {opps.length > 5 && !showAll && (
-                  <Button
-                    variant="ghost"
-                    className="w-full mt-4 text-gray-500 hover:text-gray-700"
-                    onClick={() => setShowAll(true)}
-                  >
-                    Show all {opps.length} opportunities
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+                      {/* Right side - Score and Action */}
+                      <div className="flex flex-col items-center gap-4 min-w-[160px]">
+                        <div className="text-center">
+                          <div className="text-5xl font-bold bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                            {topOpportunity.score}%
+                          </div>
+                          <p className="text-sm text-gray-500 mt-1">Opportunity Score</p>
+                          <Badge className={`mt-2 ${topOpportunity.status === "Strong" ? "bg-emerald-100 text-emerald-700" : topOpportunity.status === "Good" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
+                            {topOpportunity.status} Opportunity
+                          </Badge>
+                        </div>
 
-          {opportunitiesByCategory.size === 0 && (
-            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm p-12">
-              <div className="flex flex-col items-center justify-center text-center">
-                <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                  <Lightbulb className="w-8 h-8 text-gray-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-700">No opportunities yet</h3>
-                <p className="text-gray-500 mt-2 max-w-md">
-                  Run a clustering analysis on the Clustering page to discover business opportunities tailored to your preferences.
-                </p>
-                <Button
-                  onClick={() => navigate("/user/dashboard/clustering")}
-                  className="mt-4 bg-linear-to-r from-blue-500 to-indigo-600"
-                >
-                  Go to Clustering
-                </Button>
-              </div>
-            </Card>
-          )}
-
-          {/* Floating Compare Button */}
-          {selectedForCompare.length >= 2 && (
-            <div className="fixed bottom-8 right-8 z-30">
-              <Button
-                onClick={() => setShowCompareModal(true)}
-                className="h-14 px-6 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-full shadow-xl shadow-indigo-200 transition-all hover:scale-105"
-              >
-                <Layers className="w-5 h-5 mr-2" />
-                Compare {selectedForCompare.length} Opportunities
-              </Button>
-              <Button
-                onClick={() => setSelectedForCompare([])}
-                variant="ghost"
-                className="ml-2 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </Button>
-            </div>
-          )}
-
-          {/* Compare Modal */}
-          {showCompareModal && selectedForCompare.length >= 2 && (
-            <>
-              <div
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-                onClick={() => setShowCompareModal(false)}
-              />
-              <div className="fixed z-50 bg-white p-8 rounded-2xl shadow-2xl max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                {/* Modal Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl text-white shadow-lg">
-                      <Layers className="w-5 h-5" />
+                        <Button
+                          onClick={() => setShowTopOpportunityDetails(true)}
+                          className="w-full bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-200 transition-all hover:scale-[1.02]"
+                        >
+                          <Target className="w-4 h-4 mr-2" />
+                          View More Info
+                        </Button>
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-800">Compare Opportunities</h2>
-                      <p className="text-sm text-gray-500">Side-by-side comparison of selected opportunities</p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* View More Info Modal */}
+              {showTopOpportunityDetails && topOpportunity && (
+                <>
+                  <div
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                    onClick={() => setShowTopOpportunityDetails(false)}
+                  />
+                  <div className="fixed z-50 bg-white p-8 rounded-2xl shadow-2xl w-[520px] max-h-[85vh] overflow-y-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    {/* Modal Header */}
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className={`flex items-center justify-center w-12 h-12 rounded-xl text-white font-bold shadow-lg ${topOpportunity.status === "Strong" ? "bg-linear-to-br from-emerald-500 to-green-600" : topOpportunity.status === "Good" ? "bg-linear-to-br from-blue-500 to-indigo-600" : "bg-linear-to-br from-amber-500 to-orange-600"}`}>
+                        <Sparkles className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-800">{topOpportunity.name}</h2>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-2xl font-bold text-emerald-600">{topOpportunity.score}%</span>
+                          <Badge className={`${topOpportunity.status === "Strong" ? "bg-emerald-100 text-emerald-700" : topOpportunity.status === "Good" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
+                            {topOpportunity.status}
+                          </Badge>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Business Concept */}
+                    <div className="mb-5">
+                      <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <Store className="w-4 h-4 text-blue-500" />
+                        Business Concept
+                      </h3>
+                      <p className="text-gray-600 bg-gray-50 p-4 rounded-lg">{topOpportunity.description}</p>
+                    </div>
+
+                    {/* Recommended Operating Hours */}
+                    <div className="mb-5">
+                      <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-amber-500" />
+                        Recommended Operating Hours
+                      </h3>
+                      <p className="text-gray-600 bg-amber-50 p-4 rounded-lg border border-amber-100">
+                        {topOpportunity.operatingHours}
+                      </p>
+                    </div>
+
+                    {/* Entry Strategy */}
+                    <div className="mb-5">
+                      <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <Rocket className="w-4 h-4 text-emerald-500" />
+                        Entry Strategy
+                      </h3>
+                      <p className="text-gray-600 bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+                        {topOpportunity.entryStrategy}
+                      </p>
+                    </div>
+
+                    {/* Risk Summary */}
+                    <div className="mb-5">
+                      <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-rose-500" />
+                        Risk Summary
+                      </h3>
+                      <p className="text-gray-600 bg-rose-50 p-4 rounded-lg border border-rose-100">
+                        {topOpportunity.riskSummary}
+                      </p>
+                    </div>
+
+                    {/* Why This Location Fits */}
+                    <div className="mb-6">
+                      <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-indigo-500" />
+                        Why This Location Fits
+                      </h3>
+                      <p className="text-gray-600 bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                        {topOpportunity.locationFit}
+                      </p>
+                    </div>
+
+                    {/* Close Button */}
+                    <Button
+                      className="w-full h-12 bg-linear-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white rounded-xl"
+                      onClick={() => setShowTopOpportunityDetails(false)}
+                    >
+                      Close
+                    </Button>
                   </div>
+                </>
+              )}
+
+              {/* Recommended for You - Personalized Insights */}
+              <RecommendedForYou
+                businessType={businessType}
+                competitionLevel={overviewSummary.competitionLevel === "N/A" ? "Medium" : overviewSummary.competitionLevel}
+                zoneType={zoneAnalysisData.zoneType}
+                activityTime={overviewSummary.operatingTime === "N/A" ? "Both" : overviewSummary.operatingTime}
+                avgDensity={clusterKPIs.avgBusinessDensity}
+                avgCompetitors={clusterKPIs.avgCompetition}
+                clusterCount={clusterKPIs.numClusters}
+              />
+
+              {/* Grouped by Category */}
+              {Array.from(opportunitiesByCategory.entries()).map(([category, opps]) => (
+                <Card key={category} className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+                  <CardHeader className="bg-linear-to-r from-slate-50 to-gray-50 border-b">
+                    <div className="flex items-center justify-between flex-wrap gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-linear-to-br from-slate-600 to-gray-700 rounded-xl text-white shadow-lg">
+                          <Store className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-xl">{category}</CardTitle>
+                          <p className="text-sm text-gray-500">{opps.length} opportunities ranked by score</p>
+                        </div>
+                      </div>
+                      <Badge className="bg-slate-100 text-slate-700 border-0 px-3 py-1">
+                        Top Score: {opps[0]?.score || 0}%
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-3">
+                      {opps.slice(0, showAll ? opps.length : 5).map((op, index) => {
+                        const isSelected = selectedForCompare.some(o => o.name === op.name && o.score === op.score);
+                        return (
+                          <div
+                            key={index}
+                            className={`p-5 rounded-xl border-2 bg-white hover:shadow-lg transition-all ${isSelected ? "ring-2 ring-indigo-500" : ""}`}
+                            style={{ borderColor: isSelected ? "#6366f1" : op.status === "Strong" ? "#10b98130" : op.status === "Good" ? "#3b82f630" : "#f59e0b30" }}
+                          >
+                            {/* Top Row: Checkbox, Rank, Name, Score */}
+                            <div className="flex items-start justify-between gap-4 mb-4">
+                              <div className="flex items-start gap-3">
+                                {/* Compare Checkbox */}
+                                <button
+                                  onClick={() => toggleCompareSelection(op)}
+                                  className={`flex items-center justify-center w-6 h-6 rounded border-2 transition-all flex-shrink-0 mt-2 ${isSelected
+                                    ? "bg-indigo-500 border-indigo-500 text-white"
+                                    : "border-gray-300 hover:border-indigo-400"
+                                    }`}
+                                  title={isSelected ? "Remove from comparison" : selectedForCompare.length >= 3 ? "Max 3 items" : "Add to comparison"}
+                                >
+                                  {isSelected && <CheckCircle2 className="w-4 h-4" />}
+                                </button>
+                                <div className={`flex items-center justify-center w-10 h-10 rounded-xl text-white font-bold shadow-lg flex-shrink-0 ${op.status === "Strong" ? "bg-linear-to-br from-emerald-500 to-green-600" : op.status === "Good" ? "bg-linear-to-br from-blue-500 to-indigo-600" : "bg-linear-to-br from-amber-500 to-orange-600"}`}>
+                                  {index + 1}
+                                </div>
+                                <div>
+                                  <h4 className="font-bold text-gray-800">{op.name}</h4>
+                                  {op.location && <p className="text-xs text-gray-400 mt-0.5">{op.location}</p>}
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-end gap-1">
+                                <div className={`text-2xl font-bold ${op.status === "Strong" ? "text-emerald-600" : op.status === "Good" ? "text-blue-600" : "text-amber-600"}`}>
+                                  {op.score}%
+                                </div>
+                                <Badge className={`${op.status === "Strong" ? "bg-emerald-100 text-emerald-700" : op.status === "Good" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
+                                  {op.status}
+                                </Badge>
+                              </div>
+                            </div>
+
+                            {/* Opportunity Type Badge */}
+                            <div className="mb-3">
+                              <Badge className="bg-linear-to-r from-indigo-100 to-purple-100 text-indigo-700 border-0 px-3 py-1.5">
+                                <Target className="w-3.5 h-3.5 mr-1.5" />
+                                {op.opportunityType}
+                              </Badge>
+                            </div>
+
+                            {/* Primary Advantage */}
+                            <div className="p-3 rounded-lg bg-amber-50 border border-amber-100 mb-4">
+                              <div className="flex items-center gap-2 text-sm">
+                                <Lightbulb className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                                <span className="text-gray-700 font-medium">{op.primaryAdvantage}</span>
+                              </div>
+                            </div>
+
+                            {/* Stats Grid */}
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                              {/* Demand Pattern */}
+                              <div className="p-2.5 rounded-lg bg-gray-50 border text-center">
+                                <p className="text-xs text-gray-400 mb-1">Demand</p>
+                                <p className="text-sm font-semibold text-gray-700">{op.demandPattern}</p>
+                              </div>
+
+                              {/* Operating Time */}
+                              <div className="p-2.5 rounded-lg bg-gray-50 border text-center">
+                                <p className="text-xs text-gray-400 mb-1">Best Time</p>
+                                <div className="flex items-center justify-center gap-1">
+                                  {op.operatingTime === "Day" ? <Sun className="w-3.5 h-3.5 text-amber-500" /> :
+                                    op.operatingTime === "Evening" ? <Moon className="w-3.5 h-3.5 text-indigo-500" /> :
+                                      <Clock className="w-3.5 h-3.5 text-blue-500" />}
+                                  <span className="text-sm font-semibold text-gray-700">{op.operatingTime}</span>
+                                </div>
+                              </div>
+
+                              {/* Setup Speed */}
+                              <div className="p-2.5 rounded-lg bg-gray-50 border text-center">
+                                <p className="text-xs text-gray-400 mb-1">Setup</p>
+                                <div className="flex items-center justify-center gap-1">
+                                  <Rocket className="w-3.5 h-3.5 text-emerald-500" />
+                                  <span className="text-sm font-semibold text-gray-700">{op.setupSpeed}</span>
+                                </div>
+                              </div>
+
+                              {/* Competition */}
+                              <div className="p-2.5 rounded-lg bg-gray-50 border text-center">
+                                <p className="text-xs text-gray-400 mb-1">Competition</p>
+                                <span className={`text-sm font-semibold ${op.competitionLevel === "Low" ? "text-emerald-600" : op.competitionLevel === "Medium" ? "text-amber-600" : "text-rose-600"}`}>
+                                  {op.competitionLevel}
+                                </span>
+                              </div>
+
+                              {/* User Fit */}
+                              <div className="p-2.5 rounded-lg bg-gray-50 border text-center">
+                                <p className="text-xs text-gray-400 mb-1">User Fit</p>
+                                <Badge className={`text-xs ${op.userFitLevel === "High" ? "bg-emerald-100 text-emerald-700" : op.userFitLevel === "Medium" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
+                                  {op.userFitLevel}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {opps.length > 5 && !showAll && (
+                      <Button
+                        variant="ghost"
+                        className="w-full mt-4 text-gray-500 hover:text-gray-700"
+                        onClick={() => setShowAll(true)}
+                      >
+                        Show all {opps.length} opportunities
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+
+              {opportunitiesByCategory.size === 0 && (
+                <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm p-12">
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                      <Lightbulb className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-700">No opportunities yet</h3>
+                    <p className="text-gray-500 mt-2 max-w-md">
+                      Run a clustering analysis on the Clustering page to discover business opportunities tailored to your preferences.
+                    </p>
+                    <Button
+                      onClick={() => navigate("/user/dashboard/clustering")}
+                      className="mt-4 bg-linear-to-r from-blue-500 to-indigo-600"
+                    >
+                      Go to Clustering
+                    </Button>
+                  </div>
+                </Card>
+              )}
+
+              {/* Floating Compare Button */}
+              {selectedForCompare.length >= 2 && (
+                <div className="fixed bottom-8 right-8 z-30">
                   <Button
-                    variant="ghost"
-                    onClick={() => setShowCompareModal(false)}
-                    className="h-10 w-10 rounded-full"
+                    onClick={() => setShowCompareModal(true)}
+                    className="h-14 px-6 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-full shadow-xl shadow-indigo-200 transition-all hover:scale-105"
                   >
-                    <X className="w-5 h-5" />
+                    <Layers className="w-5 h-5 mr-2" />
+                    Compare {selectedForCompare.length} Opportunities
+                  </Button>
+                  <Button
+                    onClick={() => setSelectedForCompare([])}
+                    variant="ghost"
+                    className="ml-2 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50"
+                  >
+                    <X className="w-5 h-5 text-gray-500" />
                   </Button>
                 </div>
+              )}
 
-                {/* Comparison Grid */}
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr>
-                        <th className="text-left p-3 bg-gray-50 rounded-tl-xl font-semibold text-gray-600 w-40">Attribute</th>
-                        {selectedForCompare.map((op, idx) => (
-                          <th key={idx} className={`p-3 bg-gray-50 text-center ${idx === selectedForCompare.length - 1 ? "rounded-tr-xl" : ""}`}>
-                            <div className="flex flex-col items-center gap-2">
-                              <div className={`flex items-center justify-center w-8 h-8 rounded-lg text-white font-bold ${op.status === "Strong" ? "bg-emerald-500" : op.status === "Good" ? "bg-blue-500" : "bg-amber-500"}`}>
-                                {idx + 1}
-                              </div>
-                              <span className="font-semibold text-gray-800 text-sm">{op.name}</span>
-                            </div>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {/* Score */}
-                      <tr className="border-t">
-                        <td className="p-3 font-medium text-gray-600">Score</td>
-                        {selectedForCompare.map((op, idx) => (
-                          <td key={idx} className="p-3 text-center">
-                            <span className={`text-2xl font-bold ${op.status === "Strong" ? "text-emerald-600" : op.status === "Good" ? "text-blue-600" : "text-amber-600"}`}>
-                              {op.score}%
-                            </span>
-                            <Badge className={`ml-2 ${op.status === "Strong" ? "bg-emerald-100 text-emerald-700" : op.status === "Good" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
-                              {op.status}
-                            </Badge>
-                          </td>
-                        ))}
-                      </tr>
-                      {/* Opportunity Type */}
-                      <tr className="border-t bg-gray-50/50">
-                        <td className="p-3 font-medium text-gray-600">Opportunity Type</td>
-                        {selectedForCompare.map((op, idx) => (
-                          <td key={idx} className="p-3 text-center">
-                            <Badge className="bg-indigo-100 text-indigo-700 text-xs">
-                              {op.opportunityType}
-                            </Badge>
-                          </td>
-                        ))}
-                      </tr>
-                      {/* Primary Advantage */}
-                      <tr className="border-t">
-                        <td className="p-3 font-medium text-gray-600">Primary Advantage</td>
-                        {selectedForCompare.map((op, idx) => (
-                          <td key={idx} className="p-3 text-center text-sm text-gray-700">
-                            {op.primaryAdvantage}
-                          </td>
-                        ))}
-                      </tr>
-                      {/* Demand Pattern */}
-                      <tr className="border-t bg-gray-50/50">
-                        <td className="p-3 font-medium text-gray-600">Demand Pattern</td>
-                        {selectedForCompare.map((op, idx) => (
-                          <td key={idx} className="p-3 text-center">
-                            <span className="text-sm font-medium text-gray-700">{op.demandPattern}</span>
-                          </td>
-                        ))}
-                      </tr>
-                      {/* Best Operating Time */}
-                      <tr className="border-t">
-                        <td className="p-3 font-medium text-gray-600">Best Time</td>
-                        {selectedForCompare.map((op, idx) => (
-                          <td key={idx} className="p-3 text-center">
-                            <div className="flex items-center justify-center gap-1">
-                              {op.operatingTime === "Day" ? <Sun className="w-4 h-4 text-amber-500" /> :
-                                op.operatingTime === "Evening" ? <Moon className="w-4 h-4 text-indigo-500" /> :
-                                  <Clock className="w-4 h-4 text-blue-500" />}
-                              <span className="text-sm font-medium">{op.operatingTime}</span>
-                            </div>
-                          </td>
-                        ))}
-                      </tr>
-                      {/* Setup Speed */}
-                      <tr className="border-t bg-gray-50/50">
-                        <td className="p-3 font-medium text-gray-600">Setup Speed</td>
-                        {selectedForCompare.map((op, idx) => (
-                          <td key={idx} className="p-3 text-center">
-                            <div className="flex items-center justify-center gap-1">
-                              <Rocket className="w-4 h-4 text-emerald-500" />
-                              <span className="text-sm font-medium">{op.setupSpeed}</span>
-                            </div>
-                          </td>
-                        ))}
-                      </tr>
-                      {/* Competition Level */}
-                      <tr className="border-t">
-                        <td className="p-3 font-medium text-gray-600">Competition</td>
-                        {selectedForCompare.map((op, idx) => (
-                          <td key={idx} className="p-3 text-center">
-                            <Badge className={`text-xs ${op.competitionLevel === "Low" ? "bg-emerald-100 text-emerald-700" : op.competitionLevel === "Medium" ? "bg-amber-100 text-amber-700" : "bg-rose-100 text-rose-700"}`}>
-                              {op.competitionLevel}
-                            </Badge>
-                          </td>
-                        ))}
-                      </tr>
-                      {/* User Fit Level */}
-                      <tr className="border-t bg-gray-50/50 rounded-b-xl">
-                        <td className="p-3 font-medium text-gray-600 rounded-bl-xl">User Fit</td>
-                        {selectedForCompare.map((op, idx) => (
-                          <td key={idx} className={`p-3 text-center ${idx === selectedForCompare.length - 1 ? "rounded-br-xl" : ""}`}>
-                            <Badge className={`text-xs ${op.userFitLevel === "High" ? "bg-emerald-100 text-emerald-700" : op.userFitLevel === "Medium" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
-                              {op.userFitLevel}
-                            </Badge>
-                          </td>
-                        ))}
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              {/* Compare Modal */}
+              {showCompareModal && selectedForCompare.length >= 2 && (
+                <>
+                  <div
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                    onClick={() => setShowCompareModal(false)}
+                  />
+                  <div className="fixed z-50 bg-white p-8 rounded-2xl shadow-2xl max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    {/* Modal Header */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl text-white shadow-lg">
+                          <Layers className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-gray-800">Compare Opportunities</h2>
+                          <p className="text-sm text-gray-500">Side-by-side comparison of selected opportunities</p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        onClick={() => setShowCompareModal(false)}
+                        className="h-10 w-10 rounded-full"
+                      >
+                        <X className="w-5 h-5" />
+                      </Button>
+                    </div>
 
-                {/* Close Button */}
-                <Button
-                  className="w-full mt-6 h-12 bg-linear-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white rounded-xl"
-                  onClick={() => setShowCompareModal(false)}
-                >
-                  Close Comparison
-                </Button>
-              </div>
+                    {/* Comparison Grid */}
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr>
+                            <th className="text-left p-3 bg-gray-50 rounded-tl-xl font-semibold text-gray-600 w-40">Attribute</th>
+                            {selectedForCompare.map((op, idx) => (
+                              <th key={idx} className={`p-3 bg-gray-50 text-center ${idx === selectedForCompare.length - 1 ? "rounded-tr-xl" : ""}`}>
+                                <div className="flex flex-col items-center gap-2">
+                                  <div className={`flex items-center justify-center w-8 h-8 rounded-lg text-white font-bold ${op.status === "Strong" ? "bg-emerald-500" : op.status === "Good" ? "bg-blue-500" : "bg-amber-500"}`}>
+                                    {idx + 1}
+                                  </div>
+                                  <span className="font-semibold text-gray-800 text-sm">{op.name}</span>
+                                </div>
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {/* Score */}
+                          <tr className="border-t">
+                            <td className="p-3 font-medium text-gray-600">Score</td>
+                            {selectedForCompare.map((op, idx) => (
+                              <td key={idx} className="p-3 text-center">
+                                <span className={`text-2xl font-bold ${op.status === "Strong" ? "text-emerald-600" : op.status === "Good" ? "text-blue-600" : "text-amber-600"}`}>
+                                  {op.score}%
+                                </span>
+                                <Badge className={`ml-2 ${op.status === "Strong" ? "bg-emerald-100 text-emerald-700" : op.status === "Good" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
+                                  {op.status}
+                                </Badge>
+                              </td>
+                            ))}
+                          </tr>
+                          {/* Opportunity Type */}
+                          <tr className="border-t bg-gray-50/50">
+                            <td className="p-3 font-medium text-gray-600">Opportunity Type</td>
+                            {selectedForCompare.map((op, idx) => (
+                              <td key={idx} className="p-3 text-center">
+                                <Badge className="bg-indigo-100 text-indigo-700 text-xs">
+                                  {op.opportunityType}
+                                </Badge>
+                              </td>
+                            ))}
+                          </tr>
+                          {/* Primary Advantage */}
+                          <tr className="border-t">
+                            <td className="p-3 font-medium text-gray-600">Primary Advantage</td>
+                            {selectedForCompare.map((op, idx) => (
+                              <td key={idx} className="p-3 text-center text-sm text-gray-700">
+                                {op.primaryAdvantage}
+                              </td>
+                            ))}
+                          </tr>
+                          {/* Demand Pattern */}
+                          <tr className="border-t bg-gray-50/50">
+                            <td className="p-3 font-medium text-gray-600">Demand Pattern</td>
+                            {selectedForCompare.map((op, idx) => (
+                              <td key={idx} className="p-3 text-center">
+                                <span className="text-sm font-medium text-gray-700">{op.demandPattern}</span>
+                              </td>
+                            ))}
+                          </tr>
+                          {/* Best Operating Time */}
+                          <tr className="border-t">
+                            <td className="p-3 font-medium text-gray-600">Best Time</td>
+                            {selectedForCompare.map((op, idx) => (
+                              <td key={idx} className="p-3 text-center">
+                                <div className="flex items-center justify-center gap-1">
+                                  {op.operatingTime === "Day" ? <Sun className="w-4 h-4 text-amber-500" /> :
+                                    op.operatingTime === "Evening" ? <Moon className="w-4 h-4 text-indigo-500" /> :
+                                      <Clock className="w-4 h-4 text-blue-500" />}
+                                  <span className="text-sm font-medium">{op.operatingTime}</span>
+                                </div>
+                              </td>
+                            ))}
+                          </tr>
+                          {/* Setup Speed */}
+                          <tr className="border-t bg-gray-50/50">
+                            <td className="p-3 font-medium text-gray-600">Setup Speed</td>
+                            {selectedForCompare.map((op, idx) => (
+                              <td key={idx} className="p-3 text-center">
+                                <div className="flex items-center justify-center gap-1">
+                                  <Rocket className="w-4 h-4 text-emerald-500" />
+                                  <span className="text-sm font-medium">{op.setupSpeed}</span>
+                                </div>
+                              </td>
+                            ))}
+                          </tr>
+                          {/* Competition Level */}
+                          <tr className="border-t">
+                            <td className="p-3 font-medium text-gray-600">Competition</td>
+                            {selectedForCompare.map((op, idx) => (
+                              <td key={idx} className="p-3 text-center">
+                                <Badge className={`text-xs ${op.competitionLevel === "Low" ? "bg-emerald-100 text-emerald-700" : op.competitionLevel === "Medium" ? "bg-amber-100 text-amber-700" : "bg-rose-100 text-rose-700"}`}>
+                                  {op.competitionLevel}
+                                </Badge>
+                              </td>
+                            ))}
+                          </tr>
+                          {/* User Fit Level */}
+                          <tr className="border-t bg-gray-50/50 rounded-b-xl">
+                            <td className="p-3 font-medium text-gray-600 rounded-bl-xl">User Fit</td>
+                            {selectedForCompare.map((op, idx) => (
+                              <td key={idx} className={`p-3 text-center ${idx === selectedForCompare.length - 1 ? "rounded-br-xl" : ""}`}>
+                                <Badge className={`text-xs ${op.userFitLevel === "High" ? "bg-emerald-100 text-emerald-700" : op.userFitLevel === "Medium" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
+                                  {op.userFitLevel}
+                                </Badge>
+                              </td>
+                            ))}
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Close Button */}
+                    <Button
+                      className="w-full mt-6 h-12 bg-linear-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white rounded-xl"
+                      onClick={() => setShowCompareModal(false)}
+                    >
+                      Close Comparison
+                    </Button>
+                  </div>
+                </>
+              )}
             </>
           )}
         </TabsContent>
 
         {/* ZONE ANALYSIS TAB */}
         <TabsContent value="zone-analysis" className="space-y-6">
-          {/* Zone Characteristics Summary */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-linear-to-r from-emerald-50 to-teal-50 border-b">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-linear-to-br from-emerald-500 to-teal-600 rounded-xl text-white shadow-lg shadow-emerald-200">
-                  <Building2 className="w-5 h-5" />
+          {/* Empty State - No Clustering */}
+          {!hasClusteringResults ? (
+            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+              <CardContent className="p-12 text-center">
+                <div className="p-4 bg-amber-100 rounded-full w-fit mx-auto mb-4">
+                  <AlertCircle className="w-8 h-8 text-amber-600" />
                 </div>
-                <div>
-                  <CardTitle className="text-xl">Area Characteristics</CardTitle>
-                  <p className="text-sm text-gray-500">Understanding the recommended locations</p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Zone Type */}
-                <div className="p-5 rounded-xl bg-linear-to-br from-blue-50 to-indigo-50 border border-blue-100">
-                  <div className="flex items-center gap-2 mb-3">
-                    <MapPin className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm font-medium text-gray-600">Zone Type</span>
-                  </div>
-                  <div className="text-2xl font-bold text-blue-700">{zoneAnalysisData.zoneType}</div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {zoneAnalysisData.zoneType === "Commercial" ? "High visibility business area" :
-                      zoneAnalysisData.zoneType === "Residential" ? "Community-focused neighborhood" :
-                        "Balanced mix of businesses and residences"}
-                  </p>
-                </div>
-
-                {/* Activity Level */}
-                <div className="p-5 rounded-xl bg-linear-to-br from-emerald-50 to-green-50 border border-emerald-100">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Activity className="w-5 h-5 text-emerald-600" />
-                    <span className="text-sm font-medium text-gray-600">Business Activity</span>
-                  </div>
-                  <div className="text-2xl font-bold text-emerald-700">{zoneAnalysisData.activityLevel}</div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {zoneAnalysisData.activityLevel === "High" ? "Busy area with many businesses" :
-                      zoneAnalysisData.activityLevel === "Low" ? "Quiet area with growth potential" :
-                        "Steady business presence"}
-                  </p>
-                </div>
-
-                {/* Best Time */}
-                <div className="p-5 rounded-xl bg-linear-to-br from-amber-50 to-orange-50 border border-amber-100">
-                  <div className="flex items-center gap-2 mb-3">
-                    {zoneAnalysisData.activityTime === "Daytime" ? <Sun className="w-5 h-5 text-amber-600" /> :
-                      zoneAnalysisData.activityTime === "Evening" ? <Moon className="w-5 h-5 text-amber-600" /> :
-                        <Clock className="w-5 h-5 text-amber-600" />}
-                    <span className="text-sm font-medium text-gray-600">Strong Business Time</span>
-                  </div>
-                  <div className="text-2xl font-bold text-amber-700">{zoneAnalysisData.activityTime}</div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {zoneAnalysisData.activityTime === "Daytime" ? "Morning to afternoon peak" :
-                      zoneAnalysisData.activityTime === "Evening" ? "Afternoon to night peak" :
-                        "Consistent activity all day"}
-                  </p>
-                </div>
-
-                {/* Ease of Opening */}
-                <div className="p-5 rounded-xl bg-linear-to-br from-purple-50 to-violet-50 border border-purple-100">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Rocket className="w-5 h-5 text-purple-600" />
-                    <span className="text-sm font-medium text-gray-600">Ease of Opening</span>
-                  </div>
-                  <div className="text-2xl font-bold text-purple-700">{zoneAnalysisData.easeOfOpening}</div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {zoneAnalysisData.easeOfOpening === "Easy" ? "Low barriers to entry" :
-                      zoneAnalysisData.easeOfOpening === "Challenging" ? "May require differentiation" :
-                        "Standard market conditions"}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Business Activity Time Section */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
-            <CardHeader className="bg-linear-to-r from-amber-50 to-orange-50 border-b">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-linear-to-br from-amber-500 to-orange-600 rounded-xl text-white shadow-lg shadow-amber-200">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl">Business Activity Time</CardTitle>
-                  <p className="text-sm text-gray-500">When businesses in this area are most active</p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Time Distribution Visualization */}
-                <div className="space-y-4">
-                  <h4 className="font-semibold text-gray-700 flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-amber-500" />
-                    Activity Pattern
-                  </h4>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2 w-24">
-                        <Sun className="w-4 h-4 text-amber-500" />
-                        <span className="text-sm text-gray-600">Daytime</span>
-                      </div>
-                      <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-linear-to-r from-amber-400 to-orange-500 rounded-full transition-all"
-                          style={{ width: `${zoneAnalysisData.activityTime === "Daytime" ? 75 : zoneAnalysisData.activityTime === "Balanced" ? 50 : 30}%` }}
-                        />
-                      </div>
-                      <span className="text-sm font-medium text-gray-600 w-12 text-right">
-                        {zoneAnalysisData.activityTime === "Daytime" ? "High" : zoneAnalysisData.activityTime === "Balanced" ? "Med" : "Low"}
-                      </span>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">No zone analysis available yet</h3>
+                <p className="text-gray-500">Run clustering to analyze zones.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* Zone Characteristics Summary */}
+              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+                <CardHeader className="bg-linear-to-r from-emerald-50 to-teal-50 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-linear-to-br from-emerald-500 to-teal-600 rounded-xl text-white shadow-lg shadow-emerald-200">
+                      <Building2 className="w-5 h-5" />
                     </div>
-
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2 w-24">
-                        <Moon className="w-4 h-4 text-indigo-500" />
-                        <span className="text-sm text-gray-600">Evening</span>
-                      </div>
-                      <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-linear-to-r from-indigo-400 to-purple-500 rounded-full transition-all"
-                          style={{ width: `${zoneAnalysisData.activityTime === "Evening" ? 75 : zoneAnalysisData.activityTime === "Balanced" ? 50 : 30}%` }}
-                        />
-                      </div>
-                      <span className="text-sm font-medium text-gray-600 w-12 text-right">
-                        {zoneAnalysisData.activityTime === "Evening" ? "High" : zoneAnalysisData.activityTime === "Balanced" ? "Med" : "Low"}
-                      </span>
+                    <div>
+                      <CardTitle className="text-xl">Area Characteristics</CardTitle>
+                      <p className="text-sm text-gray-500">Understanding the recommended locations</p>
                     </div>
                   </div>
-                </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Zone Type */}
+                    <div className="p-5 rounded-xl bg-linear-to-br from-blue-50 to-indigo-50 border border-blue-100">
+                      <div className="flex items-center gap-2 mb-3">
+                        <MapPin className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm font-medium text-gray-600">Zone Type</span>
+                      </div>
+                      <div className="text-2xl font-bold text-blue-700">{zoneAnalysisData.zoneType}</div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {zoneAnalysisData.zoneType === "Commercial" ? "High visibility business area" :
+                          zoneAnalysisData.zoneType === "Residential" ? "Community-focused neighborhood" :
+                            "Balanced mix of businesses and residences"}
+                      </p>
+                    </div>
 
-                {/* Time Recommendations */}
-                <div className="space-y-4">
-                  <h4 className="font-semibold text-gray-700 flex items-center gap-2">
-                    <Lightbulb className="w-4 h-4 text-amber-500" />
-                    Operating Hour Recommendations
-                  </h4>
+                    {/* Activity Level */}
+                    <div className="p-5 rounded-xl bg-linear-to-br from-emerald-50 to-green-50 border border-emerald-100">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Activity className="w-5 h-5 text-emerald-600" />
+                        <span className="text-sm font-medium text-gray-600">Business Activity</span>
+                      </div>
+                      <div className="text-2xl font-bold text-emerald-700">{zoneAnalysisData.activityLevel}</div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {zoneAnalysisData.activityLevel === "High" ? "Busy area with many businesses" :
+                          zoneAnalysisData.activityLevel === "Low" ? "Quiet area with growth potential" :
+                            "Steady business presence"}
+                      </p>
+                    </div>
 
-                  <div className="space-y-3">
-                    {zoneAnalysisData.activityTime === "Daytime" ? (
-                      <>
-                        <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
-                          <p className="text-sm text-gray-700">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500 inline mr-2" />
-                            Best hours: <span className="font-semibold">8 AM - 6 PM</span>
-                          </p>
-                        </div>
-                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                          <p className="text-sm text-gray-700">
-                            <AlertTriangle className="w-4 h-4 text-amber-500 inline mr-2" />
-                            Evening operations may have lower foot traffic
-                          </p>
-                        </div>
-                      </>
-                    ) : zoneAnalysisData.activityTime === "Evening" ? (
-                      <>
-                        <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
-                          <p className="text-sm text-gray-700">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500 inline mr-2" />
-                            Best hours: <span className="font-semibold">4 PM - 10 PM</span>
-                          </p>
-                        </div>
-                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                          <p className="text-sm text-gray-700">
-                            <AlertTriangle className="w-4 h-4 text-amber-500 inline mr-2" />
-                            Morning hours may be slower for customer traffic
-                          </p>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
-                          <p className="text-sm text-gray-700">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500 inline mr-2" />
-                            Flexible hours: <span className="font-semibold">8 AM - 9 PM</span>
-                          </p>
-                        </div>
-                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                          <p className="text-sm text-gray-700">
-                            <Sparkles className="w-4 h-4 text-purple-500 inline mr-2" />
-                            Area supports both day and evening operations
-                          </p>
-                        </div>
-                      </>
-                    )}
+                    {/* Best Time */}
+                    <div className="p-5 rounded-xl bg-linear-to-br from-amber-50 to-orange-50 border border-amber-100">
+                      <div className="flex items-center gap-2 mb-3">
+                        {zoneAnalysisData.activityTime === "Daytime" ? <Sun className="w-5 h-5 text-amber-600" /> :
+                          zoneAnalysisData.activityTime === "Evening" ? <Moon className="w-5 h-5 text-amber-600" /> :
+                            <Clock className="w-5 h-5 text-amber-600" />}
+                        <span className="text-sm font-medium text-gray-600">Strong Business Time</span>
+                      </div>
+                      <div className="text-2xl font-bold text-amber-700">{zoneAnalysisData.activityTime}</div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {zoneAnalysisData.activityTime === "Daytime" ? "Morning to afternoon peak" :
+                          zoneAnalysisData.activityTime === "Evening" ? "Afternoon to night peak" :
+                            "Consistent activity all day"}
+                      </p>
+                    </div>
+
+                    {/* Ease of Opening */}
+                    <div className="p-5 rounded-xl bg-linear-to-br from-purple-50 to-violet-50 border border-purple-100">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Rocket className="w-5 h-5 text-purple-600" />
+                        <span className="text-sm font-medium text-gray-600">Ease of Opening</span>
+                      </div>
+                      <div className="text-2xl font-bold text-purple-700">{zoneAnalysisData.easeOfOpening}</div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {zoneAnalysisData.easeOfOpening === "Easy" ? "Low barriers to entry" :
+                          zoneAnalysisData.easeOfOpening === "Challenging" ? "May require differentiation" :
+                            "Standard market conditions"}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          {/* Zone Analysis Component */}
-          <ZoneAnalysis
-            analysis={aggregateZoneAnalysis}
-            suitability={aggregateSuitability}
-            category={businessType}
-          />
+              {/* Business Activity Time Section */}
+              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+                <CardHeader className="bg-linear-to-r from-amber-50 to-orange-50 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-linear-to-br from-amber-500 to-orange-600 rounded-xl text-white shadow-lg shadow-amber-200">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Business Activity Time</CardTitle>
+                      <p className="text-sm text-gray-500">When businesses in this area are most active</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Time Distribution Visualization */}
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-700 flex items-center gap-2">
+                        <BarChart3 className="w-4 h-4 text-amber-500" />
+                        Activity Pattern
+                      </h4>
 
-          {/* Insights Panel */}
-          <InsightsPanel insights={aggregateInsights} />
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2 w-24">
+                            <Sun className="w-4 h-4 text-amber-500" />
+                            <span className="text-sm text-gray-600">Daytime</span>
+                          </div>
+                          <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-linear-to-r from-amber-400 to-orange-500 rounded-full transition-all"
+                              style={{ width: `${zoneAnalysisData.activityTime === "Daytime" ? 75 : zoneAnalysisData.activityTime === "Balanced" ? 50 : 30}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-medium text-gray-600 w-12 text-right">
+                            {zoneAnalysisData.activityTime === "Daytime" ? "High" : zoneAnalysisData.activityTime === "Balanced" ? "Med" : "Low"}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2 w-24">
+                            <Moon className="w-4 h-4 text-indigo-500" />
+                            <span className="text-sm text-gray-600">Evening</span>
+                          </div>
+                          <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-linear-to-r from-indigo-400 to-purple-500 rounded-full transition-all"
+                              style={{ width: `${zoneAnalysisData.activityTime === "Evening" ? 75 : zoneAnalysisData.activityTime === "Balanced" ? 50 : 30}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-medium text-gray-600 w-12 text-right">
+                            {zoneAnalysisData.activityTime === "Evening" ? "High" : zoneAnalysisData.activityTime === "Balanced" ? "Med" : "Low"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Time Recommendations */}
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-700 flex items-center gap-2">
+                        <Lightbulb className="w-4 h-4 text-amber-500" />
+                        Operating Hour Recommendations
+                      </h4>
+
+                      <div className="space-y-3">
+                        {zoneAnalysisData.activityTime === "Daytime" ? (
+                          <>
+                            <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
+                              <p className="text-sm text-gray-700">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500 inline mr-2" />
+                                Best hours: <span className="font-semibold">8 AM - 6 PM</span>
+                              </p>
+                            </div>
+                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                              <p className="text-sm text-gray-700">
+                                <AlertTriangle className="w-4 h-4 text-amber-500 inline mr-2" />
+                                Evening operations may have lower foot traffic
+                              </p>
+                            </div>
+                          </>
+                        ) : zoneAnalysisData.activityTime === "Evening" ? (
+                          <>
+                            <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                              <p className="text-sm text-gray-700">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500 inline mr-2" />
+                                Best hours: <span className="font-semibold">4 PM - 10 PM</span>
+                              </p>
+                            </div>
+                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                              <p className="text-sm text-gray-700">
+                                <AlertTriangle className="w-4 h-4 text-amber-500 inline mr-2" />
+                                Morning hours may be slower for customer traffic
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                              <p className="text-sm text-gray-700">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500 inline mr-2" />
+                                Flexible hours: <span className="font-semibold">8 AM - 9 PM</span>
+                              </p>
+                            </div>
+                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                              <p className="text-sm text-gray-700">
+                                <Sparkles className="w-4 h-4 text-purple-500 inline mr-2" />
+                                Area supports both day and evening operations
+                              </p>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Zone Analysis Component */}
+              <ZoneAnalysis
+                analysis={aggregateZoneAnalysis}
+                suitability={aggregateSuitability}
+                category={businessType}
+              />
+
+              {/* Insights Panel */}
+              <InsightsPanel insights={aggregateInsights} />
+            </>
+          )}
         </TabsContent>
 
         {/* MARKET GAPS TAB */}
@@ -4012,19 +4042,32 @@ export function OpportunitiesPage() {
 
         {/* HISTORY TAB */}
         <TabsContent value="history" className="space-y-6">
-          <ClusteringHistory
-            onSelectHistory={(item) => {
-              // When history item is selected, update clustering results and switch to overview
-              if (item.locations && item.locations.length > 0) {
-                // Reload data with the selected history item
-                toast.success(`Loaded: ${item.business_category}`, {
-                  description: `${item.locations.length} opportunities from ${new Date(item.created_at).toLocaleDateString()}`,
-                });
-                setSelectedTab("overview");
-              }
-            }}
-            maxItems={20}
-          />
+          {/* Empty State - No Clustering History */}
+          {!hasClusteringResults ? (
+            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+              <CardContent className="p-12 text-center">
+                <div className="p-4 bg-amber-100 rounded-full w-fit mx-auto mb-4">
+                  <AlertCircle className="w-8 h-8 text-amber-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">No clustering history available</h3>
+                <p className="text-gray-500">Run clustering to generate new results.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <ClusteringHistory
+              onSelectHistory={(item) => {
+                // When history item is selected, update clustering results and switch to overview
+                if (item.locations && item.locations.length > 0) {
+                  // Reload data with the selected history item
+                  toast.success(`Loaded: ${item.business_category}`, {
+                    description: `${item.locations.length} opportunities from ${new Date(item.created_at).toLocaleDateString()}`,
+                  });
+                  setSelectedTab("overview");
+                }
+              }}
+              maxItems={20}
+            />
+          )}
         </TabsContent>
       </Tabs>
 
