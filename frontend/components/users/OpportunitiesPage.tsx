@@ -429,13 +429,13 @@ function generateOpportunityType(
 // Primary advantages pool - rotated to avoid repetition
 const PRIMARY_ADVANTAGES = [
   "Minimal competition means easier market entry",
-  "High foot traffic from nearby businesses",
+  "High accessibility from nearby main roads",
   "Strong demand from residential community",
-  "Prime location on busy commercial stretch",
+  "Prime location on accessible commercial stretch",
   "Underserved area with growing population",
   "Near schools and family activity zones",
   "Evening crowd brings consistent customers",
-  "Mix of residential and commercial traffic",
+  "Good accessibility for both residents and businesses",
   "First-mover opportunity in developing area",
   "Established customer base in the vicinity",
   "Low rental costs with good visibility",
@@ -460,15 +460,13 @@ function generatePrimaryAdvantage(
   if (competitors === 0) {
     baseIndex = 0; // Minimal competition
   } else if (density >= 15) {
-    baseIndex = 1; // High foot traffic
+    baseIndex = 1; // High accessibility
   } else if (zone.includes("residential")) {
     baseIndex = 2; // Residential community
   } else if (zone.includes("commercial")) {
     baseIndex = 3; // Commercial stretch
   } else if (competitors <= 2 && density >= 5) {
     baseIndex = 4; // Underserved area
-  } else if (zone.includes("mixed")) {
-    baseIndex = 7; // Mixed traffic
   } else {
     baseIndex = 9; // Established customer base
   }
@@ -1279,7 +1277,7 @@ export function OpportunitiesPage() {
       // Use predictive score when preferences are applied
       const score = appliedPreferences
         ? calculatePredictiveScore(loc, activePrefs, locations)
-        : computeOpportunityScore(businessDensity, competitors, loc.zone_type || "Mixed");
+        : computeOpportunityScore(businessDensity, competitors, loc.zone_type || "Commercial");
 
       return {
         title: `${businessType || "Business"} near ${loc.street || "Unknown"}`,
@@ -1287,7 +1285,7 @@ export function OpportunitiesPage() {
         location: loc.street || "Unknown",
         businessDensity,
         competitors,
-        zone_type: loc.zone_type || "Mixed",
+        zone_type: loc.zone_type || "Commercial",
         saturation: computeSaturation(businessDensity, competitors),
         score,
         cluster: loc.cluster,
@@ -1298,7 +1296,7 @@ export function OpportunitiesPage() {
         insights: generateInsights({
           businessDensity,
           competitors,
-          zone_type: loc.zone_type || "Mixed",
+          zone_type: loc.zone_type || "Commercial",
         }),
       };
     })
@@ -1310,7 +1308,7 @@ export function OpportunitiesPage() {
   const aggregateZoneAnalysis = useMemo(() => {
     if (opportunities.length === 0) {
       return {
-        bestZone: "Mixed" as const,
+        bestZone: "Commercial" as const,
         score: 0,
         reasoning: ["No opportunities available for analysis"],
         competitionLevel: "Low" as const,
@@ -1320,7 +1318,7 @@ export function OpportunitiesPage() {
     }
     const avgDensity = opportunities.reduce((sum, op) => sum + op.businessDensity, 0) / opportunities.length;
     const avgCompetitors = opportunities.reduce((sum, op) => sum + op.competitors, 0) / opportunities.length;
-    const primaryZone = opportunities[0]?.zone_type || "Mixed";
+    const primaryZone = opportunities[0]?.zone_type || "Commercial";
 
     return determineBestZone(avgDensity, avgCompetitors, primaryZone, businessType);
   }, [opportunities, businessType]);
@@ -1354,7 +1352,7 @@ export function OpportunitiesPage() {
     const avgDensity = opportunities.reduce((sum, op) => sum + op.businessDensity, 0) / opportunities.length;
     const avgCompetitors = opportunities.reduce((sum, op) => sum + op.competitors, 0) / opportunities.length;
     const avgScore = opportunities.reduce((sum, op) => sum + op.score, 0) / opportunities.length;
-    const primaryZone = opportunities[0]?.zone_type || "Mixed";
+    const primaryZone = opportunities[0]?.zone_type || "Commercial";
 
     return generateInsightsPanelData(businessType, primaryZone, avgDensity, avgCompetitors, avgScore);
   }, [opportunities, businessType]);
@@ -1512,7 +1510,7 @@ export function OpportunitiesPage() {
       opportunityFocusWhy = "Low competition during evening hours makes this ideal for after-work customers.";
     } else if (operatingTime === "Day" && competitionLevel === "Low") {
       opportunityFocus = "Best for daytime services";
-      opportunityFocusWhy = "Daytime foot traffic is high with few competitors serving the area.";
+      opportunityFocusWhy = "Daytime accessibility is high with few competitors serving the area.";
     } else if (setupSpeed === "Fast" && competitionLevel === "Low") {
       opportunityFocus = "Best for quick setup";
       opportunityFocusWhy = `${category} businesses require less space and lower setup time based on local patterns.`;
@@ -1749,7 +1747,7 @@ export function OpportunitiesPage() {
       } else if (clusterTop.score >= 80) {
         whyStandsOut = "High opportunity score with balanced market conditions";
       } else if (clusterTop.businessDensity >= 15) {
-        whyStandsOut = "High foot traffic area with strong customer potential";
+        whyStandsOut = "High accessibility area with strong customer potential";
       } else {
         whyStandsOut = "Good location with room for growth";
       }
@@ -3690,7 +3688,7 @@ export function OpportunitiesPage() {
                             <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
                               <p className="text-sm text-gray-700">
                                 <AlertTriangle className="w-4 h-4 text-amber-500 inline mr-2" />
-                                Evening operations may have lower foot traffic
+                                Evening operations may have lower customer flow
                               </p>
                             </div>
                           </>
