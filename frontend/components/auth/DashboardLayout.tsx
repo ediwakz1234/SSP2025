@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 
 import {
@@ -7,32 +6,19 @@ import {
   BarChart3,
   Map,
   TrendingUp,
-  LogOut,
   Menu,
-  X,
   User,
   MapPin,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 
 import { Button } from "../ui/button";
 import { supabase } from "../../lib/supabase";
 import { useKMeansStore } from "../../lib/stores/kmeansStore";
+import { GlobalSidebar } from "../shared/GlobalSidebar";
 
 export function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Extract the segment AFTER /user/
-  const currentPath = location.pathname;
-  const currentPage =
-    currentPath.startsWith("/user/")
-      ? currentPath.replace("/user/", "").split("/")[0]
-      : "dashboard";
 
   // Menu items organized by category
   const menuCategories = [
@@ -59,140 +45,38 @@ export function DashboardLayout() {
     }
   ];
 
-  const handleNavigate = (path: string) => {
-    navigate(path);
-    setIsMobileMenuOpen(false);
-  };
-
   const handleLogout = async () => {
-    // Clear K-Means session data before logout
     useKMeansStore.getState().reset();
     await supabase.auth.signOut();
     navigate("/user/login");
   };
 
+  // Extract current page for header
+  const currentPath = location.pathname;
+  const currentPage = currentPath.startsWith("/user/")
+    ? currentPath.replace("/user/", "").split("/")[0]
+    : "dashboard";
+
+  const getPageTitle = () => {
+    for (const cat of menuCategories) {
+      const item = cat.items.find(i => i.id === currentPage);
+      if (item) return item.label;
+    }
+    return "Dashboard";
+  };
+
   return (
     <div className="min-h-screen w-full bg-linear-to-br from-gray-50 via-white to-gray-100/50 flex">
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`
-          fixed lg:sticky lg:top-0 z-50 h-screen
-          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-          ${isSidebarOpen ? "w-64" : "w-20"}
-          bg-white border-r border-gray-100
-          shadow-xl lg:shadow-md
-          transition-all duration-300 ease-out
-          flex flex-col
-        `}
-      >
-        {/* Header */}
-        <div className="p-5 border-b border-gray-100 flex items-center gap-3">
-          {isSidebarOpen && (
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-[#1e3a5f] shadow-lg shadow-slate-900/20 flex items-center justify-center shrink-0">
-                <MapPin className="w-5 h-5 text-white" />
-              </div>
-              <div className="min-w-0">
-                <h1 className="font-heading font-bold text-gray-900 truncate">Store Placement</h1>
-                <p className="text-xs text-gray-500 truncate">Business Analytics</p>
-              </div>
-            </div>
-          )}
-
-          {!isSidebarOpen && (
-            <div className="w-10 h-10 rounded-xl bg-[#1e3a5f] shadow-lg shadow-slate-900/20 flex items-center justify-center mx-auto">
-              <MapPin className="w-5 h-5 text-white" />
-            </div>
-          )}
-
-          {/* Desktop Toggle */}
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="hidden lg:flex text-gray-500 hover:text-gray-900 hover:bg-gray-100"
-          >
-            {isSidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-          </Button>
-
-          {/* Mobile Close */}
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="lg:hidden text-gray-500 hover:text-gray-900 hover:bg-gray-100"
-          >
-            <X className="w-5 h-5" />
-          </Button>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-3 overflow-y-auto">
-          {menuCategories.map((category, catIdx) => (
-            <div key={category.category} className={catIdx > 0 ? "mt-4" : ""}>
-              {/* Category Header */}
-              {isSidebarOpen && (
-                <div className="px-3 py-2">
-                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    {category.category}
-                  </span>
-                </div>
-              )}
-
-              {/* Menu Items */}
-              <div className="space-y-1">
-                {category.items.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = currentPage === item.id;
-
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => handleNavigate(item.path)}
-                      className={`
-                        w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
-                        transition-all duration-200 group relative
-                        ${isActive
-                          ? "bg-[#1e3a5f] text-white shadow-lg shadow-slate-900/20"
-                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        }
-                      `}
-                    >
-                      <Icon className={`w-5 h-5 shrink-0 ${isActive ? '' : 'group-hover:scale-110'} transition-transform`} />
-                      {isSidebarOpen && (
-                        <span className="text-sm font-medium text-left">{item.label}</span>
-                      )}
-                      {isActive && isSidebarOpen && (
-                        <div className="absolute right-3 w-2 h-2 rounded-full bg-white/50" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </nav>
-
-        {/* Logout Button */}
-        <div className="mt-auto p-4 border-t border-gray-100">
-          <Button
-            onClick={handleLogout}
-            variant="destructive"
-            className={`w-full ${isSidebarOpen ? '' : 'px-0 justify-center'}`}
-          >
-            <LogOut className="w-5 h-5" />
-            {isSidebarOpen && <span>Logout</span>}
-          </Button>
-        </div>
-      </aside>
+      {/* Shared Sidebar */}
+      <GlobalSidebar
+        variant="user"
+        menuCategories={menuCategories}
+        onLogout={handleLogout}
+        headerIcon={MapPin}
+        headerTitle="Store Placement"
+        headerSubtitle="Business Analytics"
+        basePath="/user"
+      />
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0">
@@ -202,7 +86,6 @@ export function DashboardLayout() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setIsMobileMenuOpen(true)}
             className="lg:hidden text-gray-600 hover:text-gray-900"
           >
             <Menu className="w-5 h-5" />
@@ -218,11 +101,11 @@ export function DashboardLayout() {
           {/* Mobile Title */}
           <div className="lg:hidden text-center flex-1">
             <h2 className="text-base font-heading font-semibold text-gray-900">
-              Store Placement
+              {getPageTitle()}
             </h2>
           </div>
 
-          {/* Right side - can add notifications, user avatar, etc. */}
+          {/* Right side placeholder */}
           <div className="w-10 lg:w-auto" />
         </header>
 
