@@ -951,11 +951,11 @@ function generateClusterInsights(kpis: ClusterKPIs, locations: LocationData[]): 
     : 0;
 
   if (commercialPct > 50) {
-    insights.push(`Zone analysis: ${commercialPct}% commercial zones — high foot traffic areas dominate`);
+    insights.push(`Accessibility: ${commercialPct}% high-access locations near main roads`);
   } else if (residentialPct > 50) {
-    insights.push(`Zone analysis: ${residentialPct}% residential zones — community-focused businesses recommended`);
+    insights.push(`Accessibility: ${residentialPct}% residential zones — community-focused businesses recommended`);
   } else {
-    insights.push(`Zone analysis: Balanced mix — ${commercialPct}% commercial, ${residentialPct}% residential`);
+    insights.push(`Accessibility: Balanced mix — ${commercialPct}% high-access, ${residentialPct}% residential`);
   }
 
   // 6. HIGHEST DENSITY CLUSTER
@@ -1470,7 +1470,7 @@ export function OpportunitiesPage() {
       operatingTimeWhy = "Residential areas show higher daytime activity from local residents.";
     } else if (commercialRatio > 0.4 && residentialRatio < 0.3) {
       operatingTime = "Evening";
-      operatingTimeWhy = "Commercial zones show peak activity during evening hours.";
+      operatingTimeWhy = "High-access areas show peak activity during evening hours.";
     } else {
       operatingTimeWhy = "Customer activity is spread across morning and evening based on clustering data.";
     }
@@ -1970,7 +1970,7 @@ export function OpportunitiesPage() {
       "Avg Density": cluster.avgDensity,
       "Avg Competitors": cluster.avgCompetition,
       "Location Count": cluster.locationCount,
-      "Commercial Zones": cluster.commercialCount,
+      "High-Access Locations": cluster.commercialCount,
       "Residential Zones": cluster.residentialCount,
       "Mixed Zones": cluster.mixedCount,
       "Center Latitude": cluster.centerLat.toFixed(6),
@@ -2077,7 +2077,7 @@ export function OpportunitiesPage() {
       ["Number of Clusters", clusterKPIs.numClusters.toString()],
       ["Avg Business Density", clusterKPIs.avgBusinessDensity.toString()],
       ["Avg Competition", clusterKPIs.avgCompetition.toString()],
-      ["Commercial Zones", clusterKPIs.commercialZoneCount.toString()],
+      ["Accessibility Score", clusterKPIs.commercialZoneCount >= 40 ? "High" : clusterKPIs.commercialZoneCount >= 20 ? "Medium" : "Low"],
       ["Residential Zones", clusterKPIs.residentialZoneCount.toString()],
     ];
 
@@ -2272,17 +2272,17 @@ export function OpportunitiesPage() {
         <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm overflow-hidden group hover:shadow-xl transition-all hover:scale-[1.02]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-gray-500">Commercial Zones</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-500">Accessibility</CardTitle>
               <div className="p-2 bg-linear-to-br from-purple-500 to-violet-600 rounded-lg text-white shadow-lg shadow-purple-200">
                 <MapPin className="w-4 h-4" />
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold bg-linear-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">
-              {effectiveKPIs.commercialZoneCount}
+            <div className="text-2xl font-bold bg-linear-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">
+              {effectiveKPIs.commercialZoneCount >= 40 ? "High" : effectiveKPIs.commercialZoneCount >= 20 ? "Medium" : hasClusteringResults ? "Low" : "—"}
             </div>
-            <p className="text-xs text-gray-500 mt-1">of {effectiveKPIs.totalOpportunities} cluster locations</p>
+            <p className="text-xs text-gray-500 mt-1">Based on road proximity</p>
           </CardContent>
         </Card>
       </div>
@@ -2576,6 +2576,60 @@ export function OpportunitiesPage() {
                 </Card>
               )}
             </div>
+          )}
+
+          {/* Opportunity Cards Explained */}
+          {hasClusteringResults && (
+            <Card className="mt-6 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-br from-slate-500 to-gray-600 rounded-lg text-white">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">Opportunity Cards Explained</CardTitle>
+                    <p className="text-sm text-gray-500">Understanding what each metric means</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h5 className="font-semibold text-gray-800 mb-2">📊 Opportunity Score</h5>
+                    <p className="text-gray-600">Overall area potential based on business density, competition, and readiness.</p>
+                    <p className="text-xs text-gray-500 mt-2 italic">Example: 54% = moderate potential with room for improvement.</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h5 className="font-semibold text-gray-800 mb-2">🕐 Best Operating Time</h5>
+                    <p className="text-gray-600">When businesses are most active in the area based on surrounding activity.</p>
+                    <p className="text-xs text-gray-500 mt-2 italic">Example: "Both" = all-day operations recommended.</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h5 className="font-semibold text-gray-800 mb-2">⚡ Setup Speed</h5>
+                    <p className="text-gray-600">Estimated time to start operating: Fast (2-4 weeks), Moderate (1-2 months), Slow (3-6 months).</p>
+                    <p className="text-xs text-gray-500 mt-2 italic">Example: "Fast" = minimal preparation needed.</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h5 className="font-semibold text-gray-800 mb-2">👥 Competition Level</h5>
+                    <p className="text-gray-600">How many similar businesses operate nearby. Low = stable in 1-2 months, Medium = 3-6 months, High = 6-12 months.</p>
+                    <p className="text-xs text-gray-500 mt-2 italic">Example: "Medium" = some competitors exist but market is not overcrowded.</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h5 className="font-semibold text-gray-800 mb-2">🎯 Opportunity Focus</h5>
+                    <p className="text-gray-600">The main advantage this location offers for your business type.</p>
+                    <p className="text-xs text-gray-500 mt-2 italic">Example: "Best for quick setup" = location supports faster business entry.</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h5 className="font-semibold text-gray-800 mb-2">✅ Area Readiness</h5>
+                    <p className="text-gray-600">How prepared the area is: High (2-4 weeks), Medium (1-3 months), Low (3-6 months).</p>
+                    <p className="text-xs text-gray-500 mt-2 italic">Example: "Medium" = some preparation needed before opening.</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-400 mt-4 text-center">
+                  * Accessibility is used as a proxy for visibility. Locations closer to main roads and intersections are generally easier for customers to reach.
+                </p>
+              </CardContent>
+            </Card>
           )}
         </TabsContent>
 
@@ -3675,10 +3729,10 @@ export function OpportunitiesPage() {
                   <div className="grid md:grid-cols-2 gap-4">
                     {/* Morning Gap */}
                     <div className={`p-5 rounded-xl border-2 bg-white hover:shadow-md transition-all ${timeBasedGapsData.morning.status === "Gap Identified"
-                        ? "border-rose-200"
-                        : timeBasedGapsData.morning.status === "No Data Available"
-                          ? "border-gray-200"
-                          : "border-emerald-200"
+                      ? "border-rose-200"
+                      : timeBasedGapsData.morning.status === "No Data Available"
+                        ? "border-gray-200"
+                        : "border-emerald-200"
                       }`}>
                       <div className="flex items-center gap-3 mb-3">
                         <div className="p-2 bg-amber-100 rounded-lg">
@@ -3687,10 +3741,10 @@ export function OpportunitiesPage() {
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-800">Morning Hours ({timeBasedGapsData.morning.period})</h4>
                           <Badge className={`mt-1 ${timeBasedGapsData.morning.status === "Gap Identified"
-                              ? "bg-rose-100 text-rose-700"
-                              : timeBasedGapsData.morning.status === "No Data Available"
-                                ? "bg-gray-100 text-gray-600"
-                                : "bg-emerald-100 text-emerald-700"
+                            ? "bg-rose-100 text-rose-700"
+                            : timeBasedGapsData.morning.status === "No Data Available"
+                              ? "bg-gray-100 text-gray-600"
+                              : "bg-emerald-100 text-emerald-700"
                             }`}>
                             {timeBasedGapsData.morning.status}
                           </Badge>
@@ -3724,10 +3778,10 @@ export function OpportunitiesPage() {
 
                     {/* Evening Gap */}
                     <div className={`p-5 rounded-xl border-2 bg-white hover:shadow-md transition-all ${timeBasedGapsData.evening.status === "Gap Identified"
-                        ? "border-rose-200"
-                        : timeBasedGapsData.evening.status === "No Data Available"
-                          ? "border-gray-200"
-                          : "border-emerald-200"
+                      ? "border-rose-200"
+                      : timeBasedGapsData.evening.status === "No Data Available"
+                        ? "border-gray-200"
+                        : "border-emerald-200"
                       }`}>
                       <div className="flex items-center gap-3 mb-3">
                         <div className="p-2 bg-indigo-100 rounded-lg">
@@ -3736,10 +3790,10 @@ export function OpportunitiesPage() {
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-800">Evening Hours ({timeBasedGapsData.evening.period})</h4>
                           <Badge className={`mt-1 ${timeBasedGapsData.evening.status === "Gap Identified"
-                              ? "bg-rose-100 text-rose-700"
-                              : timeBasedGapsData.evening.status === "No Data Available"
-                                ? "bg-gray-100 text-gray-600"
-                                : "bg-emerald-100 text-emerald-700"
+                            ? "bg-rose-100 text-rose-700"
+                            : timeBasedGapsData.evening.status === "No Data Available"
+                              ? "bg-gray-100 text-gray-600"
+                              : "bg-emerald-100 text-emerald-700"
                             }`}>
                             {timeBasedGapsData.evening.status}
                           </Badge>
