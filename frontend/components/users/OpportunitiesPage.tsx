@@ -55,6 +55,7 @@ import {
   getDefaultTimeBasedGaps,
   type TimeBasedGapsResult,
 } from "../../utils/timeBasedGapsUtils";
+import { ClusteringHistory } from "./ClusteringHistory";
 
 // -----------------------------------------------------------------------------
 // Types
@@ -2163,7 +2164,7 @@ export function OpportunitiesPage() {
 
       {/* Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-        <TabsList className="grid grid-cols-4 w-full h-14 bg-white/80 backdrop-blur-sm shadow-lg rounded-xl p-1.5">
+        <TabsList className="grid grid-cols-5 w-full h-14 bg-white/80 backdrop-blur-sm shadow-lg rounded-xl p-1.5">
           <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-linear-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium transition-all">
             Overview
           </TabsTrigger>
@@ -2175,6 +2176,9 @@ export function OpportunitiesPage() {
           </TabsTrigger>
           <TabsTrigger value="market-gaps" className="rounded-lg data-[state=active]:bg-linear-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium transition-all">
             Market Gaps
+          </TabsTrigger>
+          <TabsTrigger value="history" className="rounded-lg data-[state=active]:bg-linear-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium transition-all">
+            History
           </TabsTrigger>
         </TabsList>
 
@@ -3658,6 +3662,23 @@ export function OpportunitiesPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* HISTORY TAB */}
+        <TabsContent value="history" className="space-y-6">
+          <ClusteringHistory
+            onSelectHistory={(item) => {
+              // When history item is selected, update clustering results and switch to overview
+              if (item.locations && item.locations.length > 0) {
+                // Reload data with the selected history item
+                toast.success(`Loaded: ${item.business_category}`, {
+                  description: `${item.locations.length} opportunities from ${new Date(item.created_at).toLocaleDateString()}`,
+                });
+                setSelectedTab("overview");
+              }
+            }}
+            maxItems={20}
+          />
         </TabsContent>
       </Tabs>
 

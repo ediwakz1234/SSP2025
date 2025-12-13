@@ -64,6 +64,7 @@ import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import { useNavigate } from "react-router-dom";
 import { useKMeansStore } from "../../lib/stores/kmeansStore";
+import { generateBusinessIdeaFromClustering } from "../../utils/businessIdeaGenerator";
 
 
 
