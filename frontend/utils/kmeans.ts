@@ -70,6 +70,57 @@ export interface ClusteringResult {
 }
 
 // -----------------------------------------------------------------------------
+// MARKET SATURATION INTERPRETATION
+// -----------------------------------------------------------------------------
+
+export interface MarketSaturationStatus {
+  percentage: number;
+  status: "Good Opportunity" | "Needs Strategic Planning" | "Highly Saturated";
+  color: "green" | "yellow" | "red";
+  emoji: "🟢" | "🟡" | "🔴";
+  explanation: string;
+  shortText: string;
+}
+
+/**
+ * Interpret market saturation value and return user-friendly status
+ * @param saturation - Market saturation as decimal (0-1) or percentage (0-100)
+ */
+export function interpretMarketSaturation(saturation: number): MarketSaturationStatus {
+  // Convert to percentage if given as decimal
+  const percentage = saturation <= 1 ? Math.round(saturation * 100) : Math.round(saturation);
+
+  if (percentage <= 30) {
+    return {
+      percentage,
+      status: "Good Opportunity",
+      color: "green",
+      emoji: "🟢",
+      explanation: "Competition in this area is relatively low, making it suitable for new business entry with minimal competitive pressure.",
+      shortText: "Low competition in this area makes it a good place to start a new business."
+    };
+  } else if (percentage <= 60) {
+    return {
+      percentage,
+      status: "Needs Strategic Planning",
+      color: "yellow",
+      emoji: "🟡",
+      explanation: "Moderate competition exists in this area. Success depends on differentiation and a clear value proposition.",
+      shortText: "Moderate competition — success depends on how you differentiate your business."
+    };
+  } else {
+    return {
+      percentage,
+      status: "Highly Saturated",
+      color: "red",
+      emoji: "🔴",
+      explanation: "This area has high competition. Entry is risky without a strong competitive advantage or unique offering.",
+      shortText: "High competition — consider a different location or strong differentiation strategy."
+    };
+  }
+}
+
+// -----------------------------------------------------------------------------
 // COLORS
 // -----------------------------------------------------------------------------
 
