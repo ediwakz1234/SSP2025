@@ -33,21 +33,21 @@ function FeatureItemAdmin({ text }: { text: string }) {
 }
 
 /* Feature Card Component */
-function FeatureCard({ 
-  icon: Icon, 
-  title, 
-  description, 
-  delay = "0ms" 
-}: { 
-  icon: React.ElementType; 
-  title: string; 
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  delay = "0ms"
+}: {
+  icon: React.ElementType;
+  title: string;
   description: string;
   delay?: string;
 }) {
   return (
-    <Card 
-      variant="elevated" 
-      className="group animate-fadeInUp" 
+    <Card
+      variant="elevated"
+      className="group animate-fadeInUp"
       style={{ animationDelay: delay }}
     >
       <CardHeader className="pb-3">
@@ -168,7 +168,7 @@ export function LandingPage() {
           </p>
 
           <p className="text-sm text-gray-400 mt-6 max-w-lg mx-auto animate-fadeIn delay-300">
-            A comprehensive business analytics platform leveraging real field survey data 
+            A comprehensive business analytics platform leveraging real field survey data
             and machine learning for optimal store placement decisions.
           </p>
 
@@ -195,31 +195,15 @@ export function LandingPage() {
           </div>
         </div>
 
-        {/* FEATURE CARDS */}
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-24">
-          <FeatureCard
-            icon={Target}
-            title="K-Means Clustering"
-            description="Advanced clustering algorithm using the Haversine formula for precise geographic analysis and optimal location grouping."
-            delay="100ms"
-          />
-          <FeatureCard
-            icon={BarChart3}
-            title="Real-Time Analytics"
-            description="Interactive map visualization & comprehensive competitor analysis for data-driven business decisions."
-            delay="200ms"
-          />
-        </div>
-
-        {/* PORTAL CARDS */}
-        <div className={`grid gap-8 max-w-4xl mx-auto ${showUser && showAdmin ? 'md:grid-cols-2' : 'md:grid-cols-1 justify-items-center'}`}>
+        {/* PORTAL CARDS - Login First */}
+        <div className={`grid gap-8 max-w-4xl mx-auto mb-24 ${showUser && showAdmin ? 'md:grid-cols-2' : 'md:grid-cols-1 justify-items-center'}`}>
 
           {/* USER PORTAL */}
           {showUser && (
-            <Card 
-              variant="elevated" 
+            <Card
+              variant="elevated"
               className="w-full max-w-md animate-fadeInUp"
-              style={{ animationDelay: '300ms' }}
+              style={{ animationDelay: '100ms' }}
             >
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto w-18 h-18 rounded-2xl bg-slate-100 flex items-center justify-center mb-4 shadow-lg shadow-slate-200">
@@ -256,10 +240,10 @@ export function LandingPage() {
 
           {/* ADMIN PORTAL */}
           {showAdmin && (
-            <Card 
-              variant="elevated" 
+            <Card
+              variant="elevated"
               className="w-full max-w-md animate-fadeInUp"
-              style={{ animationDelay: '400ms' }}
+              style={{ animationDelay: '200ms' }}
             >
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto w-18 h-18 rounded-2xl bg-slate-100 flex items-center justify-center mb-4 shadow-lg shadow-slate-200">
@@ -292,6 +276,22 @@ export function LandingPage() {
               </CardContent>
             </Card>
           )}
+        </div>
+
+        {/* FEATURE CARDS */}
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-24">
+          <FeatureCard
+            icon={Target}
+            title="K-Means Clustering"
+            description="Advanced clustering algorithm using the Haversine formula for precise geographic analysis and optimal location grouping."
+            delay="300ms"
+          />
+          <FeatureCard
+            icon={BarChart3}
+            title="Real-Time Analytics"
+            description="Interactive map visualization & comprehensive competitor analysis for data-driven business decisions."
+            delay="400ms"
+          />
         </div>
 
         {/* CTA Section */}
