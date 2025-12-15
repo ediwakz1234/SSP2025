@@ -2344,9 +2344,11 @@ export function OpportunitiesPage() {
           <TabsTrigger value="market-gaps" className="rounded-lg data-[state=active]:bg-linear-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium transition-all">
             Market Gaps
           </TabsTrigger>
+          {/* ARCHIVED: History tab hidden for now
           <TabsTrigger value="history" className="rounded-lg data-[state=active]:bg-linear-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium transition-all">
             History
           </TabsTrigger>
+          */}
         </TabsList>
 
         {/* OVERVIEW TAB */}
@@ -4142,9 +4144,8 @@ export function OpportunitiesPage() {
           )}
         </TabsContent>
 
-        {/* HISTORY TAB */}
+        {/* ARCHIVED: History tab content hidden for now
         <TabsContent value="history" className="space-y-6">
-          {/* Empty State - No Clustering History */}
           {!hasClusteringResults ? (
             <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
               <CardContent className="p-12 text-center">
@@ -4158,9 +4159,7 @@ export function OpportunitiesPage() {
           ) : (
             <ClusteringHistory
               onSelectHistory={(item) => {
-                // When history item is selected, update clustering results and switch to overview
                 if (item.locations && item.locations.length > 0) {
-                  // Reload data with the selected history item
                   toast.success(`Loaded: ${item.business_category}`, {
                     description: `${item.locations.length} opportunities from ${new Date(item.created_at).toLocaleDateString()}`,
                   });
@@ -4171,6 +4170,7 @@ export function OpportunitiesPage() {
             />
           )}
         </TabsContent>
+        */}
       </Tabs>
 
       {/* Preferences Modal */}
