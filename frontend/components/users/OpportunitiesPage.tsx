@@ -973,13 +973,17 @@ function generateClusterInsights(kpis: ClusterKPIs, locations: LocationData[]): 
   return insights.slice(0, 6); // Limit to top 6 insights
 }
 
-function buildCategoryStats(businesses: BusinessRow[]): CategoryStat[] {
+function buildCategoryStats(businesses: BusinessRow[], locations: LocationData[] = []): CategoryStat[] {
   const map = new Map<
     string,
     { count: number; totalDensity: number; totalCompetitors: number }
   >();
 
-  businesses.forEach((b) => {
+  // Use locations if available (enriched data), otherwise fallback to businesses
+  const sourceData = locations.length > 0 ? locations : businesses;
+
+  sourceData.forEach((b) => {
+    // b can be BusinessRow or LocationData - they share these fields
     const key = b.general_category || "Uncategorized";
     const prev = map.get(key) ?? {
       count: 0,
@@ -1038,14 +1042,37 @@ function classifyGapLevel(gapScore: number): GapLevel {
 
 function buildMarketGaps(
   businesses: BusinessRow[],
-  opportunities: Opportunity[]
+  opportunities: Opportunity[],
+  locations: LocationData[] = []
 ): MarketGap[] {
   const map = new Map<
     string,
     { totalDemand: number; totalSupply: number; count: number; zones: string[] }
   >();
 
-  businesses.forEach((b) => {
+  // Use locations if available (they have computed densities), otherwise fallback to businesses
+  const sourceData = locations.length > 0 ? locations : businesses;
+
+  // Enhance source data with computed densities if stored values are 0
+  const enhancedSource = sourceData.map((b) => {
+    // If stored density is 0 or undefined, compute it dynamically
+    if (!b.business_density_200m && !b.competitor_density_200m && locations.length > 0) {
+      const { businessDensity, competitorDensity } = computeDynamicDensity(
+        b as LocationData,
+        locations,
+        0.2 // 200m radius
+      );
+      return {
+        ...b,
+        business_density_200m: businessDensity,
+        competitor_density_200m: competitorDensity,
+      };
+    }
+    return b;
+  });
+
+  enhancedSource.forEach((b) => {
+    // Both BusinessRow and LocationData have these fields
     const key = b.general_category || "Uncategorized";
     const prev = map.get(key) ?? {
       totalDemand: 0,
@@ -1370,10 +1397,10 @@ export function OpportunitiesPage() {
     [clusterKPIs, locations]
   );
 
-  const categoryStats = useMemo(() => buildCategoryStats(businesses), [businesses]);
+  const categoryStats = useMemo(() => buildCategoryStats(businesses, locations), [businesses, locations]);
   const zoneStats = useMemo(() => buildZoneStats(businesses), [businesses]);
   const totalBusinesses = businesses.length;
-  const marketGaps = useMemo(() => buildMarketGaps(businesses, opportunities), [businesses, opportunities]);
+  const marketGaps = useMemo(() => buildMarketGaps(businesses, opportunities, locations), [businesses, opportunities, locations]);
 
   // Check if clustering has been run in the current session
   const hasClusteringResults = hasClusteringResultsFromStore;
