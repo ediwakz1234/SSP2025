@@ -1069,7 +1069,10 @@ function buildMarketGaps(
 
     const demand = Math.round(value.totalDemand / value.count);
     const supply = Math.round(value.totalSupply / value.count);
-    const gapScore = demand - supply;
+    // Calculate opportunity gap score using ratio-based formula
+    // High demand (business activity) + Low supply (competitors) = High opportunity
+    // Formula: demand / (supply + 1) gives higher scores for underserved markets
+    const gapScore = Math.round((demand / (supply + 1)) * 2);
 
     // recommended locations = opportunity streets of this category
     const recLocations = Array.from(
