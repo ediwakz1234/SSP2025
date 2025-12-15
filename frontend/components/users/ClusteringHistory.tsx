@@ -12,6 +12,7 @@ import {
     RefreshCw,
     RotateCcw,
     Check,
+    Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useKMeansStore } from "../../lib/stores/kmeansStore";
@@ -104,6 +105,7 @@ export function ClusteringHistory({ onSelectHistory, maxItems = 10 }: Clustering
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [restoringId, setRestoringId] = useState<string | null>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     // Get active version from store
     const activeVersionId = useKMeansStore((state) => state.activeVersionId);
@@ -137,6 +139,41 @@ export function ClusteringHistory({ onSelectHistory, maxItems = 10 }: Clustering
     useEffect(() => {
         loadHistory();
     }, [maxItems]);
+
+    // Handle delete action
+    const handleDelete = async (item: ClusteringHistoryItem, versionNumber: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        // Confirm before deleting
+        if (!window.confirm(`Delete v${versionNumber} (${item.business_category})? This cannot be undone.`)) {
+            return;
+        }
+
+        setDeletingId(item.id);
+
+        try {
+            const { error: deleteError } = await supabase
+                .from("clustering_opportunities")
+                .delete()
+                .eq("id", item.id);
+
+            if (deleteError) {
+                throw deleteError;
+            }
+
+            toast.success(`Deleted v${versionNumber}`, {
+                description: `${item.business_category} removed from history`,
+            });
+
+            // Reload history after deletion
+            await loadHistory();
+        } catch (err) {
+            console.error("Error deleting history item:", err);
+            toast.error("Failed to delete history item");
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     // Handle restore action
     const handleRestore = async (item: ClusteringHistoryItem, versionNumber: number, e: React.MouseEvent) => {
@@ -262,8 +299,8 @@ export function ClusteringHistory({ onSelectHistory, maxItems = 10 }: Clustering
                             <div
                                 key={item.id}
                                 className={`p-4 rounded-xl border transition-all ${isActive
-                                        ? "border-indigo-400 bg-indigo-50/50 shadow-md"
-                                        : "bg-white hover:border-indigo-200 hover:shadow-md"
+                                    ? "border-indigo-400 bg-indigo-50/50 shadow-md"
+                                    : "bg-white hover:border-indigo-200 hover:shadow-md"
                                     }`}
                             >
                                 <div className="flex items-center justify-between">
@@ -312,23 +349,39 @@ export function ClusteringHistory({ onSelectHistory, maxItems = 10 }: Clustering
                                         </div>
                                     </div>
 
-                                    {/* Restore Button */}
-                                    {!isActive && (
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center gap-2 ml-4">
+                                        {!isActive && (
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-700"
+                                                onClick={(e) => handleRestore(item, versionNumber, e)}
+                                                disabled={isRestoring || deletingId === item.id}
+                                            >
+                                                {isRestoring ? (
+                                                    <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
+                                                ) : (
+                                                    <RotateCcw className="w-4 h-4 mr-1" />
+                                                )}
+                                                Restore
+                                            </Button>
+                                        )}
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            className="ml-4 hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-700"
-                                            onClick={(e) => handleRestore(item, versionNumber, e)}
-                                            disabled={isRestoring}
+                                            className="hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+                                            onClick={(e) => handleDelete(item, versionNumber, e)}
+                                            disabled={deletingId === item.id || isRestoring}
                                         >
-                                            {isRestoring ? (
+                                            {deletingId === item.id ? (
                                                 <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
                                             ) : (
-                                                <RotateCcw className="w-4 h-4 mr-1" />
+                                                <Trash2 className="w-4 h-4 mr-1" />
                                             )}
-                                            Restore
+                                            Delete
                                         </Button>
-                                    )}
+                                    </div>
                                 </div>
                             </div>
                         );

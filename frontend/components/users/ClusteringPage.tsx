@@ -1121,6 +1121,9 @@ export function ClusteringPage() {
         // ✔ must match DB column: business_category
         business_category: categoryToAnalyze,
 
+        // ✔ Save the user's business idea for history display
+        business_idea: businessIdea || null,
+
         // ✔ created_at column already has default = now()
         //   (optional, but allowed)
         created_at: new Date().toISOString(),
