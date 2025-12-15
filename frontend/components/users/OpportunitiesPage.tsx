@@ -1035,9 +1035,11 @@ function buildZoneStats(businesses: BusinessRow[]): ZoneStat[] {
 }
 
 function classifyGapLevel(gapScore: number): GapLevel {
-  if (gapScore >= 15) return "High";
-  if (gapScore >= 5) return "Medium";
-  return "Low";
+  // gapScore now represents opportunity level (higher = more opportunity)
+  // Thresholds adjusted for realistic market gap detection
+  if (gapScore >= 5) return "High";    // Strong market opportunity
+  if (gapScore >= 2) return "Medium";  // Moderate opportunity
+  return "Low";                         // Market is balanced
 }
 
 function buildMarketGaps(
