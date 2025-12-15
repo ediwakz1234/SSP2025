@@ -163,8 +163,7 @@ export function AdminPortal() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'businesses' },
-        (payload) => {
-          console.log('Businesses table changed:', payload);
+        () => {
           // Refresh data when businesses table updates
           fetchData();
         }
@@ -281,7 +280,7 @@ export function AdminPortal() {
       <div className="page-content relative overflow-hidden rounded-2xl bg-slate-700 p-6 text-white">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
-        
+
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">

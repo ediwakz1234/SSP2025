@@ -1256,7 +1256,6 @@ export function OpportunitiesPage() {
 
       // Handle clustering results - don't crash on missing data
       if (clusterRes.error) {
-        console.log("No clustering opportunities found:", clusterRes.error.message);
         // This is expected if no clustering has been done yet
         setClusteringResults(null);
       } else if (clusterRes.data) {

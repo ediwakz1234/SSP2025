@@ -1206,7 +1206,6 @@ export default function SeedDataManagement() {
   // Load live stats from database
   const loadStats = async () => {
     try {
-      console.log('📊 Loading stats from Supabase...');
 
       // Get total count of businesses
       const { count: businessCount, error: countError } = await supabase
@@ -1217,7 +1216,6 @@ export default function SeedDataManagement() {
         console.error('❌ Error getting business count:', countError);
         throw countError;
       }
-      console.log('✅ Business count:', businessCount);
       setTotalBusinesses(businessCount || 0);
 
       // Get unique categories count
@@ -1230,7 +1228,6 @@ export default function SeedDataManagement() {
         throw categoryError;
       }
       const uniqueCategories = new Set(categoryData?.map((row: { general_category: string }) => row.general_category) || []);
-      console.log('✅ Unique categories:', uniqueCategories.size, 'Categories:', Array.from(uniqueCategories));
       setTotalCategories(uniqueCategories.size);
 
       // Get unique zone types count
@@ -1243,10 +1240,7 @@ export default function SeedDataManagement() {
         throw zoneError;
       }
       const uniqueZones = new Set(zoneData?.map((row: { zone_type: string }) => row.zone_type) || []);
-      console.log('✅ Unique zone types:', uniqueZones.size, 'Zones:', Array.from(uniqueZones));
       setTotalZones(uniqueZones.size);
-
-      console.log('✨ Stats loaded successfully!');
     } catch (error) {
       console.error("❌ Error loading stats:", error);
       toast.error("Failed to load statistics");
@@ -1479,8 +1473,7 @@ export default function SeedDataManagement() {
           const idxZone = getIndex('zone_type');
           const idxStatus = getIndex('status');
 
-          console.log('📊 CSV Headers:', headers);
-          console.log('📊 Column indices:', { idxId, idxName, idxCategory, idxLat, idxLng, idxStreet, idxZone, idxStatus });
+
 
           newBusinesses = lines
             .slice(1)
@@ -1491,10 +1484,6 @@ export default function SeedDataManagement() {
               const lng = idxLng >= 0 ? values[idxLng] : '';
               const rawCategory = idxCategory >= 0 ? values[idxCategory] : '';
               const normalizedCategory = normalizeCategory(rawCategory);
-
-              if (index < 3) {
-                console.log(`📊 Row ${index + 1}: category="${rawCategory}" -> "${normalizedCategory}"`);
-              }
 
               return {
                 id: (idxId >= 0 && values[idxId]) ? values[idxId] : (Date.now().toString() + index),

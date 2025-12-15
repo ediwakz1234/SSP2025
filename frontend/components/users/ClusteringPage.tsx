@@ -1245,7 +1245,6 @@ export function ClusteringPage() {
 
         if (aiResponse.ok) {
           const aiData = await aiResponse.json();
-          console.log("AI Response:", aiData); // Debug log
           if (aiData.success && aiData.recommendations) {
             setAiBusinessRecommendations(aiData.recommendations);
             // Save to Zustand store for cross-page persistence

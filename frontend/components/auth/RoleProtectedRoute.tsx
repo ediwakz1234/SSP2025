@@ -38,7 +38,6 @@ export function RoleProtectedRoute({ children, role }: Props) {
             .single();
 
           if (error || !data) {
-            console.log("Admin check failed:", error?.message || "No admin profile found");
             setHasRole(false);
           } else {
             // User exists in admin_profiles = they are an admin
