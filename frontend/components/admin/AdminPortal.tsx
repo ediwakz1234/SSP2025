@@ -116,12 +116,13 @@ export function AdminPortal() {
     try {
       setLoading(true);
 
-      const [businessRes, clusteringRes, activityRes] = await Promise.all([
+      const [businessRes, profilesRes, activityRes] = await Promise.all([
         supabase.from("businesses").select("*"),
         supabase
-          .from("clustering_opportunities")
-          .select("id, business_category, confidence, num_clusters, created_at, opportunity")
-          .order("confidence", { ascending: false })
+          .from("profiles")
+          .select("id, first_name, last_name, analyses_count, created_at")
+          .gt("analyses_count", 0)
+          .order("analyses_count", { ascending: false })
           .limit(10),
         supabase
           .from("activity_logs")
@@ -132,22 +133,26 @@ export function AdminPortal() {
 
       // Handle Errors
       if (businessRes.error) console.error("Business Error:", businessRes.error);
-      if (clusteringRes.error) console.error("Clustering Error:", clusteringRes.error);
+      if (profilesRes.error) console.error("Profiles Error:", profilesRes.error);
       if (activityRes.error) console.error("Activity Error:", activityRes.error);
 
       setBusinesses((businessRes.data || []) as BusinessRow[]);
 
-      // Map clustering opportunities - ranked by confidence score
-      const clusteringData = clusteringRes.data || [];
-      const mappedAnalyses: UserAnalysis[] = clusteringData.map(
-        (row: { id: number; business_category?: string; confidence?: number; created_at?: string; num_clusters?: number }, index: number): UserAnalysis => {
+      // Map profiles to user analyses - ranked by analyses_count
+      const profilesData = profilesRes.data || [];
+      const mappedAnalyses: UserAnalysis[] = profilesData.map(
+        (row: { id: string; first_name?: string; last_name?: string; analyses_count?: number; created_at?: string }): UserAnalysis => {
+          const fullName = `${row.first_name || ""} ${row.last_name || ""}`.trim() || "Unknown User";
+          const count = row.analyses_count || 0;
+          // Convert count to a percentage-like score (cap at 100)
+          const score = Math.min(count * 2, 100);
           return {
-            id: row.id,
-            user_name: row.business_category || "Unknown",
-            business_type: row.business_category || "N/A",
-            score: Math.round((row.confidence || 0) * 100),
+            id: parseInt(row.id.slice(0, 8), 16) || 0,
+            user_name: fullName,
+            business_type: `${count} Analyses`,
+            score: score,
             created_at: row.created_at || "",
-            num_clusters: row.num_clusters || 0,
+            num_clusters: count,
           };
         }
       );
