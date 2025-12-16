@@ -119,7 +119,7 @@ export function AdminPortal() {
       const [businessRes, clusteringRes, activityRes] = await Promise.all([
         supabase.from("businesses").select("*"),
         supabase
-          .from("clustering_results")
+          .from("clustering_opportunities")
           .select("*")
           .order("confidence", { ascending: false })
           .limit(10),
@@ -137,35 +137,13 @@ export function AdminPortal() {
 
       setBusinesses((businessRes.data || []) as BusinessRow[]);
 
-      // Fetch user profiles for clustering results
+      // Map clustering opportunities to analyses
       const clusteringData = clusteringRes.data || [];
-      const userIds = [...new Set(clusteringData.map((r: { user_id?: string }) => r.user_id).filter(Boolean))];
-
-      let profilesMap: Record<string, { first_name: string; last_name: string }> = {};
-      if (userIds.length > 0) {
-        const { data: profilesData } = await supabase
-          .from("profiles")
-          .select("id, first_name, last_name")
-          .in("id", userIds);
-
-        (profilesData || []).forEach((p: { id: string; first_name: string; last_name: string }) => {
-          profilesMap[p.id] = {
-            first_name: p.first_name || "",
-            last_name: p.last_name || "",
-          };
-        });
-      }
-
-      // Map clustering results with user names
       const mappedAnalyses: UserAnalysis[] = clusteringData.map(
-        (row: { id: number; user_id?: string; business_category?: string; confidence?: number; created_at?: string; num_clusters?: number }): UserAnalysis => {
-          const profile = row.user_id ? profilesMap[row.user_id] : null;
-          const userName = profile
-            ? `${profile.first_name} ${profile.last_name}`.trim() || "Unknown"
-            : "Unknown";
+        (row: { id: number; business_category?: string; confidence?: number; created_at?: string; num_clusters?: number; opportunity?: string }, index: number): UserAnalysis => {
           return {
             id: row.id,
-            user_name: userName,
+            user_name: `Analysis #${index + 1}`,
             business_type: row.business_category || "N/A",
             score: Math.round((row.confidence || 0) * 100),
             created_at: row.created_at || "",
