@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "../../lib/supabase"; 
+import { supabase } from "../../lib/supabase";
 
 import {
   Card,
@@ -319,10 +319,10 @@ export function AdminPortal() {
       if (b.street) streetsSet.add(b.street.trim());
     });
 
-    // Calculate BCI: normalized 0-100% metric based on average density relative to max
-    const avgDensity = densityCount > 0 ? sumDensity200m / densityCount : 0;
-    const bciScore = maxDensity200m > 0
-      ? Math.round((avgDensity / maxDensity200m) * 100)
+    // Calculate BCI: average businesses per street/area
+    const numStreets = streetsSet.size;
+    const bciScore = numStreets > 0
+      ? Math.round(totalBusinesses / numStreets)
       : 0;
 
     return {
@@ -427,8 +427,8 @@ export function AdminPortal() {
 
         <StatCard
           title="Business Concentration Index"
-          value={`${stats.bciScore}%`}
-          subtitle="Clustering strength (200m)"
+          value={stats.bciScore}
+          subtitle="Avg. per area"
           icon={<Layers className="size-5 text-purple-600" />}
           gradient="from-purple-50 to-purple-100"
         />
