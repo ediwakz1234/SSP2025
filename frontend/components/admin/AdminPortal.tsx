@@ -120,7 +120,7 @@ export function AdminPortal() {
         supabase.from("businesses").select("*"),
         supabase
           .from("clustering_opportunities")
-          .select("*")
+          .select("id, business_category, confidence, num_clusters, created_at, opportunity")
           .order("confidence", { ascending: false })
           .limit(10),
         supabase
@@ -137,13 +137,13 @@ export function AdminPortal() {
 
       setBusinesses((businessRes.data || []) as BusinessRow[]);
 
-      // Map clustering opportunities to analyses
+      // Map clustering opportunities - ranked by confidence score
       const clusteringData = clusteringRes.data || [];
       const mappedAnalyses: UserAnalysis[] = clusteringData.map(
-        (row: { id: number; business_category?: string; confidence?: number; created_at?: string; num_clusters?: number; opportunity?: string }, index: number): UserAnalysis => {
+        (row: { id: number; business_category?: string; confidence?: number; created_at?: string; num_clusters?: number }, index: number): UserAnalysis => {
           return {
             id: row.id,
-            user_name: `Analysis #${index + 1}`,
+            user_name: row.business_category || "Unknown",
             business_type: row.business_category || "N/A",
             score: Math.round((row.confidence || 0) * 100),
             created_at: row.created_at || "",
