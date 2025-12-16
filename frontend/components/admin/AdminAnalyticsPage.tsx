@@ -53,6 +53,23 @@ interface AnalysisRecord {
   analysis_type?: string;
 }
 
+// Timezone-aware date helpers for daily reset at local midnight (Philippines)
+const getTodayDate = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const getLocalDate = (utcTimestamp: string) => {
+  const date = new Date(utcTimestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export function AdminAnalyticsPage() {
   useActivity();
 
@@ -338,33 +355,41 @@ export function AdminAnalyticsPage() {
       setTopClusteringResults(topResults);
 
 
-      // 4. ACTIVITY LOGS (for top cards)
-      let activityQuery = supabase.from("activity_logs").select("*");
-
-      if (applyFilter && startDate && endDate) {
-        activityQuery = activityQuery
-          .gte("created_at", `${startDate}T00:00:00`)
-          .lte("created_at", `${endDate}T23:59:59`);
-      }
-
-      const { data: activityData } = await activityQuery;
+      // 4. ACTIVITY LOGS (for top cards) - fetch ALL logs for cumulative stats
+      const { data: activityData } = await supabase.from("activity_logs").select("*");
       const logs = activityData || [];
 
-      // Count login events (matches your new logActivity action)
-      const loginCount = logs.filter((l) =>
-        ["user_login", "SIGNED_IN", "login", "user_logged_in"].includes(
+      // Get today's date in local timezone for daily reset at 12 AM Philippines
+      const today = getTodayDate();
+
+      // Filter for today's logs using local timezone
+      const todayLogs = logs.filter(log => getLocalDate(log.created_at) === today);
+
+      // Count TODAY's login events (daily reset)
+      const todayLoginCount = todayLogs.filter((l) =>
+        ["user_login", "signed_in", "login", "user_logged_in"].includes(
           (l.action || "").toLowerCase()
         )
       ).length;
 
-      const analysisCount = logs.filter((l) => l.action === "clustering_analysis").length;
-      const dataChangeCount = logs.filter((l) => l.action === "seed_data_reset").length;
+      // Cumulative counts (never reset)
+      const totalAnalysisCount = logs.filter((l) =>
+        (l.action || "").toLowerCase().includes("analysis") ||
+        (l.action || "").toLowerCase().includes("clustering")
+      ).length;
+
+      const totalDataChangeCount = logs.filter((l) =>
+        (l.action || "").toLowerCase().includes("seed_data") ||
+        (l.action || "").toLowerCase().includes("business added") ||
+        (l.action || "").toLowerCase().includes("business updated") ||
+        (l.action || "").toLowerCase().includes("business deleted")
+      ).length;
 
       setActivityStats({
-        total: logs.length,
-        logins: loginCount,
-        analyses: analysisCount,
-        dataChanges: dataChangeCount,
+        total: todayLogs.length,  // Today's activities (daily reset)
+        logins: todayLoginCount,  // Today's logins (daily reset)
+        analyses: totalAnalysisCount,  // Cumulative (never reset) - but we use analysisStats.total from clustering_opportunities
+        dataChanges: totalDataChangeCount,  // Cumulative (never reset)
       });
 
       setLastUpdated(new Date());
