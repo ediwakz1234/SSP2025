@@ -712,9 +712,30 @@ export function AdminPortal() {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                <QualityRow label="Data Completeness" value={100} />
-                <QualityRow label="GPS Accuracy" value={100} />
-                <QualityRow label="Business Verification" value={100} />
+                {/* Data Completeness: % of businesses with general_category filled */}
+                <QualityRow
+                  label="Data Completeness"
+                  value={businesses.length > 0
+                    ? Math.round((businesses.filter(b => b.general_category).length / businesses.length) * 100)
+                    : 0
+                  }
+                />
+                {/* GPS Accuracy: % of businesses with valid lat/lng */}
+                <QualityRow
+                  label="GPS Accuracy"
+                  value={businesses.length > 0
+                    ? Math.round((businesses.filter(b => b.latitude && b.longitude && b.latitude !== 0 && b.longitude !== 0).length / businesses.length) * 100)
+                    : 0
+                  }
+                />
+                {/* Business Verification: % of businesses with status='active' */}
+                <QualityRow
+                  label="Business Verification"
+                  value={businesses.length > 0
+                    ? Math.round((businesses.filter(b => b.status === 'active').length / businesses.length) * 100)
+                    : 0
+                  }
+                />
 
                 <QualityRow
                   label="Active Analyses"
