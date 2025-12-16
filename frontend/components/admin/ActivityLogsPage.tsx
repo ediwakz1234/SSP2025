@@ -170,22 +170,28 @@ export function ActivityLogsPage() {
       });
   }, [logs, actionFilter, searchQuery, dateFilter]);
 
-  // ---------------- STATS (based on filtered logs for accurate daily counts) ----------------
-  const totalActivities = filteredLogs.length;
-  const loginCount = filteredLogs.filter((l) =>
+  // ---------------- STATS ----------------
+  // Daily stats - only count today's logs
+  const today = getTodayDate();
+  const todayLogs = logs.filter(log => log.created_at.split('T')[0] === today);
+
+  const todayActivities = todayLogs.length;
+  const todayLogins = todayLogs.filter((l) =>
     l.action === "user_login" ||
     l.action.toLowerCase().includes("login")
   ).length;
 
-  // Match both "clustering_analysis" (old) and "Ran Clustering" (new)
-  const analysisCount = filteredLogs.filter((l) =>
+  // Cumulative stats - count ALL logs (not filtered by date)
+  // Total Analyses Run: clustering_analysis, Ran Clustering, etc.
+  const totalAnalysesRun = logs.filter((l) =>
     l.action === "clustering_analysis" ||
     l.action.toLowerCase().includes("ran clustering") ||
-    l.action.toLowerCase().includes("clustering analysis")
+    l.action.toLowerCase().includes("clustering analysis") ||
+    l.action.toLowerCase().includes("analysis")
   ).length;
 
-  // Match seed data operations
-  const dataChanges = filteredLogs.filter((l) =>
+  // Admin Seed Data Changes: all seed data modifications
+  const adminSeedDataChanges = logs.filter((l) =>
     l.action === "seed_data_reset" ||
     l.action === "seed_data_updated" ||
     l.action === "seed_data_added" ||
@@ -267,6 +273,7 @@ export function ActivityLogsPage() {
 
       {/* HEADER COUNTERS */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
+        {/* Today's Activities - Daily Reset */}
         <Card className="group relative overflow-hidden border-0 bg-linear-to-br from-blue-50 to-indigo-50 shadow-md hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
           <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-blue-500/10 blur-2xl group-hover:bg-blue-500/20 transition-colors duration-500"></div>
           <CardHeader className="pb-2">
@@ -275,18 +282,19 @@ export function ActivityLogsPage() {
                 <Activity className="h-4 w-4 text-white" />
               </div>
               <CardTitle className="text-sm font-medium text-gray-600">
-                {dateFilter === "today" ? "Today's Activities" : dateFilter === "week" ? "This Week's Activities" : "Total Activities"}
+                Today's Activities
               </CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{totalActivities}</div>
+            <div className="text-3xl font-bold bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{todayActivities}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {dateFilter === "today" ? "Logged today" : dateFilter === "week" ? "Logged this week" : "All logged actions"}
+              System actions logged today
             </p>
           </CardContent>
         </Card>
 
+        {/* Today's Logins - Daily Reset */}
         <Card className="group relative overflow-hidden border-0 bg-linear-to-br from-green-50 to-emerald-50 shadow-md hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
           <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-green-500/10 blur-2xl group-hover:bg-green-500/20 transition-colors duration-500"></div>
           <CardHeader className="pb-2">
@@ -295,18 +303,19 @@ export function ActivityLogsPage() {
                 <LogIn className="h-4 w-4 text-white" />
               </div>
               <CardTitle className="text-sm font-medium text-gray-600">
-                {dateFilter === "today" ? "Today's Logins" : dateFilter === "week" ? "This Week's Logins" : "Total Logins"}
+                Today's Logins
               </CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{loginCount}</div>
+            <div className="text-3xl font-bold bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{todayLogins}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {dateFilter === "today" ? "Logins today" : dateFilter === "week" ? "Logins this week" : "All logins"}
+              User sign-ins recorded today
             </p>
           </CardContent>
         </Card>
 
+        {/* Total Analyses Run - Cumulative */}
         <Card className="group relative overflow-hidden border-0 bg-linear-to-br from-purple-50 to-violet-50 shadow-md hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
           <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-purple-500/10 blur-2xl group-hover:bg-purple-500/20 transition-colors duration-500"></div>
           <CardHeader className="pb-2">
@@ -314,15 +323,16 @@ export function ActivityLogsPage() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-purple-500 to-violet-500">
                 <BarChart3 className="h-4 w-4 text-white" />
               </div>
-              <CardTitle className="text-sm font-medium text-gray-600">Analyses</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Total Analyses Run</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold bg-linear-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">{analysisCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">Clustering operations</p>
+            <div className="text-3xl font-bold bg-linear-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">{totalAnalysesRun}</div>
+            <p className="text-xs text-muted-foreground mt-1">All analytical operations executed</p>
           </CardContent>
         </Card>
 
+        {/* Admin Seed Data Changes - Cumulative */}
         <Card className="group relative overflow-hidden border-0 bg-linear-to-br from-orange-50 to-amber-50 shadow-md hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
           <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-orange-500/10 blur-2xl group-hover:bg-orange-500/20 transition-colors duration-500"></div>
           <CardHeader className="pb-2">
@@ -330,12 +340,12 @@ export function ActivityLogsPage() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-orange-500 to-amber-500">
                 <Database className="h-4 w-4 text-white" />
               </div>
-              <CardTitle className="text-sm font-medium text-gray-600">Data Changes</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Admin Seed Data Changes</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold bg-linear-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">{dataChanges}</div>
-            <p className="text-xs text-muted-foreground mt-1">Seed data updates</p>
+            <div className="text-3xl font-bold bg-linear-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">{adminSeedDataChanges}</div>
+            <p className="text-xs text-muted-foreground mt-1">All seed data modifications by admins</p>
           </CardContent>
         </Card>
       </div>
