@@ -638,17 +638,35 @@ export function AdminPortal() {
                             </div>
                           </div>
 
-                          <Badge
-                            variant={
-                              a.score > 90
-                                ? "default"
-                                : a.score > 80
-                                  ? "secondary"
-                                  : "outline"
-                            }
-                          >
-                            {a.score > 90 ? "Excellent" : a.score > 80 ? "Good" : "Fair"}
-                          </Badge>
+                          <div className="flex flex-col items-end gap-2">
+                            <Badge
+                              variant={
+                                a.score > 90
+                                  ? "default"
+                                  : a.score > 80
+                                    ? "secondary"
+                                    : "outline"
+                              }
+                            >
+                              {a.score > 90 ? "Excellent" : a.score > 80 ? "Good" : "Fair"}
+                            </Badge>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs text-blue-600 hover:text-blue-800"
+                              onClick={() => {
+                                toast.info(
+                                  `📊 Full Details\n\n` +
+                                  `Category: ${a.business_type}\n` +
+                                  `Score: ${a.score}%\n` +
+                                  `Clusters: ${a.num_clusters}\n` +
+                                  `Date: ${new Date(a.created_at).toLocaleString()}`
+                                );
+                              }}
+                            >
+                              View More
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     );
