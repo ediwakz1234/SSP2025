@@ -85,6 +85,84 @@ export function AdminAnalyticsPage() {
 
   const [_showExportModal, setShowExportModal] = useState(false);
 
+  // Export function - exports all analytics data to CSV
+  const exportAnalyticsReport = () => {
+    const timestamp = new Date().toISOString().split('T')[0];
+    let csvContent = '';
+
+    // Header
+    csvContent += 'STRATEGIC STORE PLACEMENT SYSTEM - ANALYTICS REPORT\n';
+    csvContent += `Generated: ${new Date().toLocaleString()}\n`;
+    csvContent += `Date Range: ${startDate || 'All Time'} to ${endDate || 'Present'}\n\n`;
+
+    // Activity Summary
+    csvContent += '=== ACTIVITY SUMMARY ===\n';
+    csvContent += `Total Activities,${activityStats.total}\n`;
+    csvContent += `Total Logins,${activityStats.logins}\n`;
+    csvContent += `Total Analyses,${activityStats.analyses}\n`;
+    csvContent += `Data Changes,${activityStats.dataChanges}\n\n`;
+
+    // Category Distribution
+    csvContent += '=== CATEGORY DISTRIBUTION ===\n';
+    csvContent += 'Category,Count,Percentage\n';
+    const totalBiz = businesses.length;
+    categories.forEach(cat => {
+      const pct = totalBiz > 0 ? ((cat.value / totalBiz) * 100).toFixed(1) : '0.0';
+      csvContent += `${cat.name},${cat.value},${pct}%\n`;
+    });
+    csvContent += '\n';
+
+    // Zone Distribution
+    csvContent += '=== ZONE DISTRIBUTION ===\n';
+    csvContent += 'Zone,Count,Percentage\n';
+    zones.forEach(zone => {
+      const pct = totalBiz > 0 ? ((zone.value / totalBiz) * 100).toFixed(1) : '0.0';
+      csvContent += `${zone.name},${zone.value},${pct}%\n`;
+    });
+    csvContent += '\n';
+
+    // Key Insights
+    csvContent += '=== KEY INSIGHTS ===\n';
+    const topCategory = categories.length > 0 ? categories.sort((a, b) => b.value - a.value)[0] : null;
+    csvContent += `Most Popular Category,${topCategory?.name || 'N/A'},${topCategory?.value || 0} businesses\n`;
+    const commercialPct = totalBiz > 0 ? (((zones.find(z => z.name === 'Commercial')?.value || 0) / totalBiz) * 100).toFixed(1) : '0.0';
+    csvContent += `Commercial Zone %,${commercialPct}%\n`;
+    const avgPerStreet = streets.length > 0 ? (totalBiz / streets.length).toFixed(1) : '0.0';
+    csvContent += `Avg Businesses per Street,${avgPerStreet}\n\n`;
+
+    // Top Clustering Results
+    csvContent += '=== TOP CLUSTERING ANALYSES ===\n';
+    csvContent += 'Rank,Category,Confidence Score,Date\n';
+    topClusteringResults.slice(0, 20).forEach((result, index) => {
+      const score = Math.round(result.confidence * 100);
+      const date = result.created_at ? new Date(result.created_at).toLocaleDateString() : 'N/A';
+      csvContent += `${index + 1},${result.business_category},${score}%,${date}\n`;
+    });
+    csvContent += '\n';
+
+    // Analysis Stats
+    csvContent += '=== ANALYSIS STATISTICS ===\n';
+    csvContent += `Total Analyses Run,${analysisStats.total}\n`;
+    csvContent += 'Date,Count\n';
+    analysisStats.freqByDate.forEach(item => {
+      csvContent += `${item.date},${item.value}\n`;
+    });
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `SSP_Analytics_Report_${timestamp}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast.success('Analytics report exported successfully!');
+    logActivity('Admin Exported Analytics Report');
+  };
+
   // Date Filter - Default to empty (show ALL data) for accurate analytics
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -237,11 +315,21 @@ export function AdminAnalyticsPage() {
         .slice(0, 50)
         .map((a, index) => ({
           id: a.id || index,
-          business_category: a.business_category || "Unknown",
-          confidence: a.confidence || 0,
-          num_clusters: a.num_clusters || 0,
-          created_at: a.created_at || "",
           user_id: a.user_id || "",
+          business_category: a.business_category || "Unknown",
+          num_clusters: a.num_clusters || 0,
+          recommended_latitude: a.recommended_latitude || 0,
+          recommended_longitude: a.recommended_longitude || 0,
+          recommended_zone_type: a.recommended_zone_type || "Commercial",
+          confidence: a.confidence || 0,
+          opportunity_level: a.opportunity_level || "Medium",
+          total_businesses: a.total_businesses || 0,
+          competitor_count: a.competitor_count || 0,
+          competitors_within_500m: a.competitors_within_500m || 0,
+          competitors_within_1km: a.competitors_within_1km || 0,
+          competitors_within_2km: a.competitors_within_2km || 0,
+          market_saturation: a.market_saturation || 0,
+          created_at: a.created_at || "",
           user_name: a.business_category || "Analysis",
           user_email: "N/A"
         }))
@@ -482,7 +570,7 @@ export function AdminAnalyticsPage() {
       {/* EXPORT BUTTON */}
       <div className="flex justify-end">
         <button
-          onClick={() => setShowExportModal(true)}
+          onClick={exportAnalyticsReport}
           className="group flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
         >
           <FileDown className="w-4 h-4 group-hover:animate-bounce" />
