@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "../../lib/supabase"; \n// Admin Dashboard v2.0 - Updated Dec 16 2025
+import { supabase } from "../../lib/supabase"; 
 
 import {
   Card,
