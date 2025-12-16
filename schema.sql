@@ -11,7 +11,7 @@ CREATE TABLE public.activity_logs (
   user_email text,
   details text,
   context text,
-  searchable tsvector DEFAULT to_tsvector('english'::regconfig, ((((COALESCE(action, ''::text) || ' '::text) || COALESCE(user_email, ''::text)) || ' '::text) || COALESCE(details, ''::text))),
+  searchable tsvector GENERATED ALWAYS AS (to_tsvector('english'::regconfig, ((((COALESCE(action, ''::text) || ' '::text) || COALESCE(user_email, ''::text)) || ' '::text) || COALESCE(details, ''::text)))) STORED,
   CONSTRAINT activity_logs_pkey PRIMARY KEY (id),
   CONSTRAINT activity_logs_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
@@ -74,7 +74,7 @@ CREATE TABLE public.businesses (
   competitor_density_50m integer DEFAULT 0,
   competitor_density_100m integer DEFAULT 0,
   competitor_density_200m integer DEFAULT 0,
-  geom USER-DEFINED,
+  geom geometry(Point, 4326),
   general_category text,
   cluster_id integer,
   CONSTRAINT businesses_pkey PRIMARY KEY (id)

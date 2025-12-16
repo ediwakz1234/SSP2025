@@ -1,0 +1,3402 @@
+[
+  {
+    "id": 2001,
+    "business_id": null,
+    "business_name": "SANTA MARIA 888 Hardware & CONSTRUCTION SUPPLIES",
+    "latitude": 14.83326,
+    "longitude": 120.95468,
+    "street": "Gulod St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95468,
+        14.83326
+      ]
+    },
+    "general_category": "Merchandise / Trading",
+    "cluster_id": null
+  },
+  {
+    "id": 2002,
+    "business_id": null,
+    "business_name": "VK Cafe",
+    "latitude": 14.83335,
+    "longitude": 120.95478,
+    "street": "Gulod St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95478,
+        14.83335
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2003,
+    "business_id": null,
+    "business_name": "Reymalyn Loading Station",
+    "latitude": 14.83373,
+    "longitude": 120.95497,
+    "street": "Gulod St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95497,
+        14.83373
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2004,
+    "business_id": null,
+    "business_name": "Nanay Mercy & KMS Carwash",
+    "latitude": 14.8336,
+    "longitude": 120.95501,
+    "street": "Gulod St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95501,
+        14.8336
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2005,
+    "business_id": null,
+    "business_name": "BIGOTE'S MAMIHAN",
+    "latitude": 14.83397,
+    "longitude": 120.95488,
+    "street": "Gulod St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95488,
+        14.83397
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2006,
+    "business_id": null,
+    "business_name": "Pau Motorcycle Shop",
+    "latitude": 14.83471,
+    "longitude": 120.95503,
+    "street": "Luwasan St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95503,
+        14.83471
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2007,
+    "business_id": null,
+    "business_name": "EDANOZO FURNITURE",
+    "latitude": 14.83463,
+    "longitude": 120.95514,
+    "street": "Luwasan St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95514,
+        14.83463
+      ]
+    },
+    "general_category": "Merchandise / Trading",
+    "cluster_id": null
+  },
+  {
+    "id": 2008,
+    "business_id": null,
+    "business_name": "Dalen's Store",
+    "latitude": 14.83477,
+    "longitude": 120.95515,
+    "street": "Luwasan St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95515,
+        14.83477
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2009,
+    "business_id": null,
+    "business_name": "Heteroza Pizza Pasta Frappe A.T.B.P",
+    "latitude": 14.83486,
+    "longitude": 120.95501,
+    "street": "Luwasan St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95501,
+        14.83486
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2010,
+    "business_id": null,
+    "business_name": "Mr. BREWSKO",
+    "latitude": 14.83515,
+    "longitude": 120.9551,
+    "street": "Luwasan St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9551,
+        14.83515
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2011,
+    "business_id": null,
+    "business_name": "Xyreel's Store",
+    "latitude": 14.83558,
+    "longitude": 120.95525,
+    "street": "Centro St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95525,
+        14.83558
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2012,
+    "business_id": null,
+    "business_name": "Centro Eatery",
+    "latitude": 14.83574,
+    "longitude": 120.95533,
+    "street": "Centro St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95533,
+        14.83574
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2013,
+    "business_id": null,
+    "business_name": "KAF Pharmacy - STA. CRUZ BRANCH",
+    "latitude": 14.83591,
+    "longitude": 120.95561,
+    "street": "Centro St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95561,
+        14.83591
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2014,
+    "business_id": null,
+    "business_name": "HAIRCHITECT BARBERSHOP",
+    "latitude": 14.83619,
+    "longitude": 120.95581,
+    "street": "Centro St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95581,
+        14.83619
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2015,
+    "business_id": null,
+    "business_name": "R.C.S. MINI MART",
+    "latitude": 14.83656,
+    "longitude": 120.95555,
+    "street": "Centro St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95555,
+        14.83656
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2016,
+    "business_id": null,
+    "business_name": "SnJ Food Hub",
+    "latitude": 14.8374,
+    "longitude": 120.95592,
+    "street": "Pag-asa St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95592,
+        14.8374
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2017,
+    "business_id": null,
+    "business_name": "Casa David Private Resort",
+    "latitude": 14.83736,
+    "longitude": 120.95666,
+    "street": "Pag-asa St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95666,
+        14.83736
+      ]
+    },
+    "general_category": "Entertainment / Leisure",
+    "cluster_id": null
+  },
+  {
+    "id": 2018,
+    "business_id": null,
+    "business_name": "D.C. Marianos Hardware and Construction Supplies",
+    "latitude": 14.83752,
+    "longitude": 120.95728,
+    "street": "Pag-asa St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95728,
+        14.83752
+      ]
+    },
+    "general_category": "Merchandise / Trading",
+    "cluster_id": null
+  },
+  {
+    "id": 2019,
+    "business_id": null,
+    "business_name": "Rjhaynne Beverages Trading",
+    "latitude": 14.83734,
+    "longitude": 120.95805,
+    "street": "Pag-asa St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95805,
+        14.83734
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2020,
+    "business_id": null,
+    "business_name": "JayJays Peanut butter",
+    "latitude": 14.83671,
+    "longitude": 120.95762,
+    "street": "Pag-asa St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95762,
+        14.83671
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2021,
+    "business_id": null,
+    "business_name": "Idols Sizzlingan Atbp.",
+    "latitude": 14.83763,
+    "longitude": 120.95888,
+    "street": "Bukid St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95888,
+        14.83763
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2022,
+    "business_id": null,
+    "business_name": "MNMs Talipapa & Sari Sari Store",
+    "latitude": 14.83765,
+    "longitude": 120.95897,
+    "street": "Bukid St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95897,
+        14.83765
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2023,
+    "business_id": null,
+    "business_name": "BigBrew Sta. Cruz - Sta. Maria Bulacan",
+    "latitude": 14.83779,
+    "longitude": 120.96005,
+    "street": "Bukid St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96005,
+        14.83779
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2024,
+    "business_id": null,
+    "business_name": "Kambal Inasal",
+    "latitude": 14.83767,
+    "longitude": 120.96001,
+    "street": "Bukid St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96001,
+        14.83767
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2025,
+    "business_id": null,
+    "business_name": "Crystal World",
+    "latitude": 14.83768,
+    "longitude": 120.96035,
+    "street": "Bukid St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96035,
+        14.83768
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2026,
+    "business_id": null,
+    "business_name": "Boss kleng vape shop",
+    "latitude": 14.83448,
+    "longitude": 120.96379,
+    "street": "Matahimik St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96379,
+        14.83448
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2027,
+    "business_id": null,
+    "business_name": "Santa Cruz Bully Kennel",
+    "latitude": 14.83491,
+    "longitude": 120.96222,
+    "street": "Matahimik St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96222,
+        14.83491
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2028,
+    "business_id": null,
+    "business_name": "Sta. Cruz 888 Metal Trading and Hardware",
+    "latitude": 14.83491,
+    "longitude": 120.96183,
+    "street": "Matahimik St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96183,
+        14.83491
+      ]
+    },
+    "general_category": "Merchandise / Trading",
+    "cluster_id": null
+  },
+  {
+    "id": 2029,
+    "business_id": null,
+    "business_name": "MNM Frozen Meat Trading",
+    "latitude": 14.83486,
+    "longitude": 120.96158,
+    "street": "Maunlad St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96158,
+        14.83486
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2030,
+    "business_id": null,
+    "business_name": "DM² Food Hub/Double D' Brew",
+    "latitude": 14.83478,
+    "longitude": 120.9616,
+    "street": "Maunlad St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9616,
+        14.83478
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2031,
+    "business_id": null,
+    "business_name": "Cornelio LPG Store",
+    "latitude": 14.83556,
+    "longitude": 120.95947,
+    "street": "Maunlad St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95947,
+        14.83556
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2032,
+    "business_id": null,
+    "business_name": "ML Photography Studio",
+    "latitude": 14.83323,
+    "longitude": 120.95969,
+    "street": "Maligaya St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95969,
+        14.83323
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2033,
+    "business_id": null,
+    "business_name": "Mg Events Catering Services",
+    "latitude": 14.83347,
+    "longitude": 120.95896,
+    "street": "Maligaya St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95896,
+        14.83347
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2034,
+    "business_id": null,
+    "business_name": "LOLET'S",
+    "latitude": 14.83197,
+    "longitude": 120.96245,
+    "street": "Mapayapa St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96245,
+        14.83197
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2035,
+    "business_id": null,
+    "business_name": "JLM's STORE",
+    "latitude": 14.83183,
+    "longitude": 120.96242,
+    "street": "Mapayapa St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96242,
+        14.83183
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2036,
+    "business_id": null,
+    "business_name": "Nessies Store",
+    "latitude": 14.83178,
+    "longitude": 120.96252,
+    "street": "Mapayapa St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96252,
+        14.83178
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2037,
+    "business_id": null,
+    "business_name": "BlesZas Eatery",
+    "latitude": 14.83185,
+    "longitude": 120.96281,
+    "street": "Mapayapa St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96281,
+        14.83185
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2038,
+    "business_id": null,
+    "business_name": "Sabon Depot Dealer",
+    "latitude": 14.83106,
+    "longitude": 120.96306,
+    "street": "Mapayapa St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96306,
+        14.83106
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2039,
+    "business_id": null,
+    "business_name": "RAYMOND PHONE REPAIR AND CCTV",
+    "latitude": 14.83713,
+    "longitude": 120.95015,
+    "street": "Sonoma Residences",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95015,
+        14.83713
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2040,
+    "business_id": null,
+    "business_name": "3K Hardware and Constriction Supply",
+    "latitude": 14.83735,
+    "longitude": 120.9505,
+    "street": "Sonoma Residences",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9505,
+        14.83735
+      ]
+    },
+    "general_category": "Merchandise / Trading",
+    "cluster_id": null
+  },
+  {
+    "id": 2041,
+    "business_id": null,
+    "business_name": "MELANIO FARM FRESH EGGS - WHOLESALE and RETAIL",
+    "latitude": 14.83785,
+    "longitude": 120.95023,
+    "street": "Sonoma Residences",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95023,
+        14.83785
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2042,
+    "business_id": null,
+    "business_name": "Garage Gym",
+    "latitude": 14.83868,
+    "longitude": 120.9508,
+    "street": "Sonoma Residences",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9508,
+        14.83868
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2043,
+    "business_id": null,
+    "business_name": "BNC STORE",
+    "latitude": 14.8373,
+    "longitude": 120.95092,
+    "street": "Sonoma Residences",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95092,
+        14.8373
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2044,
+    "business_id": null,
+    "business_name": "Vicky's Cakes and Pastries",
+    "latitude": 14.83802,
+    "longitude": 120.95583,
+    "street": "Housing Project",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95583,
+        14.83802
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2045,
+    "business_id": null,
+    "business_name": "YANI'S LECHON MANOK",
+    "latitude": 14.83812,
+    "longitude": 120.95599,
+    "street": "Housing Project",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95599,
+        14.83812
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2046,
+    "business_id": null,
+    "business_name": "Sandra Store",
+    "latitude": 14.83918,
+    "longitude": 120.95609,
+    "street": "Housing Project",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95609,
+        14.83918
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2047,
+    "business_id": null,
+    "business_name": "MONTREAL BATTERY SHOP",
+    "latitude": 14.83933,
+    "longitude": 120.95625,
+    "street": "Housing Project",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95625,
+        14.83933
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2048,
+    "business_id": null,
+    "business_name": "Lots'A Pizza Fuel Hub",
+    "latitude": 14.83975,
+    "longitude": 120.95638,
+    "street": "Housing Project",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95638,
+        14.83975
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2049,
+    "business_id": null,
+    "business_name": "SilkshopManila STA.MARIA BULACAN",
+    "latitude": 14.84021,
+    "longitude": 120.95641,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95641,
+        14.84021
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2050,
+    "business_id": null,
+    "business_name": "DRD Construction Supply",
+    "latitude": 14.84048,
+    "longitude": 120.95643,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95643,
+        14.84048
+      ]
+    },
+    "general_category": "Merchandise / Trading",
+    "cluster_id": null
+  },
+  {
+    "id": 2051,
+    "business_id": null,
+    "business_name": "Jihos Food House",
+    "latitude": 14.84085,
+    "longitude": 120.95633,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95633,
+        14.84085
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2052,
+    "business_id": null,
+    "business_name": "RLW MEAT SHOP",
+    "latitude": 14.84089,
+    "longitude": 120.95635,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95635,
+        14.84089
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2053,
+    "business_id": null,
+    "business_name": "RDC Auto parts and hydraulic hose repair center",
+    "latitude": 14.84122,
+    "longitude": 120.95639,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95639,
+        14.84122
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2054,
+    "business_id": null,
+    "business_name": "Lilets Creamy Peanut butter",
+    "latitude": 14.84026,
+    "longitude": 120.95443,
+    "street": "Matimyas St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95443,
+        14.84026
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2055,
+    "business_id": null,
+    "business_name": "Body Transformers Gym",
+    "latitude": 14.84011,
+    "longitude": 120.95516,
+    "street": "Matimyas St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95516,
+        14.84011
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2056,
+    "business_id": null,
+    "business_name": "Rehydrate Water Refilling Station",
+    "latitude": 14.84064,
+    "longitude": 120.95496,
+    "street": "Matimyas St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95496,
+        14.84064
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2057,
+    "business_id": null,
+    "business_name": "CDK Coco Lumber And Trading",
+    "latitude": 14.83721,
+    "longitude": 120.95593,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95593,
+        14.83721
+      ]
+    },
+    "general_category": "Merchandise / Trading",
+    "cluster_id": null
+  },
+  {
+    "id": 2058,
+    "business_id": null,
+    "business_name": "Villa Anju Private Resort",
+    "latitude": 14.83779,
+    "longitude": 120.9569,
+    "street": "Pag asa St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9569,
+        14.83779
+      ]
+    },
+    "general_category": "Entertainment / Leisure",
+    "cluster_id": null
+  },
+  {
+    "id": 2059,
+    "business_id": null,
+    "business_name": "3Dr Poultry Supply",
+    "latitude": 14.84266,
+    "longitude": 120.9566,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9566,
+        14.84266
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2060,
+    "business_id": null,
+    "business_name": "Tacia's Store",
+    "latitude": 14.84012,
+    "longitude": 120.95516,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95516,
+        14.84012
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2061,
+    "business_id": null,
+    "business_name": "Lucing's Eatery",
+    "latitude": 14.83737,
+    "longitude": 120.96256,
+    "street": "Bukid St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96256,
+        14.83737
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2062,
+    "business_id": null,
+    "business_name": "TERRACES PET AND POULTRY SUPPLY",
+    "latitude": 14.83715,
+    "longitude": 120.96281,
+    "street": "Bukid St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96281,
+        14.83715
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2063,
+    "business_id": null,
+    "business_name": "Workout Warehouse by Coach Jow",
+    "latitude": 14.83056,
+    "longitude": 120.96316,
+    "street": "Bukid St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96316,
+        14.83056
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2064,
+    "business_id": null,
+    "business_name": "Likhang Ugat Furnishings",
+    "latitude": 14.83042,
+    "longitude": 120.9631,
+    "street": "Mapayapa St.",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9631,
+        14.83042
+      ]
+    },
+    "general_category": "Merchandise / Trading",
+    "cluster_id": null
+  },
+  {
+    "id": 2065,
+    "business_id": null,
+    "business_name": "Rej Meat Shop",
+    "latitude": 14.83076,
+    "longitude": 120.96368,
+    "street": "Mapayapa St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96368,
+        14.83076
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2066,
+    "business_id": null,
+    "business_name": "Jackie's Store",
+    "latitude": 14.83167,
+    "longitude": 120.96337,
+    "street": "Mapayapa St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96337,
+        14.83167
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2067,
+    "business_id": null,
+    "business_name": "Nessie�s Store",
+    "latitude": 14.83175,
+    "longitude": 120.96257,
+    "street": "Mapayapa St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96257,
+        14.83175
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2068,
+    "business_id": null,
+    "business_name": "Nene's Sari Sari Store",
+    "latitude": 14.83351,
+    "longitude": 120.95901,
+    "street": "Maligaya St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95901,
+        14.83351
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2069,
+    "business_id": null,
+    "business_name": "Gil's chicharon",
+    "latitude": 14.83337,
+    "longitude": 120.95481,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95481,
+        14.83337
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2070,
+    "business_id": null,
+    "business_name": "Three Grace's Store",
+    "latitude": 14.83523,
+    "longitude": 120.9553,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9553,
+        14.83523
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2071,
+    "business_id": null,
+    "business_name": "Jumpin Beans Caf�",
+    "latitude": 14.4027,
+    "longitude": 120.95633,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95633,
+        14.4027
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2072,
+    "business_id": null,
+    "business_name": "GC Rattan Outdoor Furniture Bulacan",
+    "latitude": 14.84005,
+    "longitude": 120.95715,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95715,
+        14.84005
+      ]
+    },
+    "general_category": "Merchandise / Trading",
+    "cluster_id": null
+  },
+  {
+    "id": 2073,
+    "business_id": null,
+    "business_name": "Sautter's Cafe",
+    "latitude": 14.8409,
+    "longitude": 120.9513,
+    "street": "Sonoma Residences",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9513,
+        14.8409
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2074,
+    "business_id": null,
+    "business_name": "Magnus 1 Pet Supplies",
+    "latitude": 14.84064,
+    "longitude": 120.94993,
+    "street": "Sonoma Residences",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.94993,
+        14.84064
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2075,
+    "business_id": null,
+    "business_name": "Coffee Break - Sonoma",
+    "latitude": 14.84311,
+    "longitude": 120.95093,
+    "street": "Sonoma Residences",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95093,
+        14.84311
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2076,
+    "business_id": null,
+    "business_name": "RV Sari-sari Store",
+    "latitude": 14.84365,
+    "longitude": 120.95053,
+    "street": "Sonoma Residences",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95053,
+        14.84365
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2077,
+    "business_id": null,
+    "business_name": "One Stop Barber Salon & Spa",
+    "latitude": 14.84029,
+    "longitude": 120.9497,
+    "street": "Sonoma Residences",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9497,
+        14.84029
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2078,
+    "business_id": null,
+    "business_name": "Ka Jenny Sari Sari Store",
+    "latitude": 14.83874,
+    "longitude": 120.95673,
+    "street": "Provincial Road",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95673,
+        14.83874
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2079,
+    "business_id": null,
+    "business_name": "Brew & Buff",
+    "latitude": 14.8382,
+    "longitude": 120.95609,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95609,
+        14.8382
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2080,
+    "business_id": null,
+    "business_name": "AutoFix Garage",
+    "latitude": 14.84164,
+    "longitude": 120.95592,
+    "street": "Provincial Road",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95592,
+        14.84164
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2081,
+    "business_id": null,
+    "business_name": "NorthCo Petroleum",
+    "latitude": 14.83637,
+    "longitude": 120.95636,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95636,
+        14.83637
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2082,
+    "business_id": null,
+    "business_name": "LMS Hardware - AAL hardware",
+    "latitude": 14.84186,
+    "longitude": 120.95731,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95731,
+        14.84186
+      ]
+    },
+    "general_category": "Merchandise / Trading",
+    "cluster_id": null
+  },
+  {
+    "id": 2083,
+    "business_id": null,
+    "business_name": "Oiland Sta Cruz Sta Maria",
+    "latitude": 14.84042,
+    "longitude": 120.95642,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95642,
+        14.84042
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2084,
+    "business_id": null,
+    "business_name": "AM'S FOOD CORNER",
+    "latitude": 14.84279,
+    "longitude": 120.9567,
+    "street": "Provincial Road",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9567,
+        14.84279
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2085,
+    "business_id": null,
+    "business_name": "JDS BUILDERS SUPPLY",
+    "latitude": 14.84327,
+    "longitude": 120.95683,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95683,
+        14.84327
+      ]
+    },
+    "general_category": "Merchandise / Trading",
+    "cluster_id": null
+  },
+  {
+    "id": 2086,
+    "business_id": null,
+    "business_name": "3TEN FCLS Variety Store",
+    "latitude": 14.84277,
+    "longitude": 120.9568,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9568,
+        14.84277
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2087,
+    "business_id": null,
+    "business_name": "Jetti - Sta.Cruz",
+    "latitude": 14.84302,
+    "longitude": 120.95673,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95673,
+        14.84302
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2088,
+    "business_id": null,
+    "business_name": "Raquels Salon",
+    "latitude": 14.83797,
+    "longitude": 120.96051,
+    "street": "Bukid St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96051,
+        14.83797
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2089,
+    "business_id": null,
+    "business_name": "Jeshtine Printing",
+    "latitude": 14.83797,
+    "longitude": 120.96263,
+    "street": "Bukid St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96263,
+        14.83797
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2090,
+    "business_id": null,
+    "business_name": "EVELYN EATERY",
+    "latitude": 14.83671,
+    "longitude": 120.95621,
+    "street": "Provincial Road",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95621,
+        14.83671
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2091,
+    "business_id": null,
+    "business_name": "Ell's Printing Shop & Arcade Games",
+    "latitude": 14.83695,
+    "longitude": 120.9559,
+    "street": "Provincial Road",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.9559,
+        14.83695
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2092,
+    "business_id": null,
+    "business_name": "Mang Ambo�s Lechon Manok",
+    "latitude": 14.83704,
+    "longitude": 120.95586,
+    "street": "Provincial Road",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95586,
+        14.83704
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2093,
+    "business_id": null,
+    "business_name": "JMDR Pharmacy Branch 3",
+    "latitude": 14.8372,
+    "longitude": 120.95591,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95591,
+        14.8372
+      ]
+    },
+    "general_category": "Services",
+    "cluster_id": null
+  },
+  {
+    "id": 2094,
+    "business_id": null,
+    "business_name": "Ellan Boy Eatery",
+    "latitude": 14.83767,
+    "longitude": 120.95583,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95583,
+        14.83767
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2095,
+    "business_id": null,
+    "business_name": "J&D Bigasan",
+    "latitude": 14.83522,
+    "longitude": 120.95531,
+    "street": "Provincial Road",
+    "zone_type": "Commercial",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95531,
+        14.83522
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2096,
+    "business_id": null,
+    "business_name": "Tako Alley",
+    "latitude": 14.84097,
+    "longitude": 120.94924,
+    "street": "Sonoma Residences",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.94924,
+        14.84097
+      ]
+    },
+    "general_category": "Food & Beverages",
+    "cluster_id": null
+  },
+  {
+    "id": 2097,
+    "business_id": null,
+    "business_name": "Jar and Faith Water Refilling Station",
+    "latitude": 14.83976,
+    "longitude": 120.95091,
+    "street": "Sonoma Residences",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95091,
+        14.83976
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2098,
+    "business_id": null,
+    "business_name": "St. Lorenz General Merchandize",
+    "latitude": 14.84332,
+    "longitude": 120.95729,
+    "street": "Provincial Road",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.95729,
+        14.84332
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2099,
+    "business_id": null,
+    "business_name": "R",
+    "latitude": 14.83919,
+    "longitude": 120.96282,
+    "street": "Bukid St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96282,
+        14.83919
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  },
+  {
+    "id": 2100,
+    "business_id": null,
+    "business_name": "tiptop foods opc",
+    "latitude": 14.832,
+    "longitude": 120.96322,
+    "street": "Bukid St.",
+    "zone_type": "Residential",
+    "created_at": "2025-12-13T15:59:44.933363+00:00",
+    "updated_at": null,
+    "zone_encoded": 0,
+    "status": "active",
+    "business_density_50m": 0,
+    "business_density_100m": 0,
+    "business_density_200m": 0,
+    "competitor_density_50m": 0,
+    "competitor_density_100m": 0,
+    "competitor_density_200m": 0,
+    "geom": {
+      "type": "Point",
+      "crs": {
+        "type": "name",
+        "properties": {
+          "name": "EPSG:4326"
+        }
+      },
+      "coordinates": [
+        120.96322,
+        14.832
+      ]
+    },
+    "general_category": "Retail",
+    "cluster_id": null
+  }
+]
