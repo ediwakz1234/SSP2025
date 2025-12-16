@@ -65,10 +65,22 @@ const parseContext = (value: unknown): Record<string, unknown> | null => {
   return { value };
 };
 
-// Get today's date in YYYY-MM-DD format
+// Get today's date in YYYY-MM-DD format (local timezone)
 const getTodayDate = () => {
   const today = new Date();
-  return today.toISOString().split('T')[0];
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+// Convert UTC timestamp to local date string YYYY-MM-DD
+const getLocalDate = (utcTimestamp: string) => {
+  const date = new Date(utcTimestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 export function ActivityLogsPage() {
@@ -140,15 +152,15 @@ export function ActivityLogsPage() {
     const today = getTodayDate();
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    const weekAgoStr = weekAgo.toISOString().split('T')[0];
+    const weekAgoDate = getLocalDate(weekAgo.toISOString());
 
     return logs
-      // Date filter
+      // Date filter (using local timezone)
       .filter((log) => {
         if (dateFilter === "all") return true;
-        const logDate = log.created_at.split('T')[0];
+        const logDate = getLocalDate(log.created_at);
         if (dateFilter === "today") return logDate === today;
-        if (dateFilter === "week") return logDate >= weekAgoStr;
+        if (dateFilter === "week") return logDate >= weekAgoDate;
         return true;
       })
       // Action filter
@@ -171,9 +183,9 @@ export function ActivityLogsPage() {
   }, [logs, actionFilter, searchQuery, dateFilter]);
 
   // ---------------- STATS ----------------
-  // Daily stats - only count today's logs
+  // Daily stats - only count today's logs (using local timezone)
   const today = getTodayDate();
-  const todayLogs = logs.filter(log => log.created_at.split('T')[0] === today);
+  const todayLogs = logs.filter(log => getLocalDate(log.created_at) === today);
 
   const todayActivities = todayLogs.length;
   const todayLogins = todayLogs.filter((l) =>
