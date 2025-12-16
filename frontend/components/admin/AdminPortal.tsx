@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "../../lib/supabase"; \n// Admin Dashboard v2.0 - Updated Dec 16 2025
 
 import {
   Card,
@@ -625,8 +625,8 @@ export function AdminPortal() {
                       >
                         <div className="flex items-start gap-4">
                           <div className={`size-12 rounded-full flex items-center justify-center text-lg font-bold ${index < 3
-                              ? "bg-gradient-to-br from-yellow-400 to-amber-500"
-                              : "bg-gradient-to-br from-blue-500 to-purple-500 text-white"
+                            ? "bg-gradient-to-br from-yellow-400 to-amber-500"
+                            : "bg-gradient-to-br from-blue-500 to-purple-500 text-white"
                             }`}>
                             {getRankDisplay(index)}
                           </div>
