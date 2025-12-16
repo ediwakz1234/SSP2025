@@ -85,10 +85,10 @@ export function AdminAnalyticsPage() {
 
   const [_showExportModal, setShowExportModal] = useState(false);
 
-  // Date Filter - Default to today so counters reset at midnight
-  const today = new Date().toISOString().split("T")[0];
-  const [startDate, setStartDate] = useState(today);
-  const [endDate, setEndDate] = useState(today);
+  // Date Filter - Default to empty (show ALL data) for accurate analytics
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // Color palette
   const COLORS = [
@@ -272,6 +272,7 @@ export function AdminAnalyticsPage() {
         dataChanges: dataChangeCount,
       });
 
+      setLastUpdated(new Date());
       setLoading(false);
     },
     [startDate, endDate]
@@ -513,7 +514,7 @@ export function AdminAnalyticsPage() {
             value="distribution"
             className="data-[state=active]:bg-linear-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white rounded-lg px-4 py-2 transition-all duration-300"
           >
-            Distribution
+            Business Distribution Insights
           </TabsTrigger>
           <TabsTrigger
             value="analysis"
@@ -533,32 +534,40 @@ export function AdminAnalyticsPage() {
                   </div>
                   <div>
                     <CardTitle>Category Distribution</CardTitle>
-                    <CardDescription>Total businesses per category</CardDescription>
+                    <CardDescription title="Shows how businesses are distributed across categories">Total businesses per category</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="p-5">
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={categories}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: '12px',
-                        border: 'none',
-                        boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-                      }}
-                    />
-                    <Bar dataKey="value" fill="url(#blueGradient)" radius={[6, 6, 0, 0]} />
-                    <defs>
-                      <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#3b82f6" />
-                        <stop offset="100%" stopColor="#6366f1" />
-                      </linearGradient>
-                    </defs>
-                  </BarChart>
-                </ResponsiveContainer>
+                {categories.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-[300px] text-gray-500">
+                    <Building2 className="w-12 h-12 mb-3 text-gray-300" />
+                    <p className="font-medium">No business category data available</p>
+                    <p className="text-sm">Try adjusting the date filter or adding businesses</p>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={categories}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 12 }} />
+                      <Tooltip
+                        contentStyle={{
+                          borderRadius: '12px',
+                          border: 'none',
+                          boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
+                        }}
+                      />
+                      <Bar dataKey="value" fill="url(#blueGradient)" radius={[6, 6, 0, 0]} />
+                      <defs>
+                        <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#3b82f6" />
+                          <stop offset="100%" stopColor="#6366f1" />
+                        </linearGradient>
+                      </defs>
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
               </CardContent>
             </Card>
 
@@ -575,29 +584,38 @@ export function AdminAnalyticsPage() {
                 </div>
               </CardHeader>
               <CardContent className="p-5">
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={categories}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      dataKey="value"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {categories.map((entry, index) => (
-                        <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: '12px',
-                        border: 'none',
-                        boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                {categories.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-[300px] text-gray-500">
+                    <Activity className="w-12 h-12 mb-3 text-gray-300" />
+                    <p className="font-medium">No category percentage data available</p>
+                    <p className="text-sm">Category breakdown will appear when data is available</p>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={categories}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {categories.map((entry, index) => (
+                          <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          borderRadius: '12px',
+                          border: 'none',
+                          boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
+                        }}
+                      />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -612,35 +630,50 @@ export function AdminAnalyticsPage() {
                 </div>
                 <div>
                   <CardTitle>Zone Distribution</CardTitle>
-                  <CardDescription>Commercial vs Residential</CardDescription>
+                  <CardDescription title="Compares business presence between commercial and residential areas">Commercial vs Residential</CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="p-5">
-              <ResponsiveContainer width="100%" height={350}>
-                <PieChart>
-                  <Pie
-                    data={zones}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={120}
-                    dataKey="value"
-                    label={({ name, value }) => `${name}: ${value}`}
-                  >
-                    {zones.map((entry, index) => (
-                      <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      borderRadius: '12px',
-                      border: 'none',
-                      boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-                    }}
-                  />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              {zones.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-[350px] text-gray-500">
+                  <MapPin className="w-12 h-12 mb-3 text-gray-300" />
+                  <p className="font-medium">No zone distribution data available</p>
+                  <p className="text-sm">Zone breakdown will appear when data is available</p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={350}>
+                  <PieChart>
+                    <Pie
+                      data={zones}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={120}
+                      dataKey="value"
+                      label={({ name, value, percent }) => {
+                        const pct = businesses.length > 0 ? (percent * 100).toFixed(1) : '0.0';
+                        return `${name}: ${value} (${pct}%)`;
+                      }}
+                    >
+                      {zones.map((entry, index) => (
+                        <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: '12px',
+                        border: 'none',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
+                      }}
+                      formatter={(value: number, name: string) => {
+                        const pct = businesses.length > 0 ? ((value / businesses.length) * 100).toFixed(1) : '0.0';
+                        return [`${value} (${pct}%)`, name];
+                      }}
+                    />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -653,8 +686,8 @@ export function AdminAnalyticsPage() {
                   <Building2 className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <CardTitle>Business Distribution Overview</CardTitle>
-                  <CardDescription>Complete breakdown of all business data</CardDescription>
+                  <CardTitle>Business Distribution Insights</CardTitle>
+                  <CardDescription>High-level interpretable insights derived from business and location data</CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -690,43 +723,47 @@ export function AdminAnalyticsPage() {
                     Key Insights
                   </h4>
 
-                  <div className="flex items-start gap-3 p-4 rounded-xl bg-linear-to-r from-green-50 to-emerald-50 border border-green-100">
+                  {/* Insight 1: Most Popular Business Category */}
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-linear-to-r from-green-50 to-emerald-50 border border-green-100" title="Category with the highest number of registered businesses">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-green-500 to-emerald-500 shrink-0">
                       <TrendingUp className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-800">Most popular: {categories[0]?.name}</p>
-                      <p className="text-xs text-muted-foreground">{categories[0]?.value} businesses</p>
+                      <p className="text-sm font-medium text-gray-800">
+                        Most popular: {categories.length > 0 ? categories.sort((a, b) => b.value - a.value)[0]?.name : 'N/A'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {categories.length > 0 ? categories.sort((a, b) => b.value - a.value)[0]?.value : 0} businesses
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 p-4 rounded-xl bg-linear-to-r from-blue-50 to-indigo-50 border border-blue-100">
+                  {/* Insight 2: Commercial Zone Percentage */}
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-linear-to-r from-blue-50 to-indigo-50 border border-blue-100" title="Indicates the level of business clustering in commercial areas">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-indigo-500 shrink-0">
                       <MapPin className="w-5 h-5 text-white" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-800">
-                        {(
-                          ((zones.find((z) => z.name === "Commercial")?.value || 0) /
-                            businesses.length) *
-                          100
-                        ).toFixed(1)}
-                        % are in commercial zones
+                        {businesses.length === 0
+                          ? '0.0'
+                          : (((zones.find((z) => z.name === "Commercial")?.value || 0) / businesses.length) * 100).toFixed(1)
+                        }% are in commercial zones
                       </p>
-                      <p className="text-xs text-muted-foreground">High business clustering</p>
+                      <p className="text-xs text-muted-foreground">Indicates business clustering level in commercial areas</p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 p-4 rounded-xl bg-linear-to-r from-purple-50 to-violet-50 border border-purple-100">
+                  {/* Insight 3: Average Businesses per Street */}
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-linear-to-r from-purple-50 to-violet-50 border border-purple-100" title="Average number of businesses along each mapped street">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-purple-500 to-violet-500 shrink-0">
                       <Activity className="w-5 h-5 text-white" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-800">
-                        Avg. per street:{" "}
-                        {streets.length ? (businesses.length / streets.length).toFixed(1) : 0}
+                        Avg. per street: {streets.length === 0 ? '0.0' : (businesses.length / streets.length).toFixed(1)}
                       </p>
-                      <p className="text-xs text-muted-foreground">Spread across key areas</p>
+                      <p className="text-xs text-muted-foreground">Average number of businesses along each mapped street</p>
                     </div>
                   </div>
                 </div>
@@ -744,7 +781,10 @@ export function AdminAnalyticsPage() {
                 </div>
                 <div>
                   <CardTitle>Analysis Statistics</CardTitle>
-                  <CardDescription>Admin-only insights from clustering results log</CardDescription>
+                  <CardDescription>Summary of all analytical operations performed in the system</CardDescription>
+                  {lastUpdated && (
+                    <p className="text-xs text-muted-foreground mt-1">Last updated: {lastUpdated.toLocaleString()}</p>
+                  )}
                 </div>
               </div>
             </CardHeader>
