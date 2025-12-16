@@ -187,56 +187,63 @@ export function AdminAnalyticsPage() {
       });
       setStreets(Array.from(streetMap).map(([n, v]) => ({ name: n, value: v })));
 
-      // 3. ANALYSIS (clustering_results) with user profiles
+      // 3. ANALYSIS - Use clustering_opportunities (has data) instead of empty clustering_results
       const { data: analysisData } = await supabase
-        .from("clustering_results")
-        .select("*");
+        .from("clustering_opportunities")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       const analysisList = analysisData || [];
       setAnalyses(analysisList);
 
       const freq = new Map();
-      const users = new Map();
 
       analysisList.forEach((a) => {
-        const d = a.created_at.split("T")[0];
-        freq.set(d, (freq.get(d) || 0) + 1);
-        if (a.user_id) users.set(a.user_id, (users.get(a.user_id) || 0) + 1);
+        const d = a.created_at?.split("T")[0];
+        if (d) freq.set(d, (freq.get(d) || 0) + 1);
       });
+
+      // 3b. Fetch user profiles with analyses_count for top users
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("id, first_name, last_name, email, analyses_count")
+        .gt("analyses_count", 0)
+        .order("analyses_count", { ascending: false })
+        .limit(10);
+
+      const topUsersList = (profilesData || []).map(p => ({
+        user_id: p.id,
+        count: p.analyses_count || 0
+      }));
 
       setAnalysisStats({
         total: analysisList.length,
         freqByDate: Array.from(freq).map(([date, count]) => ({ name: date as string, value: count as number, date: date as string })),
-        topUsers: Array.from(users).map(([user_id, count]) => ({ user_id: user_id as string, count: count as number })),
+        topUsers: topUsersList,
       });
 
-      // 3b. Fetch user profiles to join with clustering results
-      const userIds = [...new Set(analysisList.map(a => a.user_id).filter(Boolean))];
-      let profilesMap: Record<string, { first_name: string; last_name: string; email: string }> = {};
+      // Create profile map for display
+      const profilesMap: Record<string, { first_name: string; last_name: string; email: string }> = {};
+      (profilesData || []).forEach(p => {
+        profilesMap[p.id] = {
+          first_name: p.first_name || "",
+          last_name: p.last_name || "",
+          email: p.email || ""
+        };
+      });
 
-      if (userIds.length > 0) {
-        const { data: profilesData } = await supabase
-          .from("profiles")
-          .select("id, first_name, last_name, email")
-          .in("id", userIds);
-
-        (profilesData || []).forEach(p => {
-          profilesMap[p.id] = {
-            first_name: p.first_name || "",
-            last_name: p.last_name || "",
-            email: p.email || ""
-          };
-        });
-      }
-
-      // Create top clustering results with user info
+      // Create top clustering results with user info from clustering_opportunities
       const topResults: ClusteringAnalysisResult[] = analysisList
-        .map(a => ({
-          ...a,
-          user_name: profilesMap[a.user_id]
-            ? `${profilesMap[a.user_id].first_name} ${profilesMap[a.user_id].last_name}`.trim() || "Unknown"
-            : "Unknown",
-          user_email: profilesMap[a.user_id]?.email || "N/A"
+        .slice(0, 50)
+        .map((a, index) => ({
+          id: a.id || index,
+          business_category: a.business_category || "Unknown",
+          confidence: a.confidence || 0,
+          num_clusters: a.num_clusters || 0,
+          created_at: a.created_at || "",
+          user_id: a.user_id || "",
+          user_name: a.business_category || "Analysis",
+          user_email: "N/A"
         }))
         .sort((a, b) => b.confidence - a.confidence);
 
