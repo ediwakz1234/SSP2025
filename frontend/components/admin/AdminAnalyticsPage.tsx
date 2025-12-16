@@ -903,7 +903,7 @@ export function AdminAnalyticsPage() {
                     />
                     <Line
                       type="monotone"
-                      dataKey="count"
+                      dataKey="value"
                       stroke="url(#lineGradient)"
                       strokeWidth={3}
                       dot={{ fill: '#6366f1', strokeWidth: 2, r: 4 }}
