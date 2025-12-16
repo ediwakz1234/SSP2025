@@ -208,6 +208,7 @@ CREATE TABLE public.profiles (
   avatar_url text,
   website text,
   updated_at timestamp with time zone DEFAULT now(),
+  approval_status text DEFAULT 'pending'::text CHECK (approval_status = ANY (ARRAY['pending'::text, 'approved'::text, 'declined'::text, 'flagged'::text])),
   CONSTRAINT profiles_pkey PRIMARY KEY (id),
   CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
 );

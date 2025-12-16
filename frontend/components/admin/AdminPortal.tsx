@@ -17,7 +17,6 @@ import {
   RefreshCw,
   MapPin,
   Target,
-  Store,
   Users,
   Layers,
   Database,
@@ -26,6 +25,9 @@ import {
   Trophy,
   TrendingUp,
   Building2,
+  AlertCircle,
+  XCircle,
+  Loader2,
 } from "lucide-react";
 
 import {
@@ -84,6 +86,15 @@ interface UserAnalysis {
   num_clusters: number;
 }
 
+type ServiceStatus = "operational" | "degraded" | "offline" | "checking";
+
+interface SystemHealthStatus {
+  database: ServiceStatus;
+  api: ServiceStatus;
+  auth: ServiceStatus;
+  clustering: ServiceStatus;
+}
+
 export function AdminPortal() {
   const [businesses, setBusinesses] = useState<BusinessRow[]>([]);
   const [analyses, setAnalyses] = useState<UserAnalysis[]>([]);
@@ -93,21 +104,25 @@ export function AdminPortal() {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [selectedTab, setSelectedTab] = useState("overview");
   const [loading, setLoading] = useState(true);
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [systemHealth, setSystemHealth] = useState<SystemHealthStatus>({
+    database: "checking",
+    api: "checking",
+    auth: "checking",
+    clustering: "checking",
+  });
 
   // FETCH DATA --------------------------------------------------------------
   const fetchData = async () => {
     try {
       setLoading(true);
 
-      const [businessRes, activityRes] = await Promise.all([
+      const [businessRes, clusteringRes, activityRes] = await Promise.all([
         supabase.from("businesses").select("*"),
-        // supabase
-        //   .from("clustering_results")
-        //   .select("*")
-        //   .order("overall_score", { ascending: false })
-        //   .limit(10),
-
+        supabase
+          .from("clustering_results")
+          .select("*")
+          .order("confidence", { ascending: false })
+          .limit(10),
         supabase
           .from("activity_logs")
           .select("*")
@@ -117,23 +132,49 @@ export function AdminPortal() {
 
       // Handle Errors
       if (businessRes.error) console.error("Business Error:", businessRes.error);
-      // if (analysisRes.error) console.error("Analysis Error:", analysisRes.error);
+      if (clusteringRes.error) console.error("Clustering Error:", clusteringRes.error);
       if (activityRes.error) console.error("Activity Error:", activityRes.error);
 
       setBusinesses((businessRes.data || []) as BusinessRow[]);
 
-      // const mappedAnalyses: UserAnalysis[] = (analysisRes.data || []).map(
-      //   (row: any): UserAnalysis => ({
-      //     id: row.id,
-      //     user_name: row.user_name ?? row.user_email ?? "Unknown user",
-      //     business_type: row.business_type ?? row.target_business_type ?? "N/A",
-      //     score: Number(row.score ?? row.overall_score ?? 0),
-      //     created_at: row.created_at,
-      //     num_clusters: Number(row.num_clusters ?? row.k ?? 0),
-      //   })
-      // );
+      // Fetch user profiles for clustering results
+      const clusteringData = clusteringRes.data || [];
+      const userIds = [...new Set(clusteringData.map((r: { user_id?: string }) => r.user_id).filter(Boolean))];
 
-      setAnalyses([]); // mappedAnalyses
+      let profilesMap: Record<string, { first_name: string; last_name: string }> = {};
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name")
+          .in("id", userIds);
+
+        (profilesData || []).forEach((p: { id: string; first_name: string; last_name: string }) => {
+          profilesMap[p.id] = {
+            first_name: p.first_name || "",
+            last_name: p.last_name || "",
+          };
+        });
+      }
+
+      // Map clustering results with user names
+      const mappedAnalyses: UserAnalysis[] = clusteringData.map(
+        (row: { id: number; user_id?: string; business_category?: string; confidence?: number; created_at?: string; num_clusters?: number }): UserAnalysis => {
+          const profile = row.user_id ? profilesMap[row.user_id] : null;
+          const userName = profile
+            ? `${profile.first_name} ${profile.last_name}`.trim() || "Unknown"
+            : "Unknown";
+          return {
+            id: row.id,
+            user_name: userName,
+            business_type: row.business_category || "N/A",
+            score: Math.round((row.confidence || 0) * 100),
+            created_at: row.created_at || "",
+            num_clusters: row.num_clusters || 0,
+          };
+        }
+      );
+
+      setAnalyses(mappedAnalyses);
       setActivityLogs(activityRes.data || []);
       setLastUpdated(new Date());
     } catch (error) {
@@ -148,12 +189,60 @@ export function AdminPortal() {
     fetchData();
   }, []);
 
-  // AUTO-REFRESH -------------------------------------------------------------
+  // SYSTEM HEALTH CHECK ------------------------------------------------------
+  const checkSystemHealth = async () => {
+    const newHealth: SystemHealthStatus = {
+      database: "checking",
+      api: "checking",
+      auth: "checking",
+      clustering: "checking",
+    };
+    setSystemHealth(newHealth);
+
+    // Check Database
+    try {
+      const { error } = await supabase.from("businesses").select("id").limit(1);
+      newHealth.database = error ? "degraded" : "operational";
+    } catch {
+      newHealth.database = "offline";
+    }
+
+    // Check API
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "";
+      if (apiUrl) {
+        const response = await fetch(`${apiUrl}/api/health`, { method: "GET" });
+        newHealth.api = response.ok ? "operational" : "degraded";
+      } else {
+        // If no API URL, check if we can reach Supabase functions
+        newHealth.api = newHealth.database === "operational" ? "operational" : "degraded";
+      }
+    } catch {
+      newHealth.api = "offline";
+    }
+
+    // Check Auth
+    try {
+      const { data } = await supabase.auth.getSession();
+      newHealth.auth = data.session ? "operational" : "operational"; // Auth service is up even without session
+    } catch {
+      newHealth.auth = "offline";
+    }
+
+    // Check Clustering (based on whether we have clustering results)
+    try {
+      const { error } = await supabase.from("clustering_results").select("id").limit(1);
+      newHealth.clustering = error ? "degraded" : "operational";
+    } catch {
+      newHealth.clustering = "offline";
+    }
+
+    setSystemHealth(newHealth);
+  };
+
   useEffect(() => {
-    if (!autoRefresh) return;
-    const id = setInterval(fetchData, 30000);
-    return () => clearInterval(id);
-  }, [autoRefresh]);
+    checkSystemHealth();
+  }, []);
 
   // REALTIME SUBSCRIPTION -----------------------------------------------------
   useEffect(() => {
@@ -177,7 +266,7 @@ export function AdminPortal() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await fetchData();
+    await Promise.all([fetchData(), checkSystemHealth()]);
     setIsRefreshing(false);
     toast.success("Dashboard refreshed.");
   };
@@ -191,7 +280,7 @@ export function AdminPortal() {
         typeDistribution: {},
         commercialCount: 0,
         residentialCount: 0,
-        avgBusinessDensity: 0,
+        bciScore: 0,
         totalStreets: 0,
         streetsArray: [],
       };
@@ -202,6 +291,7 @@ export function AdminPortal() {
     const typeDistribution: Record<string, number> = {};
 
     let sumDensity200m = 0;
+    let maxDensity200m = 0;
     let densityCount = 0;
     let commercialCount = 0;
     let residentialCount = 0;
@@ -217,6 +307,7 @@ export function AdminPortal() {
       // Density
       if (typeof b.business_density_200m === "number") {
         sumDensity200m += b.business_density_200m;
+        maxDensity200m = Math.max(maxDensity200m, b.business_density_200m);
         densityCount++;
       }
 
@@ -228,14 +319,19 @@ export function AdminPortal() {
       if (b.street) streetsSet.add(b.street.trim());
     });
 
+    // Calculate BCI: normalized 0-100% metric based on average density relative to max
+    const avgDensity = densityCount > 0 ? sumDensity200m / densityCount : 0;
+    const bciScore = maxDensity200m > 0
+      ? Math.round((avgDensity / maxDensity200m) * 100)
+      : 0;
+
     return {
       totalBusinesses,
       businessTypeCount: categoriesSet.size,
       typeDistribution,
       commercialCount,
       residentialCount,
-      avgBusinessDensity:
-        densityCount > 0 ? Math.round(sumDensity200m / densityCount) : 0,
+      bciScore,
       totalStreets: streetsSet.size,
       streetsArray: Array.from(streetsSet),
     };
@@ -296,16 +392,6 @@ export function AdminPortal() {
 
           <div className="flex items-center gap-3">
             <Button
-              variant={autoRefresh ? "default" : "outline"}
-              size="sm"
-              className={`gap-2 ${autoRefresh ? 'bg-white/20 hover:bg-white/30 border-white/30' : 'bg-white/10 hover:bg-white/20 border-white/20'} text-white`}
-              onClick={() => setAutoRefresh((v) => !v)}
-            >
-              <RefreshCw className="size-4" />
-              Auto {autoRefresh ? "On" : "Off"}
-            </Button>
-
-            <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
@@ -315,7 +401,7 @@ export function AdminPortal() {
               <RefreshCw
                 className={`size-4 ${isRefreshing ? "animate-spin" : ""}`}
               />
-              Refresh
+              {isRefreshing ? "Refreshing..." : "Refresh"}
             </Button>
           </div>
         </div>
@@ -340,10 +426,10 @@ export function AdminPortal() {
         />
 
         <StatCard
-          title="Avg. Business Density"
-          value={stats.avgBusinessDensity}
-          subtitle="Within 200m radius"
-          icon={<Store className="size-5 text-purple-600" />}
+          title="Business Concentration Index"
+          value={`${stats.bciScore}%`}
+          subtitle="Clustering strength (200m)"
+          icon={<Layers className="size-5 text-purple-600" />}
           gradient="from-purple-50 to-purple-100"
         />
 
@@ -524,59 +610,71 @@ export function AdminPortal() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {analyses.map((a, index) => (
-                    <div
-                      key={a.id}
-                      className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="size-12 rounded-full bg-linear-to-br from-blue-500 to-purple-500 text-white flex items-center justify-center text-lg">
-                          #{index + 1}
-                        </div>
+                  {analyses.map((a, index) => {
+                    const getRankDisplay = (idx: number) => {
+                      if (idx === 0) return "🥇";
+                      if (idx === 1) return "🥈";
+                      if (idx === 2) return "🥉";
+                      return `#${idx + 1}`;
+                    };
 
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-medium">{a.user_name}</h4>
-                            <Badge>{a.business_type}</Badge>
+                    return (
+                      <div
+                        key={a.id}
+                        className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className={`size-12 rounded-full flex items-center justify-center text-lg font-bold ${index < 3
+                              ? "bg-gradient-to-br from-yellow-400 to-amber-500"
+                              : "bg-gradient-to-br from-blue-500 to-purple-500 text-white"
+                            }`}>
+                            {getRankDisplay(index)}
                           </div>
 
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(a.created_at).toLocaleString()}
-                          </p>
-
-                          <div className="grid grid-cols-2 gap-4 mt-3">
-                            <div>
-                              <p className="text-xs text-muted-foreground">Score</p>
-                              <div className="flex items-center gap-1 mt-1">
-                                <TrendingUp className="size-3 text-green-600" />
-                                <span>{a.score}%</span>
-                              </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-medium">{a.user_name}</h4>
+                              <Badge>{a.business_type}</Badge>
                             </div>
 
-                            <div>
-                              <p className="text-xs text-muted-foreground">Clusters</p>
-                              <div className="flex items-center gap-1 mt-1">
-                                <Layers className="size-3 text-blue-600" />
-                                <span>{a.num_clusters}</span>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(a.created_at).toLocaleString()}
+                            </p>
+
+                            <div className="grid grid-cols-2 gap-4 mt-3">
+                              <div>
+                                <p className="text-xs text-muted-foreground">Score</p>
+                                <div className="flex items-center gap-1 mt-1">
+                                  <TrendingUp className="size-3 text-green-600" />
+                                  <span>{a.score}%</span>
+                                </div>
+                              </div>
+
+                              <div>
+                                <p className="text-xs text-muted-foreground">Clusters</p>
+                                <div className="flex items-center gap-1 mt-1">
+                                  <Layers className="size-3 text-blue-600" />
+                                  <span>{a.num_clusters}</span>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
 
-                        <Badge
-                          variant={
-                            a.score > 90
-                              ? "default"
-                              : a.score > 80
-                                ? "secondary"
-                                : "outline"
-                          }
-                        >
-                          {a.score > 90 ? "Excellent" : a.score > 80 ? "Good" : "Fair"}
-                        </Badge>
+                          <Badge
+                            variant={
+                              a.score > 90
+                                ? "default"
+                                : a.score > 80
+                                  ? "secondary"
+                                  : "outline"
+                            }
+                          >
+                            {a.score > 90 ? "Excellent" : a.score > 80 ? "Good" : "Fair"}
+                          </Badge>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
@@ -596,19 +694,10 @@ export function AdminPortal() {
               </CardHeader>
 
               <CardContent className="space-y-3">
-                <SystemStatus label="Supabase Database" />
-                <SystemStatus label="API Services" />
-                <SystemStatus label="Authentication" />
-
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <Target className="size-4 text-blue-600" />
-                    <span className="text-sm">K-Means Clustering</span>
-                  </div>
-                  <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                    Active
-                  </Badge>
-                </div>
+                <DynamicSystemStatus label="Supabase Database" status={systemHealth.database} />
+                <DynamicSystemStatus label="API Services" status={systemHealth.api} />
+                <DynamicSystemStatus label="Authentication" status={systemHealth.auth} />
+                <DynamicSystemStatus label="K-Means Clustering" status={systemHealth.clustering} />
               </CardContent>
             </Card>
 
@@ -652,7 +741,7 @@ export function AdminPortal() {
                 />
 
                 <SchemaCard
-                  icon={<Store className="size-4 text-green-600" />}
+                  icon={<Layers className="size-4 text-green-600" />}
                   title="Business Density"
                   pills={[
                     "business_density_50m",
@@ -705,7 +794,7 @@ function StatCard({
   gradient,
 }: {
   title: string;
-  value: number;
+  value: number | string;
   subtitle: string;
   icon: React.ReactNode;
   gradient: string;
@@ -799,16 +888,46 @@ function SchemaCard({
   );
 }
 
-function SystemStatus({ label }: { label: string }) {
+function DynamicSystemStatus({ label, status }: { label: string; status: ServiceStatus }) {
+  const getStatusConfig = (s: ServiceStatus) => {
+    switch (s) {
+      case "operational":
+        return {
+          icon: <CheckCircle className="size-4 text-green-600" />,
+          badge: <Badge className="bg-green-100 text-green-700 border-green-300">Operational</Badge>,
+          bg: "bg-green-50",
+        };
+      case "degraded":
+        return {
+          icon: <AlertCircle className="size-4 text-yellow-600" />,
+          badge: <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">Degraded</Badge>,
+          bg: "bg-yellow-50",
+        };
+      case "offline":
+        return {
+          icon: <XCircle className="size-4 text-red-600" />,
+          badge: <Badge className="bg-red-100 text-red-700 border-red-300">Offline</Badge>,
+          bg: "bg-red-50",
+        };
+      case "checking":
+      default:
+        return {
+          icon: <Loader2 className="size-4 text-blue-600 animate-spin" />,
+          badge: <Badge className="bg-blue-100 text-blue-700 border-blue-300">Checking...</Badge>,
+          bg: "bg-blue-50",
+        };
+    }
+  };
+
+  const config = getStatusConfig(status);
+
   return (
-    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+    <div className={`flex items-center justify-between p-3 ${config.bg} rounded-lg`}>
       <div className="flex items-center gap-2">
-        <CheckCircle className="size-4 text-green-600" />
+        {config.icon}
         <span className="text-sm">{label}</span>
       </div>
-      <Badge className="bg-green-100 text-green-700 border-green-300">
-        Operational
-      </Badge>
+      {config.badge}
     </div>
   );
 }
