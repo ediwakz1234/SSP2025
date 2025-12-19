@@ -5,7 +5,7 @@
 #
 # Required Repository Secrets:
 #   - SUPABASE_URL: Supabase project URL
-#   - SUPABASE_SERVICE_KEY: Supabase service role key
+#   - SUPABASE_SERVICE_ROLE_KEY: Supabase service role key
 #   - JWT_SECRET: JWT signing secret
 #   - GEMINI_API_KEY: Google Gemini API key
 #   - VITE_SUPABASE_URL: Supabase URL for frontend
@@ -56,7 +56,7 @@ jobs:
         run: npm test
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
