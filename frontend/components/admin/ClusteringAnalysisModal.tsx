@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -10,11 +9,8 @@ import {
     User,
     MapPin,
     Target,
-    TrendingUp,
     Calendar,
     Building2,
-    AlertTriangle,
-    ChevronRight,
     Trophy,
 } from "lucide-react";
 
@@ -90,18 +86,18 @@ export function ClusteringAnalysisModal({
                         {rank && rank <= 3 && (
                             <div
                                 className={`flex h-12 w-12 items-center justify-center rounded-full ${rank === 1
-                                        ? "bg-yellow-400/30"
-                                        : rank === 2
-                                            ? "bg-gray-300/30"
-                                            : "bg-amber-600/30"
+                                    ? "bg-yellow-400/30"
+                                    : rank === 2
+                                        ? "bg-gray-300/30"
+                                        : "bg-amber-600/30"
                                     }`}
                             >
                                 <Trophy
                                     className={`h-6 w-6 ${rank === 1
-                                            ? "text-yellow-300"
-                                            : rank === 2
-                                                ? "text-gray-200"
-                                                : "text-amber-400"
+                                        ? "text-yellow-300"
+                                        : rank === 2
+                                            ? "text-gray-200"
+                                            : "text-amber-400"
                                         }`}
                                 />
                             </div>

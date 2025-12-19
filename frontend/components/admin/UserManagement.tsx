@@ -26,7 +26,6 @@ import {
   Search,
   RefreshCcw,
   UserCheck,
-  UserX,
   Calendar,
   Activity,
   MapPin,
@@ -237,7 +236,7 @@ function EditUserModal({
     if (!validateForm()) return;
 
     // If address is invalid, set status to flagged
-    let finalData = { ...formData };
+    const finalData = { ...formData };
     if (!isValidAddress(formData.address)) {
       finalData.approval_status = "flagged";
     }

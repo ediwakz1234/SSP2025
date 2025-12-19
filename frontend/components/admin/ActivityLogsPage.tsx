@@ -28,11 +28,8 @@ import {
   RefreshCcw,
   Eye,
   Calendar,
-  Download,
   Filter,
   Inbox,
-  User,
-  Shield,
 } from "lucide-react";
 
 import { supabase } from "../../lib/supabase";

@@ -8,7 +8,6 @@ import {
     Building2,
     AlertTriangle,
     CheckCircle2,
-    TrendingUp,
     Zap,
     Target,
     ChevronRight,
@@ -180,7 +179,7 @@ export function RecommendedForYou({
                         <div className="flex items-center gap-3 mb-3">
                             <div className="p-2 bg-white rounded-lg shadow-sm">
                                 <AlertTriangle className={`w-5 h-5 ${recommendation.riskSummary.level === "Low" ? "text-emerald-500" :
-                                        recommendation.riskSummary.level === "Medium" ? "text-amber-500" : "text-rose-500"
+                                    recommendation.riskSummary.level === "Medium" ? "text-amber-500" : "text-rose-500"
                                     }`} />
                             </div>
                             <div>

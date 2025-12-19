@@ -233,7 +233,7 @@ function clampToBarangay(lat: number, lng: number) {
 /**
  * Generate a unique run ID for this clustering execution
  */
-function generateRunId(): string {
+function _generateRunId(): string {
   return `run_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 }
 
@@ -443,7 +443,7 @@ function computeLocationScore(
  * Compute dynamic confidence score based on multiple factors
  * Returns value between 0.40 and 0.95
  */
-function computeDynamicConfidence(
+function _computeDynamicConfidence(
   recommended: GeoPoint,
   clusterPoints: ClusterPoint[],
   allPoints: Business[],

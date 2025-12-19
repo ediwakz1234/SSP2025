@@ -8,13 +8,6 @@ import {
 } from "../ui/card";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 import { Input } from "../ui/input";
 import {
   Loader2,
@@ -27,13 +20,8 @@ import {
   FileSpreadsheet,
   TrendingUp,
   Sparkles,
-  AlertTriangle,
-  ThumbsUp,
   Lightbulb,
   Store,
-  Shield,
-  TrendingDown,
-  Zap,
   XCircle,
   AlertOctagon,
   ChevronRight,

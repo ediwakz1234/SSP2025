@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Label } from "../ui/label";
-import { MapPin, Filter, RefreshCcw, Loader2, Globe, Layers, Compass, List, ChevronRight, Building, Info } from "lucide-react";
+import { MapPin, Filter, RefreshCcw, Loader2, Globe, Layers, Compass, List, ChevronRight, Info } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { LOCATION_INFO } from "../../data/businesses";
@@ -561,8 +561,8 @@ export function MapPage() {
                     });
                   }}
                   className={`text-left p-3 rounded-xl border transition-all duration-200 ${isSelected
-                      ? "bg-indigo-50 border-indigo-300 shadow-md"
-                      : "bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+                    ? "bg-indigo-50 border-indigo-300 shadow-md"
+                    : "bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300"
                     }`}
                 >
                   <div className="flex items-start gap-3">
@@ -579,8 +579,8 @@ export function MapPage() {
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className={`text-xs px-2 py-0.5 rounded-full ${business.zone_type === "Commercial"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-green-100 text-green-700"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-green-100 text-green-700"
                           }`}>
                           {business.zone_type}
                         </span>

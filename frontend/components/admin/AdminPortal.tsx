@@ -273,9 +273,9 @@ export function AdminPortal() {
     const categoriesSet = new Set<string>();
     const typeDistribution: Record<string, number> = {};
 
-    let sumDensity200m = 0;
-    let maxDensity200m = 0;
-    let densityCount = 0;
+    let _sumDensity200m = 0;
+    let _maxDensity200m = 0;
+    let _densityCount = 0;
     let commercialCount = 0;
     let residentialCount = 0;
     const streetsSet = new Set<string>();
@@ -289,9 +289,9 @@ export function AdminPortal() {
 
       // Density
       if (typeof b.business_density_200m === "number") {
-        sumDensity200m += b.business_density_200m;
-        maxDensity200m = Math.max(maxDensity200m, b.business_density_200m);
-        densityCount++;
+        _sumDensity200m += b.business_density_200m;
+        _maxDensity200m = Math.max(_maxDensity200m, b.business_density_200m);
+        _densityCount++;
       }
 
       // Zone

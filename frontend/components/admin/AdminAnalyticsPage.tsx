@@ -100,7 +100,7 @@ export function AdminAnalyticsPage() {
   const [analysisSortBy, setAnalysisSortBy] = useState<"score" | "recent">("score");
   const [analysisCategoryFilter, setAnalysisCategoryFilter] = useState<string>("all");
 
-  const [_showExportModal, setShowExportModal] = useState(false);
+  const [_showExportModal, _setShowExportModal] = useState(false);
 
   // Export function - exports all analytics data to CSV
   const exportAnalyticsReport = () => {
@@ -196,7 +196,7 @@ export function AdminAnalyticsPage() {
   ];
 
   // QUICK FILTERS
-  const applyQuickFilter = (days?: number | "year") => {
+  const _applyQuickFilter = (days?: number | "year") => {
     const today = new Date();
     const end = today.toISOString().split("T")[0];
 

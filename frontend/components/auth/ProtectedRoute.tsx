@@ -25,7 +25,7 @@ type ApprovalStatus = "pending" | "approved" | "declined" | "flagged" | null;
 function StatusPage({
   status,
   icon: Icon,
-  iconColor,
+  _iconColor,
   bgGradient,
   glowColor,
   title,
@@ -35,7 +35,7 @@ function StatusPage({
 }: {
   status: "pending" | "flagged" | "declined";
   icon: React.ElementType;
-  iconColor: string;
+  _iconColor: string;
   bgGradient: string;
   glowColor: string;
   title: string;
@@ -285,7 +285,7 @@ export function ProtectedRoute({ children }: { children: JSX.Element }) {
       <StatusPage
         status="pending"
         icon={Clock}
-        iconColor="text-white"
+        _iconColor="text-white"
         bgGradient="bg-gradient-to-br from-amber-500 to-orange-600"
         glowColor="bg-amber-500"
         title="Awaiting Approval"
@@ -306,7 +306,7 @@ export function ProtectedRoute({ children }: { children: JSX.Element }) {
       <StatusPage
         status="flagged"
         icon={MapPin}
-        iconColor="text-white"
+        _iconColor="text-white"
         bgGradient="bg-gradient-to-br from-orange-500 to-red-600"
         glowColor="bg-orange-500"
         title="Location Under Review"
@@ -327,7 +327,7 @@ export function ProtectedRoute({ children }: { children: JSX.Element }) {
       <StatusPage
         status="declined"
         icon={XCircle}
-        iconColor="text-white"
+        _iconColor="text-white"
         bgGradient="bg-gradient-to-br from-red-500 to-rose-700"
         glowColor="bg-red-500"
         title="Application Declined"

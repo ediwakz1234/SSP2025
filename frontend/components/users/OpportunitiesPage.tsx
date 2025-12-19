@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Progress } from "../ui/progress";
 import { useActivity, logActivity } from "../../utils/activity";
 import {
   Activity,

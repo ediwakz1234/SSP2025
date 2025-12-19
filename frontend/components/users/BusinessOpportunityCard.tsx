@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { Progress } from "../ui/progress";
 import {
     ChevronDown,
     ChevronUp,
@@ -52,7 +51,7 @@ export interface EnhancedOpportunityData {
 
 interface BusinessOpportunityCardProps {
     opportunity: EnhancedOpportunityData;
-    index: number;
+    _index: number;
     onViewOnMap?: (lat: number, lng: number, label: string) => void;
 }
 
@@ -97,7 +96,7 @@ function getZoneSuitabilityIcon(suitability: ZoneSuitability) {
 
 export function BusinessOpportunityCard({
     opportunity,
-    index,
+    _index,
     onViewOnMap
 }: BusinessOpportunityCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
