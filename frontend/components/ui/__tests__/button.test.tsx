@@ -13,7 +13,7 @@ describe("Button Component", () => {
     it("renders button with default variant", () => {
       render(<Button>Default</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-primary");
+      expect(button).toHaveClass("bg-[#1e3a5f]");
     });
 
     it("renders destructive variant", () => {
@@ -31,19 +31,19 @@ describe("Button Component", () => {
     it("renders secondary variant", () => {
       render(<Button variant="secondary">Secondary</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-secondary");
+      expect(button).toHaveClass("bg-gray-100");
     });
 
     it("renders ghost variant", () => {
       render(<Button variant="ghost">Ghost</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("hover:bg-accent");
+      expect(button).toHaveClass("hover:bg-gray-100");
     });
 
     it("renders gradient variant", () => {
       render(<Button variant="gradient">Gradient</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-gradient-to-r");
+      expect(button).toHaveClass("bg-[#1e3a5f]");
     });
 
     it("renders success variant", () => {
@@ -123,7 +123,7 @@ describe("Button Component", () => {
       const user = userEvent.setup();
       const handleClick = vi.fn();
       render(<Button onClick={handleClick}>Click me</Button>);
-      
+
       await user.click(screen.getByRole("button"));
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
@@ -132,7 +132,7 @@ describe("Button Component", () => {
       const user = userEvent.setup();
       const handleClick = vi.fn();
       render(<Button disabled onClick={handleClick}>Click me</Button>);
-      
+
       await user.click(screen.getByRole("button"));
       expect(handleClick).not.toHaveBeenCalled();
     });
@@ -141,7 +141,7 @@ describe("Button Component", () => {
       const user = userEvent.setup();
       const handleClick = vi.fn();
       render(<Button loading onClick={handleClick}>Click me</Button>);
-      
+
       await user.click(screen.getByRole("button"));
       expect(handleClick).not.toHaveBeenCalled();
     });
