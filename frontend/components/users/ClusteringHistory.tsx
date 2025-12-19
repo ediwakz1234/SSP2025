@@ -138,6 +138,7 @@ export function ClusteringHistory({ onSelectHistory, maxItems = 10 }: Clustering
 
     useEffect(() => {
         loadHistory();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [maxItems]);
 
     // Handle delete action

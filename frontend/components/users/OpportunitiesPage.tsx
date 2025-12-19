@@ -55,7 +55,7 @@ import {
   getDefaultTimeBasedGaps,
   type TimeBasedGapsResult,
 } from "../../utils/timeBasedGapsUtils";
-import { ClusteringHistory } from "./ClusteringHistory";
+import { ClusteringHistory as _ClusteringHistory } from "./ClusteringHistory";
 
 // -----------------------------------------------------------------------------
 // Types
@@ -236,7 +236,7 @@ function determineSetupSpeed(category: string): "Fast" | "Moderate" | "Slow" {
 }
 
 // Calculate comprehensive opportunity score
-function calculateOpportunityScore(
+function _calculateOpportunityScore(
   density: number,
   competitors: number,
   zoneType: string,
@@ -769,7 +769,7 @@ function computeDynamicDensity(loc: LocationData, allLocations: LocationData[], 
   return { businessDensity, competitorDensity };
 }
 
-function calculateClusterKPIs(locations: LocationData[], numClusters: number): ClusterKPIs {
+function calculateClusterKPIs(locations: LocationData[], _numClusters: number): ClusterKPIs {
   if (locations.length === 0) {
     return {
       totalOpportunities: 0,
@@ -1274,6 +1274,7 @@ export function OpportunitiesPage() {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationState?.fromClustering, navigationState?.selectedCategory]);
 
   // ============================================================================
@@ -1398,8 +1399,8 @@ export function OpportunitiesPage() {
   );
 
   const categoryStats = useMemo(() => buildCategoryStats(businesses, locations), [businesses, locations]);
-  const zoneStats = useMemo(() => buildZoneStats(businesses), [businesses]);
-  const totalBusinesses = businesses.length;
+  const _zoneStats = useMemo(() => buildZoneStats(businesses), [businesses]);
+  const _totalBusinesses = businesses.length;
   const marketGaps = useMemo(() => buildMarketGaps(businesses, opportunities, locations), [businesses, opportunities, locations]);
 
   // Check if clustering has been run in the current session

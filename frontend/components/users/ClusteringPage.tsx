@@ -52,7 +52,7 @@ import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import { useNavigate } from "react-router-dom";
 import { useKMeansStore } from "../../lib/stores/kmeansStore";
-import { generateBusinessIdeaFromClustering } from "../../utils/businessIdeaGenerator";
+import { generateBusinessIdeaFromClustering as _generateBusinessIdeaFromClustering } from "../../utils/businessIdeaGenerator";
 
 
 
@@ -71,7 +71,7 @@ type ExtendedResult = ClusteringResult & {
 };
 
 // Your new general category set — make sure DB categories match these strings
-const CATEGORY_OPTIONS = [
+const _CATEGORY_OPTIONS = [
   {
     value: "Retail",
     label: "Retail",
@@ -153,7 +153,7 @@ export function ClusteringPage() {
   const [aiCategoryExplanation, setAiCategoryExplanation] = useState<
     string | null
   >(null);
-  const [aiCategoryLoading, setAiCategoryLoading] = useState<boolean>(false);
+  const [_aiCategoryLoading, setAiCategoryLoading] = useState<boolean>(false);
   const [allowedCategories, setAllowedCategories] = useState<string[]>([]); // NEW: track valid categories
   const [categoryLockedByUser, setCategoryLockedByUser] =
     useState<boolean>(false);
@@ -439,6 +439,7 @@ export function ClusteringPage() {
         description: "Your clustering results are ready to view.",
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businesses.length]); // Re-run when businesses are loaded
 
   // Auto-switch between local dev and production
@@ -575,7 +576,7 @@ export function ClusteringPage() {
   }, [businessIdea]);
 
   // Manual AI category suggestion (triggered via button)
-  const requestAiCategory = async () => {
+  const _requestAiCategory = async () => {
     const idea = businessIdea.trim();
 
     if (!idea) {
@@ -1592,7 +1593,7 @@ export function ClusteringPage() {
     }
   };
 
-  const exportCSV = () => {
+  const _exportCSV = () => {
     const rows = [
       ["Field", "Value"],
       ["Latitude", result?.recommendedLocation.latitude],
