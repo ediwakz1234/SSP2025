@@ -1289,9 +1289,9 @@ export function OpportunitiesPage() {
   const numClusters = kmeansStore.hasResults
     ? (clusteringResults?.num_clusters ?? 0)
     : 0;
-  const locations = kmeansStore.hasResults
+  const locations = useMemo(() => kmeansStore.hasResults
     ? (clusteringResults?.locations || [])
-    : [];
+    : [], [kmeansStore.hasResults, clusteringResults?.locations]);
 
   // Build opportunities array with predictive scoring
   const opportunities: Opportunity[] = useMemo(() => {
@@ -1610,7 +1610,7 @@ export function OpportunitiesPage() {
 
     // Add AI top businesses if available
     if (aiRecommendations?.topBusinesses) {
-      aiRecommendations.topBusinesses.forEach((biz, idx) => {
+      aiRecommendations.topBusinesses.forEach((biz, _idx) => {
         const cat = businessType || "General";
         if (!categories.has(cat)) categories.set(cat, []);
 
@@ -1650,7 +1650,7 @@ export function OpportunitiesPage() {
     }
 
     // Add opportunities from clustering results
-    opportunities.forEach((op, idx) => {
+    opportunities.forEach((op, _idx) => {
       const cat = op.category || "General";
       if (!categories.has(cat)) categories.set(cat, []);
 

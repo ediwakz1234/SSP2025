@@ -516,7 +516,7 @@ function generateCandidates(
   clusterPoints: ClusterPoint[],
   businesses: Business[],
   majorRoads: string[],
-  count: number = 6
+  _count: number = 6
 ): GeoPoint[] {
   const candidates: GeoPoint[] = [];
 

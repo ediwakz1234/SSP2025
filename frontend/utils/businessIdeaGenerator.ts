@@ -91,7 +91,7 @@ export function generateDetailedBusinessIdea(params: BusinessIdeaParams & {
     recommendedHours: string;
 } {
     const shortIdea = generateBusinessIdea(params);
-    const { category, zoneType, confidence } = params;
+    const { category: _category, zoneType, confidence: _confidence } = params;
 
     // Generate description
     let description = `A ${shortIdea.toLowerCase()} `;
