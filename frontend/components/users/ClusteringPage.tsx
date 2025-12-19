@@ -101,8 +101,8 @@ const CATEGORY_OPTIONS = [
     label: "Food & Beverages",
   },
   {
-    value: "Merchandise / Trading",
-    label: "Merchandise / Trading",
+    value: "Merchandising / Trading",
+    label: "Merchandising / Trading",
   },
   {
     value: "Entertainment / Leisure",
